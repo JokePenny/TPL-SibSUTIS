@@ -6,28 +6,58 @@ namespace lab1
 {
     class Lexer
     {
-        struct TokenNode
+        public struct TokenNode
         {
-            public TokenNode(Token token, int idPosition)
+            public TokenNode(Token token, string subStroke, int tokenID, int idPosition)
             {
                 this.token = token;
+                this.subStroke = subStroke;
+                this.tokenID = tokenID;
                 this.idPosition = idPosition;
             }
 
-            private Token token;
-            private int idPosition;
+            public Token token;
+            public int tokenID;
+            public int idPosition;
+            public string subStroke;
         }
 
         public enum Token : int
         {
-            ID = 0,
+            KEYWORD = 0,
+            TYPE,
             OP,
             NUM,
-            VAR,
+            ID,
+            TWINS,
+            SEMILICON,
             FAILED
         }
 
-        public void StartLexer(string stroke)
+        static string[] dictTokenKEYWORD = { "break", "while", "else", "if", "for", "new",
+                                             "as", "base", "case", ""};
+
+        static string[] dictTokenTYPE = { "string", "var", "char", "byte", "Sbyte",
+                                                "int", "uint", "double", "float",
+                                                "long", "ulong", "decimal"};
+
+        static string[] dictTokenOP = { "<", "<=", "=", "=>", "==", "!=", "+",
+                                              "-", "/", "%", "*", "^"};
+
+        static char[] dictTokenNUM = { '0', '1', '2', '3', '4', '5', '6',
+                                              '7', '8', '9'};
+
+        static char dotInNUM = '.';
+
+        static char[] dictTokenTWINS = { '[', ']', '(', ')', '{', '}', '\'', '\"'};
+
+        static char[] dictForbiddenSymbolsTokenID = { '[', '@', ',', '.', ']', '+', '-', '/', '}',
+                                                        '|', '\\', '*', '^', '$', '#', '!', '~', '&',
+                                                        '\'', '\"'};
+
+        static char semicolon = ';';
+
+        public static void StartLexer(string stroke)
         {
             string[] strokeWithoutEmpty = DeleteEmpty(stroke);
 
@@ -35,111 +65,104 @@ namespace lab1
 
             for (int i = 0; i < strokeWithoutEmpty.Length; i++)
             {
-                Token token = TokenDetermine(strokeWithoutEmpty[i]);
+                int tokenId = 0;
+                Token token = TokenDetermine(strokeWithoutEmpty[i], ref tokenId);
+                TokenNode tokenNode = new TokenNode(token, strokeWithoutEmpty[i], tokenId, i);
+                listTokens.Add(tokenNode);
+            }
+            ViewTokens(listTokens);
+        }
 
-                if(token == Token.FAILED)
-                {
-                    throw new Exception("Токен " + strokeWithoutEmpty[i] + " по индексу - " + i + " не определился");
-                }
-                else
-                {
-                    TokenNode tokenNode = new TokenNode(token, i);
-                    listTokens.Add(tokenNode);
-                }
+        public static void ViewTokens(List<TokenNode> listTokens)
+        {
+            for (int i = 0; i < listTokens.Count; i++)
+            {
+                Console.WriteLine(listTokens[i].token + " '" + listTokens[i].subStroke + "'\n");
             }
         }
 
-        private string[] DeleteEmpty(string stroke)
+        private static string[] DeleteEmpty(string stroke)
         {
-            string deleteTabulation = stroke.Replace("\t", "");
-            string deleteNewline = deleteTabulation.Replace("\n", "");
+            string deleteTabulation = stroke.Replace("\t", " ");
+            string deleteNewline = deleteTabulation.Replace("\n", " ");
             string[] deleteSpace = deleteNewline.Split(" ");
             return deleteSpace;
         }
 
-        public static Token TokenDetermine(string subStroke)
+        private static Token TokenDetermine(string subStroke, ref int tokenId)
         {
-            if (FindTokenID(subStroke)) return Token.ID;
-            if (FindTokenOP(subStroke)) return Token.OP;
-            if (FindTokenNUM(subStroke)) return Token.NUM;
-            if (FindTokenVAR(subStroke)) return Token.VAR;
+            if (FindTokenInDictionary(dictTokenKEYWORD, subStroke, ref tokenId)) return Token.KEYWORD;
+            if (FindTokenInDictionary(dictTokenTYPE, subStroke, ref tokenId)) return Token.TYPE;
+            if (FindTokenInDictionary(dictTokenOP, subStroke, ref tokenId)) return Token.OP;
+            if (FindFractionTokenInDictionary(dictTokenNUM, subStroke, ref tokenId)) return Token.NUM;
+            if(subStroke.Length == 1)
+            {
+                if (FindTokenInDictionary(dictTokenTWINS, subStroke[0], ref tokenId)) return Token.TWINS;
+                if (semicolon == subStroke[0]) return Token.SEMILICON;
+            }
+            if (FindFractionTokenID(dictTokenNUM, subStroke, ref tokenId)) return Token.ID;
             return Token.FAILED;
         }
 
-
-        private static bool FindTokenID(string subStroke)
+        private static bool FindFractionTokenID(char[] dictTokenNUM, string subStroke, ref int tokenId)
         {
-            switch (subStroke.ToLower())
-            {
-                case "break":
-                case "while":
-                case "else":
-                case "if":
-                case "for":
-                case "string":
-                case "var":
-                case "char":
-                case "byte":
-                case "Sbyte":
-                case "int":
-                case "uint":
-                case "double":
-                case "float":
-                case "long":
-                case "ulong":
-                case "decimal":
-                    return true;
-            }
-            return false;
+            
         }
 
-        private static bool FindTokenOP(string subStroke)
+        private static bool FindTokenInDictionary(string[] dictionary, string subStroke, ref int tokenId)
         {
-            switch (subStroke)
+            for (int i = 0; i < dictionary.Length; i++)
             {
-                case "<":
-                case "<=":
-                case "=":
-                case "=>":
-                case "==":
-                case "!=":
-                case "+":
-                case "-":
-                case "/":
-                case "%":
-                case "*":
-                case "^":
-                    return true;
-            }
-            return false;
-        }
-
-        private static bool FindTokenNUM(string subStroke)
-        {
-            for (int i = 0; i < subStroke.Length; i++)
-            {
-                switch (subStroke[i])
+                if (subStroke == dictionary[i])
                 {
-                    case '0':
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
-                        continue;
-                    default:
-                        return false;
+                    tokenId = i;
+                    return true;
                 }
             }
-            return true;
+            return false;
         }
 
-        private static bool FindTokenVAR(string subStroke)
+        private static bool FindTokenInDictionary(char[] dictionary, char subStroke, ref int tokenId)
         {
+            for (int i = 0; i < dictionary.Length; i++)
+            {
+                if (subStroke == dictionary[i])
+                {
+                    tokenId = i;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool FindFractionTokenInDictionary(char[] dictionary, string subStroke, ref int tokenId)
+        {
+            bool isNumFind = false;
+            bool isDotFirst = true;
+            bool isStartToken = false;
+            for (int i = 0; i < subStroke.Length; i++)
+            {
+                for (int j = 0; j < dictionary.Length; j++)
+                {
+                    if (subStroke[i] == dictionary[j])
+                    {
+                        isNumFind = true;
+                        if (!isStartToken)
+                        {
+                            isStartToken = true;
+                            tokenId = j;
+                        }
+                        break;
+                    }
+                    if (subStroke[i] == dotInNUM)
+                    {
+                        tokenId = j;
+                        if (!isDotFirst) return false;
+                        else isDotFirst = false;
+                    }
+                }
+                if (!isNumFind) return false;
+            }
             return true;
         }
     }

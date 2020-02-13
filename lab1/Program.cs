@@ -6,15 +6,16 @@ namespace lab1
     {
         static void Main(string[] args)
         {
-
+            Lexer.StartLexer("int[] array = new int[8]; " +
+                "int tmp = array[0]; for (int i = 0; i " +
+                "< array.Length; i++){if (tmp > array[i])tmp = array[i];}");
         }
 
         private static void TestMethod()
         {
 
             // find min
-            int[]array= new int[8];
-            //int[] array = new int[8];
+            int[] array = new int[8];
             int tmp = array[0];
             for (int i = 0; i < array.Length; i++)
             {
