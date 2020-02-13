@@ -8,18 +8,20 @@ namespace lab1
     {
         public struct TokenNode
         {
-            public TokenNode(Token token, string subStroke, int tokenID, int idPosition)
+            public TokenNode(Token token, string subStroke, int tokenID, int y, int x)
             {
                 this.token = token;
                 this.subStroke = subStroke;
                 this.tokenID = tokenID;
-                this.idPosition = idPosition;
+                this.y = y + 1;
+                this.x = x + 1;
             }
 
             public Token token;
             public int tokenID;
-            public int idPosition;
             public string subStroke;
+            public int y;
+            public int x;
         }
 
         public enum Token : int
@@ -46,28 +48,37 @@ namespace lab1
 
         public static void StartLexer(string stroke)
         {
-            string[] strokeWithoutEmpty = DeleteEmpty(stroke);
+            string[] strokeWithoutComm = DeleteCommentsAndTabulations(stroke);
 
             List<TokenNode> listTokens = new List<TokenNode>();
-
-            for (int i = 0; i < strokeWithoutEmpty.Length; i++)
+            for (int i = 0; i < strokeWithoutComm.Length; i++)
             {
-                int tokenId = 0;
-                Token token = TokenDetermine(strokeWithoutEmpty[i], ref tokenId);
-                TokenNode tokenNode = new TokenNode(token, strokeWithoutEmpty[i], tokenId, i);
-                listTokens.Add(tokenNode);
+                string[] strokeWithoutSpace = DeleteSpace(strokeWithoutComm[i]);
+
+                for (int j = 0; j < strokeWithoutSpace.Length; j++)
+                {
+                    int tokenId = 0;
+                    Token token = TokenDetermine(strokeWithoutSpace[j], ref tokenId);
+                    TokenNode tokenNode = new TokenNode(token, strokeWithoutSpace[j], tokenId, i, j);
+                    listTokens.Add(tokenNode);
+                }
             }
             ViewTokens(listTokens);
         }
 
-        private static string[] DeleteEmpty(string stroke)
+        private static string[] DeleteSpace(string stroke)
+        {
+            string insertSpaceBetweenKey = InsertSpaceBetween(stroke);
+            string[] deleteSpace = insertSpaceBetweenKey.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            return deleteSpace;
+        }
+
+        private static string[] DeleteCommentsAndTabulations(string stroke)
         {
             string deleteComments = FindComments(stroke);
             string deleteTabulation = deleteComments.Replace("\t", " ");
-            string deleteNewline = deleteTabulation.Replace("\n", " ");
-            string insertSpaceBetweenKey = InsertSpaceBetween(deleteNewline);
-            string[] deleteSpace = insertSpaceBetweenKey.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-            return deleteSpace;
+            string[] deleteNewline = deleteTabulation.Split("\n");
+            return deleteNewline;
         }
 
         private static string FindComments(string stroke)
@@ -228,22 +239,24 @@ namespace lab1
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("|Tokens\t\tLexema|");
-            Console.WriteLine("---------------------------------");
+            Console.WriteLine("---------------------------------------");
             Console.ResetColor();
             for (int i = 0; i < listTokens.Count; i++)
             {
-                bool isFail = listTokens[i].token == Token.FAILED;
+                TokenNode tokenNode = listTokens[i];
+                bool isFail = tokenNode.token == Token.FAILED;
                 if (isFail) Console.ForegroundColor = ConsoleColor.Red;
 
-                string tabulation = listTokens[i].token.ToString().Length > 6 ? "\t" : "\t\t";
-                string end = listTokens[i].subStroke.ToString().Length > 5 ? "\t|" : "\t\t|";
+                string lineInfoToken = tokenNode.token + " <" + tokenNode.y + ":" + tokenNode.x + ">";
+                string tabulation = lineInfoToken.ToString().Length > 15 ? "\t" : "\t\t";
+                string end = tokenNode.subStroke.ToString().Length > 5 ? "\t|" : "\t\t|";
 
 
-                Console.WriteLine("|" + listTokens[i].token + tabulation + "'" + listTokens[i].subStroke + "'" + end);
+                Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subStroke + "'" + end);
                 if (isFail) Console.ResetColor();
             }
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("---------------------------------");
+            Console.WriteLine("---------------------------------------");
             Console.ResetColor();
         }
     }

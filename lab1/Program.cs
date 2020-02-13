@@ -7,9 +7,11 @@ namespace lab1
         static void Main(string[] args)
         {
             DictionaryFilling.FillDictionary();
-            Lexer.StartLexer("int[] array = new int[8]; \n" +
-                "/*int tmp = array[0]; for (int i = 0; i \n" +
-                "< array.Length; i++){if (tmp > array[i])tmp = array[i];}");
+            string test = "int[] array = new int[8]; \n" +
+                "int tmp = array[0]; for (int i = 0; i \n" +
+                "< array.Length; i++){if (tmp > array[i])tmp = array[i];}";
+            Console.WriteLine(test);
+            Lexer.StartLexer(test);
         }
 
         private static void TestMethod()
