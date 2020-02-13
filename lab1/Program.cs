@@ -6,8 +6,9 @@ namespace lab1
     {
         static void Main(string[] args)
         {
-            Lexer.StartLexer("int[] array = new int[8]; " +
-                "int tmp = array[0]; for (int i = 0; i " +
+            DictionaryFilling.FillDictionary();
+            Lexer.StartLexer("int[] array = new int[8]; \n" +
+                "/*int tmp = array[0]; for (int i = 0; i \n" +
                 "< array.Length; i++){if (tmp > array[i])tmp = array[i];}");
         }
 

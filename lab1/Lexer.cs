@@ -34,28 +34,15 @@ namespace lab1
             FAILED
         }
 
-        static string[] dictTokenKEYWORD = { "break", "while", "else", "if", "for", "new",
-                                             "as", "base", "case", ""};
+        public static string[] dictTokenKEYWORD;
+        public static string[] dictTokenTYPE;
+        public static string[] dictTokenOP;
+        public static char[] dictTokenTWINS;
+        public static char[] dictForbiddenSymbolsTokenID;
 
-        static string[] dictTokenTYPE = { "string", "var", "char", "byte", "Sbyte",
-                                                "int", "uint", "double", "float",
-                                                "long", "ulong", "decimal"};
-
-        static string[] dictTokenOP = { "<", "<=", "=", "=>", "==", "!=", "+",
-                                              "-", "/", "%", "*", "^"};
-
-        static char[] dictTokenNUM = { '0', '1', '2', '3', '4', '5', '6',
-                                              '7', '8', '9'};
-
-        static char dotInNUM = '.';
-
-        static char[] dictTokenTWINS = { '[', ']', '(', ')', '{', '}', '\'', '\"'};
-
-        static char[] dictForbiddenSymbolsTokenID = { '[', '@', ',', '.', ']', '+', '-', '/', '}',
-                                                        '|', '\\', '*', '^', '$', '#', '!', '~', '&',
-                                                        '\'', '\"'};
-
-        static char semicolon = ';';
+        public static char[] dictTokenNUM = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        private static char dotInNUM = '.';
+        private static char semicolon = ';';
 
         public static void StartLexer(string stroke)
         {
@@ -73,20 +60,84 @@ namespace lab1
             ViewTokens(listTokens);
         }
 
-        public static void ViewTokens(List<TokenNode> listTokens)
-        {
-            for (int i = 0; i < listTokens.Count; i++)
-            {
-                Console.WriteLine(listTokens[i].token + " '" + listTokens[i].subStroke + "'\n");
-            }
-        }
-
         private static string[] DeleteEmpty(string stroke)
         {
-            string deleteTabulation = stroke.Replace("\t", " ");
+            string deleteComments = FindComments(stroke);
+            string deleteTabulation = deleteComments.Replace("\t", " ");
             string deleteNewline = deleteTabulation.Replace("\n", " ");
-            string[] deleteSpace = deleteNewline.Split(" ");
+            string insertSpaceBetweenKey = InsertSpaceBetween(deleteNewline);
+            string[] deleteSpace = insertSpaceBetweenKey.Split(" ", StringSplitOptions.RemoveEmptyEntries);
             return deleteSpace;
+        }
+
+        private static string FindComments(string stroke)
+        {
+            StringBuilder insertingSpace = new StringBuilder();
+            StringBuilder multyLineComment = new StringBuilder();
+            bool isFindNewLine = false;
+            bool isFindMultyLine = false;
+            for (int i = 0; i < stroke.Length - 1; i++)
+            {
+                if (stroke[i] == '/' && stroke[i + 1] == '*')
+                {
+                    isFindMultyLine = true;
+                }
+                if (stroke[i] == '/' && stroke[i + 1] == '/')
+                {
+                    isFindNewLine = true;
+                }
+                if (stroke[i] == '\n')
+                {
+                    isFindNewLine = false;
+                }
+
+                if (!isFindNewLine && !isFindMultyLine) insertingSpace.Append(stroke[i]);
+                else if (isFindMultyLine) multyLineComment.Append(stroke[i]);
+
+                if (stroke[i] == '*' && stroke[i + 1] == '\\')
+                {
+                    isFindMultyLine = false;
+                }
+            }
+            if (isFindMultyLine) insertingSpace.Append(multyLineComment);
+            return insertingSpace.ToString();
+        }
+
+        private static string InsertSpaceBetween(string deleteNewline)
+        {
+            StringBuilder insertingSpace = new StringBuilder(deleteNewline);
+            char[] strokeWithSpace = deleteNewline.ToCharArray();
+            for (int i = 0, indexInsert = 0; i < strokeWithSpace.Length; i++, indexInsert++)
+            {
+                for (int j = 0; j < dictTokenTWINS.Length; j++)
+                {
+                    if (strokeWithSpace[i] == dictTokenTWINS[j])
+                    {
+                        insertingSpace.Insert(indexInsert, " ");
+                        indexInsert++;
+                        insertingSpace.Insert(indexInsert + 1, " ");
+                        indexInsert++;
+                        break;
+                    }
+                    else if(strokeWithSpace[i] == semicolon)
+                    {
+                        insertingSpace.Insert(indexInsert, " ");
+                        indexInsert++;
+                        insertingSpace.Insert(indexInsert + 1, " ");
+                        indexInsert++;
+                        break;
+                    }
+                    else if (strokeWithSpace[i] == dotInNUM)
+                    {
+                        insertingSpace.Insert(indexInsert, " ");
+                        indexInsert++;
+                        insertingSpace.Insert(indexInsert + 1, " ");
+                        indexInsert++;
+                        break;
+                    }
+                }
+            }
+            return insertingSpace.ToString();
         }
 
         private static Token TokenDetermine(string subStroke, ref int tokenId)
@@ -100,13 +151,20 @@ namespace lab1
                 if (FindTokenInDictionary(dictTokenTWINS, subStroke[0], ref tokenId)) return Token.TWINS;
                 if (semicolon == subStroke[0]) return Token.SEMILICON;
             }
-            if (FindFractionTokenID(dictTokenNUM, subStroke, ref tokenId)) return Token.ID;
+            if (FindForbiddenSymbolsTokenID(dictForbiddenSymbolsTokenID, subStroke)) return Token.ID;
             return Token.FAILED;
         }
 
-        private static bool FindFractionTokenID(char[] dictTokenNUM, string subStroke, ref int tokenId)
+        private static bool FindForbiddenSymbolsTokenID(char[] dictionary, string subStroke)
         {
-            
+            for (int i = 0; i < subStroke.Length; i++)
+            {
+                for (int j = 0; j < dictionary.Length; j++)
+                {
+                    if (subStroke[i] == dictionary[j]) return false;
+                }
+            }
+            return true;
         }
 
         private static bool FindTokenInDictionary(string[] dictionary, string subStroke, ref int tokenId)
@@ -164,6 +222,29 @@ namespace lab1
                 if (!isNumFind) return false;
             }
             return true;
+        }
+
+        private static void ViewTokens(List<TokenNode> listTokens)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("|Tokens\t\tLexema|");
+            Console.WriteLine("---------------------------------");
+            Console.ResetColor();
+            for (int i = 0; i < listTokens.Count; i++)
+            {
+                bool isFail = listTokens[i].token == Token.FAILED;
+                if (isFail) Console.ForegroundColor = ConsoleColor.Red;
+
+                string tabulation = listTokens[i].token.ToString().Length > 6 ? "\t" : "\t\t";
+                string end = listTokens[i].subStroke.ToString().Length > 5 ? "\t|" : "\t\t|";
+
+
+                Console.WriteLine("|" + listTokens[i].token + tabulation + "'" + listTokens[i].subStroke + "'" + end);
+                if (isFail) Console.ResetColor();
+            }
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("---------------------------------");
+            Console.ResetColor();
         }
     }
 }
