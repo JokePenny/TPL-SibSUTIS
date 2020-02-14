@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "lab1": {
+      "commandName": "Project",
+      "commandLineArgs": "0 1 2 --dump-tokens \\source.txt"
+    }
+  }
+}

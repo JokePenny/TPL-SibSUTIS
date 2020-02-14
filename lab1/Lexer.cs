@@ -6,6 +6,17 @@ namespace lab1
 {
     class Lexer
     {
+        public static string[] dictTokenKEYWORD;
+        public static string[] dictTokenTYPE;
+        public static string[] dictTokenOP;
+        public static char[] dictTokenTWINS;
+        public static char[] dictForbiddenSymbolsTokenID;
+        public static char[] dictTokenNUM = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
+        public static char dotInNUM = '.';
+        public static char semicolon = ';';
+        private static List<TokenNode> listTokens = new List<TokenNode>();
+
         public struct TokenNode
         {
             public TokenNode(Token token, string subStroke, int tokenID, int y, int x)
@@ -24,6 +35,7 @@ namespace lab1
             public int x;
         }
 
+        // виды токенов
         public enum Token : int
         {
             KEYWORD = 0,
@@ -32,28 +44,25 @@ namespace lab1
             NUM,
             ID,
             TWINS,
+            STROKE,
             SEMILICON,
+            FORBIDEN,
             FAILED
         }
 
-        public static string[] dictTokenKEYWORD;
-        public static string[] dictTokenTYPE;
-        public static string[] dictTokenOP;
-        public static char[] dictTokenTWINS;
-        public static char[] dictForbiddenSymbolsTokenID;
-
-        public static char[] dictTokenNUM = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-        private static char dotInNUM = '.';
-        private static char semicolon = ';';
-
         public static void StartLexer(string stroke)
         {
-            string[] strokeWithoutComm = DeleteCommentsAndTabulations(stroke);
+            DictionaryFilling.FillDictionary();
 
-            List<TokenNode> listTokens = new List<TokenNode>();
+            StringBuilder stringFinder = new StringBuilder();
+            bool isFindStroke = false;
+
+            string[] strokeWithoutComm = StringTreatment.DeleteCommentsAndTab(stroke);
+
             for (int i = 0; i < strokeWithoutComm.Length; i++)
             {
-                string[] strokeWithoutSpace = DeleteSpace(strokeWithoutComm[i]);
+                string strokeFormat = StringTreatment.FormatStroke(strokeWithoutComm[i]);
+                string[] strokeWithoutSpace = StringTreatment.HeavyDeleteSpace(strokeFormat, ref stringFinder, ref isFindStroke);
 
                 for (int j = 0; j < strokeWithoutSpace.Length; j++)
                 {
@@ -63,110 +72,60 @@ namespace lab1
                     listTokens.Add(tokenNode);
                 }
             }
-            ViewTokens(listTokens);
         }
 
-        private static string[] DeleteSpace(string stroke)
+        public static void ViewTokens()
         {
-            string insertSpaceBetweenKey = InsertSpaceBetween(stroke);
-            string[] deleteSpace = insertSpaceBetweenKey.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-            return deleteSpace;
-        }
-
-        private static string[] DeleteCommentsAndTabulations(string stroke)
-        {
-            string deleteComments = FindComments(stroke);
-            string deleteTabulation = deleteComments.Replace("\t", " ");
-            string[] deleteNewline = deleteTabulation.Split("\n");
-            return deleteNewline;
-        }
-
-        private static string FindComments(string stroke)
-        {
-            StringBuilder insertingSpace = new StringBuilder();
-            StringBuilder multyLineComment = new StringBuilder();
-            bool isFindNewLine = false;
-            bool isFindMultyLine = false;
-            for (int i = 0; i < stroke.Length - 1; i++)
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("|Tokens|\t\t|Lexema|");
+            Console.WriteLine("-----------------------------------------");
+            Console.ResetColor();
+            for (int i = 0; i < listTokens.Count; i++)
             {
-                if (stroke[i] == '/' && stroke[i + 1] == '*')
-                {
-                    isFindMultyLine = true;
-                }
-                if (stroke[i] == '/' && stroke[i + 1] == '/')
-                {
-                    isFindNewLine = true;
-                }
-                if (stroke[i] == '\n')
-                {
-                    isFindNewLine = false;
-                }
+                TokenNode tokenNode = listTokens[i];
+                bool isFail = tokenNode.token == Token.FAILED;
+                if (isFail) Console.ForegroundColor = ConsoleColor.Red;
 
-                if (!isFindNewLine && !isFindMultyLine) insertingSpace.Append(stroke[i]);
-                else if (isFindMultyLine) multyLineComment.Append(stroke[i]);
+                string lineInfoToken = tokenNode.token + " <" + tokenNode.y + ":" + tokenNode.x + ">";
+                string tabulation = lineInfoToken.ToString().Length > 15 ? "\t" : "\t\t";
+                string end = tokenNode.subStroke.ToString().Length > 5 ? "\t|" : "\t\t|";
 
-                if (stroke[i] == '*' && stroke[i + 1] == '\\')
-                {
-                    isFindMultyLine = false;
-                }
+                Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subStroke + "'" + end);
+                if (isFail) Console.ResetColor();
             }
-            if (isFindMultyLine) insertingSpace.Append(multyLineComment);
-            return insertingSpace.ToString();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("-----------------------------------------");
+            Console.ResetColor();
         }
 
-        private static string InsertSpaceBetween(string deleteNewline)
+        public static void FreeTokens()
         {
-            StringBuilder insertingSpace = new StringBuilder(deleteNewline);
-            char[] strokeWithSpace = deleteNewline.ToCharArray();
-            for (int i = 0, indexInsert = 0; i < strokeWithSpace.Length; i++, indexInsert++)
-            {
-                for (int j = 0; j < dictTokenTWINS.Length; j++)
-                {
-                    if (strokeWithSpace[i] == dictTokenTWINS[j])
-                    {
-                        insertingSpace.Insert(indexInsert, " ");
-                        indexInsert++;
-                        insertingSpace.Insert(indexInsert + 1, " ");
-                        indexInsert++;
-                        break;
-                    }
-                    else if(strokeWithSpace[i] == semicolon)
-                    {
-                        insertingSpace.Insert(indexInsert, " ");
-                        indexInsert++;
-                        insertingSpace.Insert(indexInsert + 1, " ");
-                        indexInsert++;
-                        break;
-                    }
-                    else if (strokeWithSpace[i] == dotInNUM)
-                    {
-                        insertingSpace.Insert(indexInsert, " ");
-                        indexInsert++;
-                        insertingSpace.Insert(indexInsert + 1, " ");
-                        indexInsert++;
-                        break;
-                    }
-                }
-            }
-            return insertingSpace.ToString();
+            listTokens.Clear();
         }
 
         private static Token TokenDetermine(string subStroke, ref int tokenId)
         {
+            // поиск ключевых слов
             if (FindTokenInDictionary(dictTokenKEYWORD, subStroke, ref tokenId)) return Token.KEYWORD;
+            // поиск типов
             if (FindTokenInDictionary(dictTokenTYPE, subStroke, ref tokenId)) return Token.TYPE;
+            // поиск операндов
             if (FindTokenInDictionary(dictTokenOP, subStroke, ref tokenId)) return Token.OP;
+            // поиск цифр
             if (FindFractionTokenInDictionary(dictTokenNUM, subStroke, ref tokenId)) return Token.NUM;
             if(subStroke.Length == 1)
             {
+                // поиск блочных символов
                 if (FindTokenInDictionary(dictTokenTWINS, subStroke[0], ref tokenId)) return Token.TWINS;
+                // поиск точки с запятой
                 if (semicolon == subStroke[0]) return Token.SEMILICON;
             }
-            if (FindForbiddenSymbolsTokenID(dictForbiddenSymbolsTokenID, subStroke)) return Token.ID;
+            // поиск запрещенных символов в переменных
+            if (FindForbiddenTokenID(dictForbiddenSymbolsTokenID, subStroke)) return Token.ID;
             return Token.FAILED;
         }
 
-        private static bool FindForbiddenSymbolsTokenID(char[] dictionary, string subStroke)
+        private static bool FindForbiddenTokenID(char[] dictionary, string subStroke)
         {
             for (int i = 0; i < subStroke.Length; i++)
             {
@@ -191,11 +150,11 @@ namespace lab1
             return false;
         }
 
-        private static bool FindTokenInDictionary(char[] dictionary, char subStroke, ref int tokenId)
+        private static bool FindTokenInDictionary(char[] dictionary, char tween, ref int tokenId)
         {
             for (int i = 0; i < dictionary.Length; i++)
             {
-                if (subStroke == dictionary[i])
+                if (tween == dictionary[i])
                 {
                     tokenId = i;
                     return true;
@@ -233,31 +192,6 @@ namespace lab1
                 if (!isNumFind) return false;
             }
             return true;
-        }
-
-        private static void ViewTokens(List<TokenNode> listTokens)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("|Tokens\t\tLexema|");
-            Console.WriteLine("---------------------------------------");
-            Console.ResetColor();
-            for (int i = 0; i < listTokens.Count; i++)
-            {
-                TokenNode tokenNode = listTokens[i];
-                bool isFail = tokenNode.token == Token.FAILED;
-                if (isFail) Console.ForegroundColor = ConsoleColor.Red;
-
-                string lineInfoToken = tokenNode.token + " <" + tokenNode.y + ":" + tokenNode.x + ">";
-                string tabulation = lineInfoToken.ToString().Length > 15 ? "\t" : "\t\t";
-                string end = tokenNode.subStroke.ToString().Length > 5 ? "\t|" : "\t\t|";
-
-
-                Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subStroke + "'" + end);
-                if (isFail) Console.ResetColor();
-            }
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("---------------------------------------");
-            Console.ResetColor();
         }
     }
 }
