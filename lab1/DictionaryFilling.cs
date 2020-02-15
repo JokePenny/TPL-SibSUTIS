@@ -4,30 +4,23 @@
     {
         private const string pathDictTokenKEYWORD = @"\dictionary\keyword.txt";
         private const string pathDictTokenTYPE = @"\dictionary\type.txt";
-        private const string pathDictTokenOP = @"\dictionary\op.txt";
-        private const string pathDictTokenTWINS = @"\dictionary\twins.txt";
-        private const string pathDictForbiddenSymbolsTokenID = @"\dictionary\forbiddensymbols.txt";
         private const string pathDictSpacebetween = @"\dictionary\spacebetween.txt";
 
         public static void FillDictionary()
         {
             Lexer.dictTokenKEYWORD = GetString(pathDictTokenKEYWORD);
             Lexer.dictTokenTYPE = GetString(pathDictTokenTYPE);
-            Lexer.dictTokenOP = GetString(pathDictTokenOP);
-            Lexer.dictTokenTWINS = GetChar(pathDictTokenTWINS);
-            Lexer.dictForbiddenSymbolsTokenID = GetChar(pathDictForbiddenSymbolsTokenID);
-            StringTreatment.dictSpaceBetween = GetChar(pathDictSpacebetween);
+            StringTreatment.dictSpaceBetween = GetStringWitchSpace(pathDictSpacebetween);
         }
 
-        private static char[] GetChar(string path)
+        private static string GetString(string path)
         {
-            string deletenewLine = ReadFile(path).Replace("\r\n", null);
-            return deletenewLine.ToCharArray();
+            return ReadFile(path).Replace("\r\n", "");
         }
 
-        private static string[] GetString(string path)
+        private static string GetStringWitchSpace(string path)
         {
-            return ReadFile(path).Split("\r\n");
+            return ReadFile(path).Replace("\r\n", " ");
         }
     }
 }
