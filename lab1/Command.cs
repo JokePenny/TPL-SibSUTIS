@@ -2,7 +2,7 @@
 
 namespace lab1
 {
-    class Command
+    sealed class Command
     {
         public static void RunCommand(string[] command)
         {

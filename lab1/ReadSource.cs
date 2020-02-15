@@ -1,12 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace lab1
 {
-    class ReadSource
+    sealed class ReadSource : Dictionary
     {
+        private const string pathDictTokenKEYWORD = @"\dictionary\keyword.txt";
+        private const string pathDictTokenTYPE = @"\dictionary\type.txt";
+        private const string pathDictSpacebetween = @"\dictionary\spacebetween.txt";
+
         public static string ReadFile(string path)
         {
             FileStream fstream = File.OpenRead(Environment.CurrentDirectory + path);
@@ -14,6 +17,23 @@ namespace lab1
             fstream.Read(array, 0, array.Length);
             fstream.Close();
             return Encoding.Default.GetString(array);
+        }
+
+        public static void FillDictionary()
+        {
+            dictTokenKEYWORD = GetString(pathDictTokenKEYWORD);
+            dictTokenTYPE = GetString(pathDictTokenTYPE);
+            StringTreatment.dictSpaceBetween = GetStringWitchSpace(pathDictSpacebetween);
+        }
+
+        private static string GetString(string path)
+        {
+            return ReadFile(path).Replace("\r\n", "");
+        }
+
+        private static string GetStringWitchSpace(string path)
+        {
+            return ReadFile(path).Replace("\r\n", " ");
         }
     }
 }

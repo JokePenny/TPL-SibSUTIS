@@ -1,23 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace lab1
 {
-    class Lexer
+    sealed class Lexer : Dictionary
     {
-        public static string dictTokenKEYWORD;
-        public static string dictTokenTYPE;
-        public static string dictTokenNUM_REAL = @"[0-9]+\.[0-9]*";
-        public static string dictTokenNUM = @"[0-9]+";
-        public static string dictTokenSTRING = @"'[^']*'";
-        public static string dictTokenOP = @"[+\-\*/.=<>]";
-        public static string dictTokenTWINS = @"[\[\](\)\{\}]";
-        public static string dictForbiddenSymbolsTokenID = @"T:\\\\";
-        public static string dictTokenID = @"[A-Za-z][A-Za-z0-9]*";
-
-        public static char semicolon = ';';
         private static List<TokenNode> listTokens = new List<TokenNode>();
 
         public struct TokenNode
@@ -46,29 +34,50 @@ namespace lab1
             NUM_REAL,
             ID,
             TWINS,
-            STROKE,
             SEMILICON,
             STRING,
+            CHAR,
+            NULL,
             FAILED
         }
 
         public static void StartLexer(string stroke)
         {
-            DictionaryFilling.FillDictionary();
+            ReadSource.FillDictionary();
 
             string[] strokeWithoutComm = StringTreatment.DeleteCommentsAndTab(stroke);
 
+            bool isFindString = false;
+            int countQuotes = 0;
+
+            List<char> buildToken = new List<char>();
             for (int i = 0, j = 0; i < strokeWithoutComm.Length; i++)
             {
                 string line = StringTreatment.FormatStroke(strokeWithoutComm[i]);
                 Console.WriteLine(line);
-                List<char> buildToken = new List<char>();
 
-                Token tokenType = Token.FAILED;
+                Token tokenType = Token.NULL;
                 string findToken = "";
-                for (; j < line.Length; j++)
+                countQuotes = 0;
+                isFindString = false;
+
+                for (j = 0; j < line.Length; j++)
                 {
-                    if(line[j] != ' ')
+                    if (line[j] == '"' || isFindString)// обработка строки в кавычках
+                    {
+                        isFindString = true;
+                        buildToken.Add(line[j]);
+                        if(line[j] == '"') countQuotes++;
+                        if (countQuotes == 2)
+                        {
+                            countQuotes = 0;
+                            isFindString = false;
+                            findToken = new string(buildToken.ToArray());
+                            CreateNodeToken(Token.STRING, findToken, i, j);
+                            buildToken.Clear();
+                        }
+                    }
+                    else if (line[j] != ' ')//обработка токена
                     {
                         buildToken.Add(line[j]);
                         findToken = new string(buildToken.ToArray());
@@ -76,13 +85,28 @@ namespace lab1
                     }
                     else if(buildToken.Count != 0)
                     {
-                        TokenNode tokenNode = new TokenNode(tokenType, findToken, i, j);
-                        listTokens.Add(tokenNode);
+                        CreateNodeToken(!isFindString ? tokenType : Token.FAILED, findToken, i, j);
                         buildToken.Clear();
                     }
                 }
-                j = 0;
+                if (isFindString)// проверка на закрытие найденной строки
+                {
+                    findToken = new string(buildToken.ToArray());
+                    CreateNodeToken(Token.FAILED, findToken, i, i);
+                    buildToken.Clear();
+                }
+                if (buildToken.Count != 0)
+                {
+                    CreateNodeToken(!isFindString ? tokenType : Token.FAILED, findToken, i, j);
+                    buildToken.Clear();
+                }
             }
+        }
+
+        private static void CreateNodeToken(Token token, string subStroke, int y, int x)
+        {
+            TokenNode tokenNode = new TokenNode(token, subStroke, y, x);
+            listTokens.Add(tokenNode);
         }
 
         private static Token FindToken(string buildToken)
@@ -93,7 +117,7 @@ namespace lab1
             if (Regex.IsMatch(buildToken, dictTokenTWINS)) return Token.TWINS;
             if (Regex.IsMatch(buildToken, dictTokenNUM)) return Token.NUM;
             if (Regex.IsMatch(buildToken, dictTokenNUM_REAL)) return Token.NUM_REAL;
-            if (Regex.IsMatch(buildToken, dictTokenSTRING)) return Token.STRING;
+            if (Regex.IsMatch(buildToken, dictTokenCHAR)) return Token.CHAR;
             if (Regex.IsMatch(buildToken, dictTokenID)) return Token.ID;
             if (Regex.IsMatch(buildToken, dictForbiddenSymbolsTokenID)) return Token.FAILED;
             if (buildToken[0] == semicolon) return Token.SEMILICON;
@@ -114,9 +138,8 @@ namespace lab1
 
                 string lineInfoToken = tokenNode.token + " <" + tokenNode.y + ":" + tokenNode.x + ">";
                 string tabulation = lineInfoToken.ToString().Length > 15 ? "\t" : "\t\t";
-                string end = tokenNode.subStroke.ToString().Length > 5 ? "\t|" : "\t\t|";
 
-                Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subStroke + "'" + end);
+                Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subStroke + "'");
                 if (isFail) Console.ResetColor();
             }
             Console.ForegroundColor = ConsoleColor.Yellow;

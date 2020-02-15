@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace lab1
 {
-    class StringTreatment
+    sealed class StringTreatment
     {
         public static string dictSpaceBetween;
 
