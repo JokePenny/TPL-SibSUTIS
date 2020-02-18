@@ -4,22 +4,22 @@ using System.Text.RegularExpressions;
 
 namespace lab1
 {
-    sealed class Lexer : Dictionary
+    public class Lexer : Dictionary
     {
         private static List<TokenNode> listTokens = new List<TokenNode>();
 
         public struct TokenNode
         {
-            public TokenNode(Token token, string subStroke, int y, int x)
+            public TokenNode(Token token, string subStr, int y, int x)
             {
                 this.token = token;
-                this.subStroke = subStroke;
+                this.subStr = subStr;
                 this.y = y + 1;
                 this.x = x + 1;
             }
 
             public Token token;
-            public string subStroke;
+            public string subStr;
             public int y;
             public int x;
         }
@@ -41,76 +41,41 @@ namespace lab1
             FAILED
         }
 
-        public static void StartLexer(string stroke)
+        public static void StartLexer(string str)
         {
+            // заполнение словарей
             ReadSource.FillDictionary();
 
-            string[] strokeWithoutComm = StringTreatment.DeleteCommentsAndTab(stroke);
+            // удаление комментариев и табуляции
+            string[] strokeWithoutComm = StringTreatment.DeleteCommentsAndTab(str);
 
-            bool isFindString = false;
-            int countQuotes = 0;
-
-            List<char> buildToken = new List<char>();
-            for (int i = 0, j = 0; i < strokeWithoutComm.Length; i++)
+            // обработка строк
+            for (int i = 0; i < strokeWithoutComm.Length; i++)
             {
-                string line = StringTreatment.FormatStroke(strokeWithoutComm[i]);
-                Console.WriteLine(line);
+                Console.WriteLine(strokeWithoutComm[i]);
 
-                Token tokenType = Token.NULL;
-                string findToken = "";
-                countQuotes = 0;
-                isFindString = false;
+                /* 
+                форматирование строки, например:
+                вход:  int[]=new int[8];
+                --------
+                выход: int [ ] = new int [ 8 ] ;
+                */
+                string[] line = StringTreatment.FormatStroke(strokeWithoutComm[i]);
 
-                for (j = 0; j < line.Length; j++)
+                // обработка слов
+                for (int j = 0; j < line.Length; j++)
                 {
-                    if (line[j] == '"' || isFindString)// обработка строки в кавычках
-                    {
-                        isFindString = true;
-                        buildToken.Add(line[j]);
-                        if(line[j] == '"') countQuotes++;
-                        if (countQuotes == 2)
-                        {
-                            countQuotes = 0;
-                            isFindString = false;
-                            findToken = new string(buildToken.ToArray());
-                            CreateNodeToken(Token.STRING, findToken, i, j);
-                            buildToken.Clear();
-                        }
-                    }
-                    else if (line[j] != ' ')//обработка токена
-                    {
-                        buildToken.Add(line[j]);
-                        findToken = new string(buildToken.ToArray());
-                        tokenType = FindToken(findToken);
-                    }
-                    else if(buildToken.Count != 0)
-                    {
-                        CreateNodeToken(!isFindString ? tokenType : Token.FAILED, findToken, i, j);
-                        buildToken.Clear();
-                    }
-                }
-                if (isFindString)// проверка на закрытие найденной строки
-                {
-                    findToken = new string(buildToken.ToArray());
-                    CreateNodeToken(Token.FAILED, findToken, i, i);
-                    buildToken.Clear();
-                }
-                if (buildToken.Count != 0)
-                {
-                    CreateNodeToken(!isFindString ? tokenType : Token.FAILED, findToken, i, j);
-                    buildToken.Clear();
+                    // определения вида токена
+                    Token tokenType = FindToken(line[j]);
+                    // создание токена
+                    CreateNodeToken(tokenType, line[j], i, j);
                 }
             }
         }
 
-        private static void CreateNodeToken(Token token, string subStroke, int y, int x)
+        public static Token FindToken(string buildToken)
         {
-            TokenNode tokenNode = new TokenNode(token, subStroke, y, x);
-            listTokens.Add(tokenNode);
-        }
-
-        private static Token FindToken(string buildToken)
-        {
+            if (Regex.IsMatch(buildToken, dictTokenSTRING)) return Token.STRING;
             if (Regex.IsMatch(buildToken, dictTokenTYPE)) return Token.TYPE;
             if (Regex.IsMatch(buildToken, dictTokenKEYWORD)) return Token.KEYWORD;
             if (Regex.IsMatch(buildToken, dictTokenOP)) return Token.OP;
@@ -124,6 +89,12 @@ namespace lab1
             return Token.FAILED;
         }
 
+        private static void CreateNodeToken(Token token, string subStr, int y, int x)
+        {
+            TokenNode tokenNode = new TokenNode(token, subStr, y, x);
+            listTokens.Add(tokenNode);
+        }
+
         public static void ViewTokens()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -135,12 +106,13 @@ namespace lab1
                 TokenNode tokenNode = listTokens[i];
                 bool isFail = tokenNode.token == Token.FAILED;
                 if (isFail) Console.ForegroundColor = ConsoleColor.Red;
+                else Console.ForegroundColor = ConsoleColor.Green;
 
                 string lineInfoToken = tokenNode.token + " <" + tokenNode.y + ":" + tokenNode.x + ">";
                 string tabulation = lineInfoToken.ToString().Length > 15 ? "\t" : "\t\t";
 
-                Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subStroke + "'");
-                if (isFail) Console.ResetColor();
+                Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subStr + "'");
+                Console.ResetColor();
             }
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("-----------------------------------------");

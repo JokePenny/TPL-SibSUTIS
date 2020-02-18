@@ -1,4 +1,4 @@
-\b(?:
+^(?:
 bool
 |byte
 |sbyte
@@ -14,4 +14,4 @@ bool
 |string
 |decimal
 |double
-)\b
+)$

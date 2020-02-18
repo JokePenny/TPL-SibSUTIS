@@ -1,0 +1,17 @@
+E:\01Programs\Repositories\TYAP\lab1\TestModule\bin\Debug\netcoreapp2.1\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+E:\01Programs\Repositories\TYAP\lab1\TestModule\bin\Debug\netcoreapp2.1\xunit.runner.reporters.netcoreapp10.dll
+E:\01Programs\Repositories\TYAP\lab1\TestModule\bin\Debug\netcoreapp2.1\xunit.runner.utility.netcoreapp10.dll
+E:\01Programs\Repositories\TYAP\lab1\TestModule\bin\Debug\netcoreapp2.1\TestModule.deps.json
+E:\01Programs\Repositories\TYAP\lab1\TestModule\bin\Debug\netcoreapp2.1\TestModule.runtimeconfig.json
+E:\01Programs\Repositories\TYAP\lab1\TestModule\bin\Debug\netcoreapp2.1\TestModule.runtimeconfig.dev.json
+E:\01Programs\Repositories\TYAP\lab1\TestModule\bin\Debug\netcoreapp2.1\TestModule.dll
+E:\01Programs\Repositories\TYAP\lab1\TestModule\bin\Debug\netcoreapp2.1\TestModule.pdb
+E:\01Programs\Repositories\TYAP\lab1\TestModule\obj\Debug\netcoreapp2.1\TestModule.csprojAssemblyReference.cache
+E:\01Programs\Repositories\TYAP\lab1\TestModule\obj\Debug\netcoreapp2.1\TestModule.csproj.CoreCompileInputs.cache
+E:\01Programs\Repositories\TYAP\lab1\TestModule\obj\Debug\netcoreapp2.1\TestModule.AssemblyInfoInputs.cache
+E:\01Programs\Repositories\TYAP\lab1\TestModule\obj\Debug\netcoreapp2.1\TestModule.AssemblyInfo.cs
+E:\01Programs\Repositories\TYAP\lab1\TestModule\obj\Debug\netcoreapp2.1\TestModule.dll
+E:\01Programs\Repositories\TYAP\lab1\TestModule\obj\Debug\netcoreapp2.1\TestModule.pdb
+E:\01Programs\Repositories\TYAP\lab1\TestModule\bin\Debug\netcoreapp2.1\lab1.dll
+E:\01Programs\Repositories\TYAP\lab1\TestModule\bin\Debug\netcoreapp2.1\lab1.pdb
+E:\01Programs\Repositories\TYAP\lab1\TestModule\obj\Debug\netcoreapp2.1\TestModule.csproj.CopyComplete

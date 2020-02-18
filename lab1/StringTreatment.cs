@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace lab1
 {
-    sealed class StringTreatment
+    public sealed class StringTreatment
     {
-        public static string dictSpaceBetween;
+        public readonly static string dictSpaceBetween = "[@,.]+-/{}|*^$!~&()%|?=<>!;";
 
         public static string[] DeleteCommentsAndTab(string stroke)
         {
@@ -17,11 +17,11 @@ namespace lab1
             return deleteNewline;
         }
 
-        private static string FindComments(string str)
+        public static string FindComments(string str)
         {
             StringBuilder strWithoutComments = new StringBuilder();
             StringBuilder multyLineComment = new StringBuilder();
-            bool isFindNewLine = false;
+            bool isFindLine = false;
             bool isFindMultyLine = false;
             for (int i = 0; i < str.Length - 1; i++)
             {
@@ -31,47 +31,106 @@ namespace lab1
                 }
                 if (str[i] == '/' && str[i + 1] == '/')
                 {
-                    isFindNewLine = true;
+                    isFindLine = true;
                 }
-                if (str[i] == '\n')
+                if (str[i] == '\n' || i == str.Length - 1)
                 {
-                    isFindNewLine = false;
+                    isFindLine = false;
                 }
 
-                if (!isFindNewLine && !isFindMultyLine) strWithoutComments.Append(str[i]);
+                if (!isFindLine && !isFindMultyLine) strWithoutComments.Append(str[i]);
                 else if (isFindMultyLine) multyLineComment.Append(str[i]);
 
                 if (str[i] == '*' && str[i + 1] == '/')
                 {
                     isFindMultyLine = false;
-                    i++;
                 }
             }
             if (isFindMultyLine) strWithoutComments.Append(multyLineComment);
+
+            int strLen = str.Length;
+
+            // добавляем последний элемет если он не относится ни к одному из видов комментариев
+            if (!(str[strLen - 2] == '/' && str[strLen - 1] == '*'
+                || str[strLen - 2] == '/' && str[strLen - 1] == '/'
+                || str[strLen - 2] == '*' && str[strLen - 1] == '/'
+                || str[strLen - 1] == '\n') && !isFindLine)
+            {
+                strWithoutComments.Append(str[strLen - 1]);
+            }
+
             return strWithoutComments.ToString();
         }
 
-        public static string FormatStroke(string stroke)
+        public static string[] FormatStroke(string stroke)
         {
             string insertSpaceBetweenKey = InsertSpaceBetween(stroke);
-            return Regex.Replace(insertSpaceBetweenKey, @"\s+", " ");
+            return SplitString(insertSpaceBetweenKey);
         }
 
-        private static string InsertSpaceBetween(string deleteNewline)
+        public static string[] SplitString(string insertSpaceBetweenKey)
+        {
+            List<string> listWords = new List<string>();
+            StringBuilder insertingSpace = new StringBuilder();
+            char[] strokeWithSpace = insertSpaceBetweenKey.ToCharArray();
+
+            bool isFindString = false;
+
+            for (int i = 0; i < strokeWithSpace.Length; i++)
+            {
+                if(insertSpaceBetweenKey[i] == '"')
+                {
+                    isFindString = !isFindString;
+                    insertingSpace.Append(insertSpaceBetweenKey[i]);
+                    continue;
+                }
+                else if(insertSpaceBetweenKey[i] == ' ' && !isFindString && insertingSpace.Length != 0)
+                {
+                    listWords.Add(insertingSpace.ToString());
+                    insertingSpace = new StringBuilder();
+                    continue;
+                }
+                if (insertSpaceBetweenKey[i] != ' ' || isFindString) insertingSpace.Append(insertSpaceBetweenKey[i]);
+            }
+            if (insertingSpace.Length != 0) listWords.Add(insertingSpace.ToString());
+            return listWords.ToArray();
+        }
+
+        public static string InsertSpaceBetween(string deleteNewline)
         {
             StringBuilder insertingSpace = new StringBuilder(deleteNewline);
             char[] strokeWithSpace = deleteNewline.ToCharArray();
+
+            bool isFindString = false;
 
             for (int i = 0, indexInsert = 0; i < strokeWithSpace.Length; i++, indexInsert++)
             {
                 for (int j = 0; j < dictSpaceBetween.Length; j++)
                 {
-                    if (strokeWithSpace[i] == dictSpaceBetween[j])
+                    if (strokeWithSpace[i] == '"')
                     {
-                        insertingSpace.Insert(indexInsert, " ");
-                        indexInsert++;
-                        insertingSpace.Insert(indexInsert + 1, " ");
-                        indexInsert++;
+                        isFindString = !isFindString;
+                        continue;
+                    }
+
+                    if (strokeWithSpace[i] == dictSpaceBetween[j] && !isFindString)
+                    {
+                        if (indexInsert - 1 >= 0)
+                        {
+                            if (insertingSpace[indexInsert - 1] != ' ')
+                            {
+                                insertingSpace.Insert(indexInsert, " ");
+                                indexInsert++;
+                            }
+                        }
+                        if (indexInsert + 1 < insertingSpace.Length)
+                        {
+                            if (insertingSpace[indexInsert + 1] != ' ')
+                            {
+                                insertingSpace.Insert(indexInsert + 1, " ");
+                                indexInsert++;
+                            }
+                        }
                         break;
                     }
                 }

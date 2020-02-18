@@ -1,4 +1,4 @@
-\b(?:
+^(?:
 abstract
 |as
 |base
@@ -63,4 +63,4 @@ abstract
 |void
 |volatile
 |while
-)\b
+)$
