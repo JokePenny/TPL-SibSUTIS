@@ -23,42 +23,55 @@ namespace lab1
             StringBuilder multyLineComment = new StringBuilder();
             bool isFindLine = false;
             bool isFindMultyLine = false;
-            for (int i = 0; i < str.Length - 1; i++)
+            if(str.Length > 1)
             {
-                if (str[i] == '/' && str[i + 1] == '*')
+                for (int i = 0; i < str.Length - 1; i++)
                 {
-                    isFindMultyLine = true;
-                }
-                if (str[i] == '/' && str[i + 1] == '/')
-                {
-                    isFindLine = true;
-                }
-                if (str[i] == '\n' || i == str.Length - 1)
-                {
-                    isFindLine = false;
-                }
+                    if (str[i] == '/' && str[i + 1] == '*')
+                    {
+                        isFindMultyLine = true;
+                    }
 
-                if (!isFindLine && !isFindMultyLine) strWithoutComments.Append(str[i]);
-                else if (isFindMultyLine) multyLineComment.Append(str[i]);
+                    if (str[i] == '/' && str[i + 1] == '/')
+                    {
+                        isFindLine = true;
+                    }
 
-                if (str[i] == '*' && str[i + 1] == '/')
-                {
-                    isFindMultyLine = false;
+                    if (str[i] == '\n' || i == str.Length - 1)
+                    {
+                        isFindLine = false;
+                    }
+
+                    if (!isFindLine && !isFindMultyLine) strWithoutComments.Append(str[i]);
+                    else if (isFindMultyLine) multyLineComment.Append(str[i]);
+
+                    if (str[i] == '*' && str[i + 1] == '/')
+                    {
+                        isFindMultyLine = false;
+                    }
                 }
             }
+            else strWithoutComments.Append(str[0]);
+
             if (isFindMultyLine) strWithoutComments.Append(multyLineComment);
 
             int strLen = str.Length;
 
             // добавляем последний элемет если он не относится ни к одному из видов комментариев
-            if (!(str[strLen - 2] == '/' && str[strLen - 1] == '*'
-                || str[strLen - 2] == '/' && str[strLen - 1] == '/'
-                || str[strLen - 2] == '*' && str[strLen - 1] == '/'
-                || str[strLen - 1] == '\n') && !isFindLine)
+            try
             {
-                strWithoutComments.Append(str[strLen - 1]);
+                if (!(str[strLen - 2] == '/' && str[strLen - 1] == '*'
+                  || str[strLen - 2] == '/' && str[strLen - 1] == '/'
+                  || str[strLen - 2] == '*' && str[strLen - 1] == '/'
+                  || str[strLen - 1] == '\n') && !isFindLine)
+                {
+                    strWithoutComments.Append(str[strLen - 1]);
+                }
             }
+            catch
+            {
 
+            }
             return strWithoutComments.ToString();
         }
 
@@ -105,12 +118,17 @@ namespace lab1
 
             for (int i = 0, indexInsert = 0; i < strokeWithSpace.Length; i++, indexInsert++)
             {
+                if (strokeWithSpace[i] == '"')
+                {
+                    isFindString = !isFindString;
+                    continue;
+                }
+
                 for (int j = 0; j < dictSpaceBetween.Length; j++)
                 {
-                    if (strokeWithSpace[i] == '"')
+                    if(dictSpaceBetween[j] == '.' && i - 1 >= 0 && i + 1 < strokeWithSpace.Length)
                     {
-                        isFindString = !isFindString;
-                        continue;
+                        if (Char.IsDigit(strokeWithSpace[i - 1]) && Char.IsDigit(strokeWithSpace[i + 1])) break;
                     }
 
                     if (strokeWithSpace[i] == dictSpaceBetween[j] && !isFindString)

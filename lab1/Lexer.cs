@@ -99,8 +99,8 @@ namespace lab1
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("|Tokens|\t\t|Lexema|");
-            Console.WriteLine("-----------------------------------------");
             Console.ResetColor();
+            Console.WriteLine("-----------------------------------------");
             for (int i = 0; i < listTokens.Count; i++)
             {
                 TokenNode tokenNode = listTokens[i];
@@ -114,9 +114,7 @@ namespace lab1
                 Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subStr + "'");
                 Console.ResetColor();
             }
-            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("-----------------------------------------");
-            Console.ResetColor();
         }
 
         public static void FreeTokens()

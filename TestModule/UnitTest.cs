@@ -6,7 +6,7 @@ namespace lab1.TestModule
     public class UnitTest
     {
         [Fact]
-        public void InsertSpaceBetween_Str_returnStrWithspaceFormat()
+        public void InsertSpaceBetween_Str_returnStrWithSpaceFormat()
         {
             //arrange
             string str = "int[]=i;";
@@ -44,39 +44,13 @@ namespace lab1.TestModule
             Assert.Equal(actual, expected);
         }
 
-        [Fact]
-        public void FindComments_StrWithComm_returnStrWithoutComm()
+        [Theory]
+        [InlineData ("//int[]=i;\n asdasd ", "\n asdasd ")]
+        [InlineData("//int[]=i;\n// asdasd ", "\n")]
+        [InlineData("/*int[]=i;\n asdasd */", "")] // удаление мульти комментариев
+        [InlineData("a//int[]=i;", "a")]
+        public void FindComments_StrWithCommInMultyLine_returnStrWithoutComms(string str, string expected)
         {
-            //arrange
-            string str = "//int[]=i;";
-            string expected = "";
-
-            //act
-            string actual = StringTreatment.FindComments(str);
-            //assert
-            Assert.Equal(actual, expected);
-        }
-
-        [Fact]
-        public void FindComments_StrWithMultyComm_returnStrWithoutComm()
-        {
-            //arrange
-            string str = "/*int[]=i;\n asdasd */";
-            string expected = "";
-
-            //act
-            string actual = StringTreatment.FindComments(str);
-            //assert
-            Assert.Equal(actual, expected);
-        }
-
-        [Fact]
-        public void FindComments_StrWithCommInMultyLine_returnStrWithoutComm()
-        {
-            //arrange
-            string str = "//int[]=i;\n asdasd ";
-            string expected = "\n asdasd ";
-
             //act
             string actual = StringTreatment.FindComments(str);
             //assert

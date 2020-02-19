@@ -11,7 +11,6 @@ namespace lab1
 
         private static void TestMethod()
         {
-
             // find min
             int[] array = new int[8];
             int tmp = array[0];
@@ -20,7 +19,6 @@ namespace lab1
                 if (tmp > array[i])
                     tmp = array[i];
             }
-
 
             // find substroke in stroke
             string stroke = "sdf";
