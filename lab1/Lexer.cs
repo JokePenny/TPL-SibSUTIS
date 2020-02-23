@@ -4,25 +4,25 @@ using System.Text.RegularExpressions;
 
 namespace lab1
 {
+    public class TokenNode : Lexer
+    {
+        public TokenNode(Token token, string subString, int y, int x)
+        {
+            this.token = token;
+            this.subString = subString;
+            this.y = y + 1;
+            this.x = x + 1;
+        }
+
+        public Token token;
+        public string subString;
+        public int y;
+        public int x;
+    }
+
     public class Lexer : Dictionary
     {
         private static List<TokenNode> listTokens = new List<TokenNode>();
-
-        public struct TokenNode
-        {
-            public TokenNode(Token token, string subStr, int y, int x)
-            {
-                this.token = token;
-                this.subStr = subStr;
-                this.y = y + 1;
-                this.x = x + 1;
-            }
-
-            public Token token;
-            public string subStr;
-            public int y;
-            public int x;
-        }
 
         // виды токенов
         public enum Token : int
@@ -41,36 +41,36 @@ namespace lab1
             FAILED
         }
 
+        static int lineMemmory = 0;
+        static int indexMemmory = 0;
+        static string[] line = { };
+        static string[] stringWithoutComm;
+
         public static void StartLexer(string str)
         {
             // заполнение словарей
             ReadSource.FillDictionary();
-
             // удаление комментариев и табуляции
-            string[] strokeWithoutComm = StringTreatment.DeleteCommentsAndTab(str);
+            stringWithoutComm = StringTreatment.DeleteCommentsAndTab(str);
+            line = StringTreatment.FormatStroke(stringWithoutComm[lineMemmory]);
+            Console.WriteLine(stringWithoutComm[lineMemmory]);
+            AbstractSyntaxTree.CreateAST();
+        }
 
-            // обработка строк
-            for (int i = 0; i < strokeWithoutComm.Length; i++)
+        public static TokenNode GetToken()
+        {
+            for (; lineMemmory < stringWithoutComm.Length;)
             {
-                Console.WriteLine(strokeWithoutComm[i]);
-
-                /* 
-                форматирование строки, например:
-                вход:  int[]=new int[8];
-                --------
-                выход: int [ ] = new int [ 8 ] ;
-                */
-                string[] line = StringTreatment.FormatStroke(strokeWithoutComm[i]);
-
                 // обработка слов
-                for (int j = 0; j < line.Length; j++)
+                for (; indexMemmory < line.Length;)
                 {
                     // определения вида токена
-                    Token tokenType = FindToken(line[j]);
+                    Token tokenType = FindToken(line[indexMemmory]);
                     // создание токена
-                    CreateNodeToken(tokenType, line[j], i, j);
+                    return CreateNodeToken(tokenType, line[indexMemmory]);
                 }
             }
+            return null;
         }
 
         public static Token FindToken(string buildToken)
@@ -89,12 +89,24 @@ namespace lab1
             return Token.FAILED;
         }
 
-        private static void CreateNodeToken(Token token, string subStr, int y, int x)
+        private static TokenNode CreateNodeToken(Token token, string subStr)
         {
-            TokenNode tokenNode = new TokenNode(token, subStr, y, x);
+            TokenNode tokenNode = new TokenNode(token, subStr, lineMemmory, indexMemmory);
+            indexMemmory++;
+            if (indexMemmory == line.Length)
+            {
+                indexMemmory = 0;
+                lineMemmory++;
+                if (lineMemmory != stringWithoutComm.Length)
+                {
+                    Console.WriteLine(stringWithoutComm[lineMemmory]);
+                    line = StringTreatment.FormatStroke(stringWithoutComm[lineMemmory]);
+                }
+            }
             listTokens.Add(tokenNode);
+            return tokenNode;
         }
-
+        
         public static void ViewTokens()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -111,15 +123,10 @@ namespace lab1
                 string lineInfoToken = tokenNode.token + " <" + tokenNode.y + ":" + tokenNode.x + ">";
                 string tabulation = lineInfoToken.ToString().Length > 15 ? "\t" : "\t\t";
 
-                Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subStr + "'");
+                Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subString + "'");
                 Console.ResetColor();
             }
             Console.WriteLine("-----------------------------------------");
-        }
-
-        public static void FreeTokens()
-        {
-            listTokens.Clear();
         }
     }
 }

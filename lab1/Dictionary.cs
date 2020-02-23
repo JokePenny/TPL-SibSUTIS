@@ -7,7 +7,7 @@ namespace lab1
         protected static string dictTokenTYPE;
         protected const string dictTokenNUM_REAL = @"^[0-9]+\.[0-9]*$";
         protected const string dictTokenNUM = @"^[0-9]+$";
-        protected const string dictTokenOP = @"^[+\-\*/.=<>!&%]";
+        protected const string dictTokenOP = @"^[+\-\*/.,=<>!&%]";
         protected const string dictTokenTWINS = @"^[\[\](\)\{\}]";
         protected const string dictForbiddenSymbolsTokenID = @"T:\\\\";
         protected const string dictTokenID = @"^[A-Za-z][A-Za-z0-9]*";
