@@ -4,10 +4,10 @@ using System.Text;
 
 namespace lab1
 {
-    public sealed class ReadSource : Dictionary
+    public sealed class ReadSource
     {
-        private const string pathDictTokenKEYWORD = @"\dictionary\keyword.txt";
-        private const string pathDictTokenTYPE = @"\dictionary\type.txt";
+        private const string PathTokenKeyword = @"\dictionary\keyword.txt";
+        private const string PathTokenType = @"\dictionary\type.txt";
 
         public static string ReadFile(string path)
         {
@@ -18,10 +18,10 @@ namespace lab1
             return Encoding.Default.GetString(array);
         }
 
-        public static void FillDictionary()
+        public static void FillTokens()
         {
-            dictTokenKEYWORD = GetString(pathDictTokenKEYWORD);
-            dictTokenTYPE = GetString(pathDictTokenTYPE);
+            Tokens.Keyword = GetString(PathTokenKeyword);
+            Tokens.Type = GetString(PathTokenType);
         }
 
         private static string GetString(string path)

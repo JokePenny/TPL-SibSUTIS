@@ -1,4 +1,4 @@
-﻿using System;
+﻿using lab1.Helpers;
 
 namespace lab1
 {
@@ -38,15 +38,8 @@ namespace lab1
             }
             else
             {
-                ViewWarning("Исходник пустой");
+                ConsoleHelper.WriteError("Исходник пустой");
             }
-        }
-
-        private static void ViewWarning(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
-            Console.ResetColor();
         }
     }
 }
