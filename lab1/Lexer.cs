@@ -1,4 +1,4 @@
-﻿using System;
+﻿using lab1.Helpers;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -20,7 +20,7 @@ namespace lab1
         public int x;
     }
 
-    public class Lexer : Dictionary
+    public class Lexer
     {
         private static List<TokenNode> listTokens = new List<TokenNode>();
 
@@ -49,11 +49,11 @@ namespace lab1
         public static void StartLexer(string str)
         {
             // заполнение словарей
-            ReadSource.FillDictionary();
+            ReadSource.FillTokens();
             // удаление комментариев и табуляции
             stringWithoutComm = StringTreatment.DeleteCommentsAndTab(str);
             line = StringTreatment.FormatStroke(stringWithoutComm[lineMemmory]);
-            Console.WriteLine(stringWithoutComm[lineMemmory]);
+            ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
             AbstractSyntaxTree.CreateAST();
         }
 
@@ -75,17 +75,17 @@ namespace lab1
 
         public static Token FindToken(string buildToken)
         {
-            if (Regex.IsMatch(buildToken, dictTokenSTRING)) return Token.STRING;
-            if (Regex.IsMatch(buildToken, dictTokenTYPE)) return Token.TYPE;
-            if (Regex.IsMatch(buildToken, dictTokenKEYWORD)) return Token.KEYWORD;
-            if (Regex.IsMatch(buildToken, dictTokenOP)) return Token.OP;
-            if (Regex.IsMatch(buildToken, dictTokenTWINS)) return Token.TWINS;
-            if (Regex.IsMatch(buildToken, dictTokenNUM)) return Token.NUM;
-            if (Regex.IsMatch(buildToken, dictTokenNUM_REAL)) return Token.NUM_REAL;
-            if (Regex.IsMatch(buildToken, dictTokenCHAR)) return Token.CHAR;
-            if (Regex.IsMatch(buildToken, dictTokenID)) return Token.ID;
-            if (Regex.IsMatch(buildToken, dictForbiddenSymbolsTokenID)) return Token.FAILED;
-            if (buildToken[0] == semicolon) return Token.SEMILICON;
+            if (Regex.IsMatch(buildToken, Tokens.String)) return Token.STRING;
+            if (Regex.IsMatch(buildToken, Tokens.Type)) return Token.TYPE;
+            if (Regex.IsMatch(buildToken, Tokens.Keyword)) return Token.KEYWORD;
+            if (Regex.IsMatch(buildToken, Tokens.Operator)) return Token.OP;
+            if (Regex.IsMatch(buildToken, Tokens.Twins)) return Token.TWINS;
+            if (Regex.IsMatch(buildToken, Tokens.Num)) return Token.NUM;
+            if (Regex.IsMatch(buildToken, Tokens.NumReal)) return Token.NUM_REAL;
+            if (Regex.IsMatch(buildToken, Tokens.Char)) return Token.CHAR;
+            if (Regex.IsMatch(buildToken, Tokens.Id)) return Token.ID;
+            if (Regex.IsMatch(buildToken, Tokens.ForbiddenSymbolsId)) return Token.FAILED;
+            if (buildToken[0] == Tokens.Semicolon) return Token.SEMILICON;
             return Token.FAILED;
         }
 
@@ -99,7 +99,7 @@ namespace lab1
                 lineMemmory++;
                 if (lineMemmory != stringWithoutComm.Length)
                 {
-                    Console.WriteLine(stringWithoutComm[lineMemmory]);
+                    ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
                     line = StringTreatment.FormatStroke(stringWithoutComm[lineMemmory]);
                 }
             }
@@ -109,24 +109,30 @@ namespace lab1
         
         public static void ViewTokens()
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("|Tokens|\t\t|Lexema|");
-            Console.ResetColor();
-            Console.WriteLine("-----------------------------------------");
+            ConsoleHelper.WriteHeader("|Tokens|\t\t|Lexema|");
+            ConsoleHelper.WriteSeparator();
             for (int i = 0; i < listTokens.Count; i++)
             {
                 TokenNode tokenNode = listTokens[i];
-                bool isFail = tokenNode.token == Token.FAILED;
-                if (isFail) Console.ForegroundColor = ConsoleColor.Red;
-                else Console.ForegroundColor = ConsoleColor.Green;
+                string tokenInfo = GetTokenInfo(tokenNode);
 
-                string lineInfoToken = tokenNode.token + " <" + tokenNode.y + ":" + tokenNode.x + ">";
-                string tabulation = lineInfoToken.ToString().Length > 15 ? "\t" : "\t\t";
-
-                Console.WriteLine(lineInfoToken + tabulation + "'" + tokenNode.subString + "'");
-                Console.ResetColor();
+                if (tokenNode.token == Token.FAILED)
+                {
+                    ConsoleHelper.WriteError(tokenInfo);
+                }
+                else
+                {
+                    ConsoleHelper.WriteSuccess(tokenInfo);
+                }
             }
-            Console.WriteLine("-----------------------------------------");
+            ConsoleHelper.WriteSeparator();
+        }
+
+        private static string GetTokenInfo(TokenNode tokenNode)
+        {
+            string lineInfoToken = tokenNode.token + " <" + tokenNode.y + ":" + tokenNode.x + ">";
+            string tabulation = lineInfoToken.Length > 15 ? "\t" : "\t\t";
+            return lineInfoToken + tabulation + "'" + tokenNode.subString + "'";
         }
     }
 }

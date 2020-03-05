@@ -1,4 +1,5 @@
 ﻿using lab1.ASTNodes;
+using lab1.Helpers;
 using System;
 using System.Collections;
 
@@ -20,14 +21,14 @@ namespace lab1
             DescentSide(headAST);
         }
 
-        private static void getNextToken()
+        private static void GetNextToken()
         {
             CurTok = Lexer.GetToken();
         }
 
         private static ASTNode ParsePrimary()
         {
-            getNextToken();
+            GetNextToken();
             if (CurTok == null) return null;
             switch (CurTok.token)
             {
@@ -54,14 +55,9 @@ namespace lab1
                 case Lexer.Token.FAILED:
                     return null;
                 default:
-                    Error("unknown token when expecting an expression");
+                    ConsoleHelper.WriteError("Error: unknown token when expecting an expression\n");
                     return null;
             }
-        }
-
-        private static void Error(string str)
-        {
-            Console.WriteLine("Error: {str}\n");
         }
 
         private static void DescentSide(ASTNode nodeAST)
