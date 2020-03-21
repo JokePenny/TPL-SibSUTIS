@@ -28,10 +28,39 @@ namespace lab1
         public enum Token : int
         {
             KEYWORD = 0,
+            K_FOREACH,
+            K_FOR,
+            K_IF,
+            K_WHILE,
+            K_DO,
+            K_STRUCT,
+            K_CLASS,
+            K_NAMESPACE,
+            K_ENUM,
+            K_NEW,
+            K_ELSE,
+            K_RETURN,
+            COMM,
+            BRACE_L,
+            BRACE_R,
+            PARENTHESIS_L,
+            PARENTHESIS_R,
+            BRACKET_L,
+            BRACKET_R,
+            INCREMENT,
+            DECREMENT,
+            ASSIGNMENT,
+            ASSIGNMENT_PLUS,
+            ASSIGNMENT_MINUS,
+            ASSIGNMENT_MULTY,
+            ASSIGNMENT_DIVISION,
+            ACCESS_MODIFIER,
             TYPE,
+            BOOL,
             OP,
             NUM,
             NUM_REAL,
+            NUM_16X,
             ID,
             TWINS,
             SEMILICON,
@@ -43,7 +72,7 @@ namespace lab1
 
         static int lineMemmory = 0;
         static int indexMemmory = 0;
-        static string[] line = { };
+        static string[] line;
         static string[] stringWithoutComm;
 
         public static void StartLexer(string str)
