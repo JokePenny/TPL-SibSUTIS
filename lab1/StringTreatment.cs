@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
-namespace lab1
+namespace lab1 // for(i++;)
 {
     public sealed class StringTreatment
     {
-        public readonly static string dictSpaceBetween = "[@,.]+-/{}|*^$!~&()%|?=<>!;";
-
-        public static string[] DeleteCommentsAndTab(string stroke)
+        public static string[] DeleteComments(string stroke)
         {
             string deleteComments = FindComments(stroke);
             string deleteTabulation = deleteComments.Replace("\t", "");
@@ -73,87 +70,6 @@ namespace lab1
 
             }
             return strWithoutComments.ToString();
-        }
-
-        public static string[] FormatStroke(string stroke)
-        {
-            string insertSpaceBetweenKey = InsertSpaceBetween(stroke);
-            return SplitString(insertSpaceBetweenKey);
-        }
-
-        public static string[] SplitString(string insertSpaceBetweenKey)
-        {
-            List<string> listWords = new List<string>();
-            StringBuilder insertingSpace = new StringBuilder();
-            char[] strokeWithSpace = insertSpaceBetweenKey.ToCharArray();
-
-            bool isFindString = false;
-
-            for (int i = 0; i < strokeWithSpace.Length; i++)
-            {
-                if(insertSpaceBetweenKey[i] == '"')
-                {
-                    isFindString = !isFindString;
-                    insertingSpace.Append(insertSpaceBetweenKey[i]);
-                    continue;
-                }
-                else if(insertSpaceBetweenKey[i] == ' ' && !isFindString && insertingSpace.Length != 0)
-                {
-                    listWords.Add(insertingSpace.ToString());
-                    insertingSpace = new StringBuilder();
-                    continue;
-                }
-                if (insertSpaceBetweenKey[i] != ' ' || isFindString) insertingSpace.Append(insertSpaceBetweenKey[i]);
-            }
-            if (insertingSpace.Length != 0) listWords.Add(insertingSpace.ToString());
-            return listWords.ToArray();
-        }
-
-        public static string InsertSpaceBetween(string deleteNewline)
-        {
-            StringBuilder insertingSpace = new StringBuilder(deleteNewline);
-            char[] strokeWithSpace = deleteNewline.ToCharArray();
-
-            bool isFindString = false;
-
-            for (int i = 0, indexInsert = 0; i < strokeWithSpace.Length; i++, indexInsert++)
-            {
-                if (strokeWithSpace[i] == '"')
-                {
-                    isFindString = !isFindString;
-                    continue;
-                }
-
-                for (int j = 0; j < dictSpaceBetween.Length; j++)
-                {
-                    if(dictSpaceBetween[j] == '.' && i - 1 >= 0 && i + 1 < strokeWithSpace.Length)
-                    {
-                        if (Char.IsDigit(strokeWithSpace[i - 1]) && Char.IsDigit(strokeWithSpace[i + 1])) break;
-                    }
-
-                    if (strokeWithSpace[i] == dictSpaceBetween[j] && !isFindString)
-                    {
-                        if (indexInsert - 1 >= 0)
-                        {
-                            if (insertingSpace[indexInsert - 1] != ' ')
-                            {
-                                insertingSpace.Insert(indexInsert, " ");
-                                indexInsert++;
-                            }
-                        }
-                        if (indexInsert + 1 < insertingSpace.Length)
-                        {
-                            if (insertingSpace[indexInsert + 1] != ' ')
-                            {
-                                insertingSpace.Insert(indexInsert + 1, " ");
-                                indexInsert++;
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-            return insertingSpace.ToString();
         }
     }
 }

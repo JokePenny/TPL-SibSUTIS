@@ -6,6 +6,7 @@ namespace lab1.ASTNodes
 {
     class ASTNode
     {
+        public virtual void Print(string level) { }
         ~ASTNode() { }
     }
 }

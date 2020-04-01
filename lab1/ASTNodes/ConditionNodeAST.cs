@@ -1,4 +1,6 @@
-﻿namespace lab1.ASTNodes
+﻿using System;
+
+namespace lab1.ASTNodes
 {
     class ConditionNodeAST : ASTNode
     {
@@ -8,6 +10,27 @@
         {
             this.bodyCondition = bodyCondition;
             this.body = body;
+        }
+
+        public ASTNode GetCondition()
+        {
+            return bodyCondition;
+        }
+
+        public ASTNode GetBody()
+        {
+            return body;
+        }
+
+        public override void Print(string level)
+        {
+            if (bodyCondition != null)
+            {
+                Console.WriteLine(level + "[CONDITION]");
+                bodyCondition.Print(level + "\t");
+            }
+            Console.WriteLine(level + "[BODY]");
+            body.Print(level + "\t");
         }
     }
 }

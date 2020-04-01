@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace lab1.ASTNodes
 {
@@ -11,6 +10,20 @@ namespace lab1.ASTNodes
         public PostconditionForAST(List<ASTNode> memberPostcondition)
         {
             this.memberPostcondition = memberPostcondition;
+        }
+
+        public List<ASTNode> GetMemberPostcondition()
+        {
+            return memberPostcondition;
+        }
+
+        public override void Print(string level)
+        {
+            Console.WriteLine(level + "[FOR_POSTCONDITION]");
+            for (int i = 0; i < memberPostcondition.Count; i++)
+            {
+                memberPostcondition[i].Print(level + "\t");
+            }
         }
     }
 }

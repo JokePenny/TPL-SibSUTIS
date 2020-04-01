@@ -1,12 +1,14 @@
 ﻿using lab1.Helpers;
+using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace lab1
 {
     public class TokenNode : Lexer
     {
-        public TokenNode(Token token, string subString, int y, int x)
+        public TokenNode(Tokens.Token token, string subString, int y, int x)
         {
             this.token = token;
             this.subString = subString;
@@ -14,7 +16,7 @@ namespace lab1
             this.x = x + 1;
         }
 
-        public Token token;
+        public Tokens.Token token;
         public string subString;
         public int y;
         public int x;
@@ -24,115 +26,117 @@ namespace lab1
     {
         private static List<TokenNode> listTokens = new List<TokenNode>();
 
-        // виды токенов
-        public enum Token : int
-        {
-            KEYWORD = 0,
-            K_FOREACH,
-            K_FOR,
-            K_IF,
-            K_WHILE,
-            K_DO,
-            K_STRUCT,
-            K_CLASS,
-            K_NAMESPACE,
-            K_ENUM,
-            K_NEW,
-            K_ELSE,
-            K_RETURN,
-            COMM,
-            BRACE_L,
-            BRACE_R,
-            PARENTHESIS_L,
-            PARENTHESIS_R,
-            BRACKET_L,
-            BRACKET_R,
-            INCREMENT,
-            DECREMENT,
-            ASSIGNMENT,
-            ASSIGNMENT_PLUS,
-            ASSIGNMENT_MINUS,
-            ASSIGNMENT_MULTY,
-            ASSIGNMENT_DIVISION,
-            ACCESS_MODIFIER,
-            TYPE,
-            BOOL,
-            OP,
-            NUM,
-            NUM_REAL,
-            NUM_16X,
-            ID,
-            TWINS,
-            SEMILICON,
-            STRING,
-            CHAR,
-            NULL,
-            FAILED
-        }
-
-        static int lineMemmory = 0;
-        static int indexMemmory = 0;
-        static string[] line;
-        static string[] stringWithoutComm;
+        private static int lineMemmory = 0;
+        private static int indexMemmory = 0;
+        private static int startTokenIndex = 0;
+        private static string line;
+        private static string[] stringWithoutComm;
+        private static Tokens.Token tokenTypeMemory = Tokens.Token.EMPTY;
+        private static string tokenBuilderMemory = "";
 
         public static void StartLexer(string str)
         {
-            // заполнение словарей
-            ReadSource.FillTokens();
             // удаление комментариев и табуляции
-            stringWithoutComm = StringTreatment.DeleteCommentsAndTab(str);
-            line = StringTreatment.FormatStroke(stringWithoutComm[lineMemmory]);
+            stringWithoutComm = StringTreatment.DeleteComments(str);
             ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
+            line = stringWithoutComm[lineMemmory];
             AbstractSyntaxTree.CreateAST();
         }
 
         public static TokenNode GetToken()
         {
-            for (; lineMemmory < stringWithoutComm.Length;)
+            StringBuilder tokenBuilder = new StringBuilder();
+            bool isFindString = false;
+            bool isFindChar = false;
+            startTokenIndex = indexMemmory;
+            // обработка слов
+            for (; lineMemmory < stringWithoutComm.Length; lineMemmory++, line = stringWithoutComm[lineMemmory])
             {
-                // обработка слов
-                for (; indexMemmory < line.Length;)
+                for (; indexMemmory < line.Length; indexMemmory++)
                 {
+                    if (line[indexMemmory] == ' ' && !isFindString)
+                    {
+                        if (tokenBuilderMemory != null)
+                        {
+                            indexMemmory++;
+                            return CreateNodeToken(tokenTypeMemory, tokenBuilderMemory);
+                        }
+                        else continue;
+                    }
+                    tokenBuilder.Append(line[indexMemmory]);
+                    if(isFindString && line[indexMemmory] == '"')
+                    {
+                        isFindString = !isFindString;
+                    }
+                    else if (isFindString || line[indexMemmory] == '"')
+                    {
+                        isFindString = true;
+                        continue;
+                    }
+
+                    if (isFindChar && line[indexMemmory] == '\'')
+                    {
+                        isFindChar = !isFindChar;
+                    }
+                    else if (isFindChar || line[indexMemmory] == '\'')
+                    {
+                        isFindChar = true;
+                        continue;
+                    }
+
                     // определения вида токена
-                    Token tokenType = FindToken(line[indexMemmory]);
-                    // создание токена
-                    return CreateNodeToken(tokenType, line[indexMemmory]);
+                    Tokens.Token tokenType = FindToken(tokenBuilder.ToString());
+                    if (Tokens.IsErrorToken(ref tokenType, tokenTypeMemory, tokenBuilder.Length) && indexMemmory != line.Length - 1)
+                    {
+                        tokenTypeMemory = tokenType;
+                        tokenBuilderMemory = tokenBuilder.ToString();
+                        continue;
+                    }
+
+                    if (indexMemmory == line.Length - 1 && tokenType != Tokens.Token.FAILED)
+                    {
+                        tokenBuilderMemory = tokenBuilder.ToString();
+                        tokenTypeMemory = tokenType;
+                        indexMemmory++;
+                    }
+                    return CreateNodeToken(tokenTypeMemory, tokenBuilderMemory);
                 }
+                ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
             }
             return null;
         }
 
-        public static Token FindToken(string buildToken)
+        public static Tokens.Token FindToken(string buildToken)
         {
-            if (Regex.IsMatch(buildToken, Tokens.String)) return Token.STRING;
-            if (Regex.IsMatch(buildToken, Tokens.Type)) return Token.TYPE;
-            if (Regex.IsMatch(buildToken, Tokens.Keyword)) return Token.KEYWORD;
-            if (Regex.IsMatch(buildToken, Tokens.Operator)) return Token.OP;
-            if (Regex.IsMatch(buildToken, Tokens.Twins)) return Token.TWINS;
-            if (Regex.IsMatch(buildToken, Tokens.Num)) return Token.NUM;
-            if (Regex.IsMatch(buildToken, Tokens.NumReal)) return Token.NUM_REAL;
-            if (Regex.IsMatch(buildToken, Tokens.Char)) return Token.CHAR;
-            if (Regex.IsMatch(buildToken, Tokens.Id)) return Token.ID;
-            if (Regex.IsMatch(buildToken, Tokens.ForbiddenSymbolsId)) return Token.FAILED;
-            if (buildToken[0] == Tokens.Semicolon) return Token.SEMILICON;
-            return Token.FAILED;
+            if (Regex.IsMatch(buildToken, Tokens.String)) return Tokens.Token.STRING;
+            if (Regex.IsMatch(buildToken, Tokens.Char)) return Tokens.Token.CHAR;
+            if (Regex.IsMatch(buildToken, Tokens.DoubleVal)) return Tokens.Token.DOUBLE_VALUE;
+            if (Regex.IsMatch(buildToken, Tokens.IntVal)) return Tokens.Token.INT_VALUE;
+            if (Regex.IsMatch(buildToken, Tokens.X16)) return Tokens.Token.X16_VALUE;
+            if (Regex.IsMatch(buildToken, Tokens.X8)) return Tokens.Token.X8_VALUE;
+            if (Regex.IsMatch(buildToken, Tokens.X2)) return Tokens.Token.X2_VALUE;
+            Tokens.Token token = Tokens.Token.EMPTY;
+            if (Tokens.DictionaryWord.TryGetValue(buildToken, out token)) return token;
+            if (Regex.IsMatch(buildToken, Tokens.Id)) return Tokens.Token.ID;
+            return Tokens.Token.FAILED;
         }
 
-        private static TokenNode CreateNodeToken(Token token, string subStr)
+        private static TokenNode CreateNodeToken(Tokens.Token token, string subStr)
         {
-            TokenNode tokenNode = new TokenNode(token, subStr, lineMemmory, indexMemmory);
-            indexMemmory++;
+            TokenNode tokenNode = new TokenNode(token, subStr, lineMemmory, startTokenIndex);
             if (indexMemmory == line.Length)
             {
                 indexMemmory = 0;
                 lineMemmory++;
-                if (lineMemmory != stringWithoutComm.Length)
+                if (lineMemmory < stringWithoutComm.Length)
                 {
                     ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
-                    line = StringTreatment.FormatStroke(stringWithoutComm[lineMemmory]);
+                    line = stringWithoutComm[lineMemmory];
                 }
             }
             listTokens.Add(tokenNode);
+            tokenTypeMemory = Tokens.Token.EMPTY;
+            tokenBuilderMemory = null;
             return tokenNode;
         }
         
@@ -145,7 +149,7 @@ namespace lab1
                 TokenNode tokenNode = listTokens[i];
                 string tokenInfo = GetTokenInfo(tokenNode);
 
-                if (tokenNode.token == Token.FAILED)
+                if (tokenNode.token == Tokens.Token.FAILED)
                 {
                     ConsoleHelper.WriteError(tokenInfo);
                 }

@@ -12,5 +12,20 @@ namespace lab1.ASTNodes
         {
             this.memberMethod = memberMethod;
         }
+
+        public List<ASTNode> GetMemberMethod()
+        {
+            return memberMethod;
+        }
+
+        public override void Print(string level)
+        {
+            Console.WriteLine(level + "[BODY]");
+            
+            for(int i = 0; i < memberMethod.Count; i++)
+            {
+                memberMethod[i].Print(level + "\t");
+            }
+        }
     }
 }

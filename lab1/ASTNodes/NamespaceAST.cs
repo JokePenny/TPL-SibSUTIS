@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace lab1.ASTNodes
 {
@@ -11,6 +12,24 @@ namespace lab1.ASTNodes
         {
             this.members = members;
             this.idNamespace = idNamespace;
+        }
+
+        public List<ASTNode> GetMembers()
+        {
+            return members;
+        }
+
+        public string GetName()
+        {
+            return idNamespace;
+        }
+        public override void Print(string level)
+        {
+            Console.WriteLine(level + "[NAMESPACE] " + idNamespace);
+            for (int i = 0; i < members.Count; i++)
+            {
+                members[i].Print(level + "\t");
+            }
         }
     }
 }

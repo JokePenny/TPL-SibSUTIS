@@ -24,6 +24,13 @@ namespace lab1.Helpers
             Console.ResetColor();
         }
 
+        public static void WriteErrorAST(string message, int y, int x)
+        {
+            Console.ForegroundColor = Error;
+            Console.WriteLine("Error <" + y + ", " + x + ">: " + message);
+            Console.ResetColor();
+        }
+
         public static void WriteSuccess(string message)
         {
             Console.ForegroundColor = Success;
