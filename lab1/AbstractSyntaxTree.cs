@@ -15,8 +15,16 @@ namespace lab1
 
         public static void CreateAST()
         {
-            //GetNextToken();
-            headAST = ParseNamespace();
+            GetNextToken();
+            if (CurTok == null) return;
+            if (CurTok.token != Tokens.Token.K_NAMESPACE)
+            {
+                ConsoleHelper.WriteErrorAST("Expected 'namespace'", CurTok.y, CurTok.x);
+                SkipToToken(Tokens.Token.K_NAMESPACE);
+            }
+            else GetNextToken();
+
+            headAST = ParseMainArea(Area.NAMESPACE);
             headAST.Print("");
         }
 
@@ -26,146 +34,152 @@ namespace lab1
 
         private static ASTNode ParseBrackets(bool isCanValues)
         {
+            ASTNode brackets = null;
             if (isCanValues)
             {
                 GetNextToken();
                 if (CurTok == null) return null;
-                if (CurTok.token == Tokens.Token.BRACKET_R) ConsoleHelper.WriteErrorAST("Expected '[X]'", CurTok.y, CurTok.x);
-                ASTNode exp = MemberBinOperation();
 
+                if (CurTok.token == Tokens.Token.BRACKET_R) ConsoleHelper.WriteErrorAST("Expected '[X]'", CurTok.y, CurTok.x);
+
+                ASTNode exp = MemberBinOperation();
                 if (CurTok == null) return null;
+
                 if(CurTok.token == Tokens.Token.BRACKET_L)
                 {
                     exp = new BracketsAST(exp, ParseBrackets(true));
+                    if (CurTok == null) return null;
                 }
 
-                ASTNode exprNode = exp;
+                brackets = exp;
                 if (CurTok.token == Tokens.Token.OP)
                 {
-                    exprNode = ParseBinaryOperation(exp);
+                    brackets = ParseBinaryOperation(exp);
                     if (CurTok == null) return null;
                 }
                 else if (CurTok.token != Tokens.Token.BRACKET_R) ConsoleHelper.WriteErrorAST("Expected ']'", CurTok.y, CurTok.x);
-                else GetNextToken();
-                return exprNode;
             }
             else
             {
                 GetNextToken();
                 if (CurTok == null) return null;
                 if (CurTok.token != Tokens.Token.BRACKET_R) ConsoleHelper.WriteErrorAST("Expected ']'", CurTok.y, CurTok.x);
-                return new BracketsAST();
+                brackets = new BracketsAST();
             }
+            GetNextToken();
+            return brackets;
         }
 
         //---------------------
-        // Парсер области имен
+        // Парсер скобки {
         //---------------------
 
-        private static ASTNode ParseNamespace()
+        private enum Area : int
         {
-            GetNextToken();
-            if (CurTok == null) return null;
-            if (CurTok.token != Tokens.Token.K_NAMESPACE) ConsoleHelper.WriteErrorAST("Expected 'namespace'", CurTok.y, CurTok.x);
-
-            GetNextToken();
-            if (CurTok == null) return null;
-            if (CurTok.token != Tokens.Token.ID) ConsoleHelper.WriteErrorAST("Expected 'identificator' for namespace", CurTok.y, CurTok.x);
-
-            string idName = CurTok.subString;
-
-            GetNextToken();
-            if (CurTok == null) return null;
-            if (CurTok.token != Tokens.Token.BRACE_L) ConsoleHelper.WriteErrorAST("Expected '{'", CurTok.y, CurTok.x);
-
-            List<ASTNode> memberNamespace = ParseBraceNamespace();
-
-            GetNextToken();
-            if (CurTok == null) return new NamespaceAST(memberNamespace, idName);
-            if (CurTok.token != Tokens.Token.BRACE_R) ConsoleHelper.WriteErrorAST("Expected '}'", CurTok.y, CurTok.x);
-
-            return new NamespaceAST(memberNamespace, idName);
+            NAMESPACE = 0,
+            CLASS,
+            METHOD
         }
 
-        private static List<ASTNode> ParseBraceNamespace()
+        private static List<ASTNode> ParseBrace(Area area, bool isCycle)
         {
-            List<ASTNode> memmbersNamespace = new List<ASTNode>();
+            isCycleArea = isCycle;
+            List<ASTNode> membersBodyMethod = new List<ASTNode>();
             while (true)
             {
-                ASTNode memmberNamespace = MemmberNamespace();
-
-                if (memmberNamespace == null) break; // null
-                memmbersNamespace.Add(memmberNamespace);
-
-                if (CurTok == null) return memmbersNamespace;
-                if (CurTok.token == Tokens.Token.BRACE_R) break; // null
+                ASTNode member = GetMemberArea(area, isCycle);
+                if (member != null) membersBodyMethod.Add(member);
+                if (CurTok == null) break;
+                if (CurTok.token == Tokens.Token.BRACE_R) break;
             }
-            return memmbersNamespace;
+            GetNextToken();
+            return membersBodyMethod;
         }
 
-        private static ASTNode MemmberNamespace()
+        private static ASTNode GetMemberArea(Area area, bool isCycle)
+        {
+            switch (area)
+            {
+                case Area.NAMESPACE:
+                    return MemberNamespace();
+                case Area.CLASS:
+                    return MemberClass();
+                case Area.METHOD:
+                    return MemberMethod(isCycle);
+            }
+            return null;
+        }
+
+        private static bool isRawToken = false;
+        private static ASTNode MemberMethod(bool isCycle)
+        {
+            if (!isRawToken)
+            {
+                GetNextToken();
+                if (CurTok == null) return null;
+            }
+            else isRawToken = false;
+            switch (CurTok.token)
+            {
+                case Tokens.Token.SEMILICON:
+                    break;
+                case Tokens.Token.TYPE:
+                    return ParseType(false, false, Tokens.Token.SEMILICON);
+                case Tokens.Token.ID:
+                    return ParseId(Tokens.Token.SEMILICON);
+                case Tokens.Token.CREMENT:
+                    return ParseCrement(Tokens.Token.SEMILICON);
+                case Tokens.Token.K_FOR:
+                    return ParseFor();
+                case Tokens.Token.K_IF:
+                    return ParseIf();
+                case Tokens.Token.K_WHILE:
+                    return ParseWhile();
+                case Tokens.Token.K_CONTINUE:
+                case Tokens.Token.K_BREAK:
+                    if (!isCycle) ConsoleHelper.WriteErrorAST("No external loop to interrupt or continue", CurTok.y, CurTok.x);
+                    ASTNode node;
+                    if (CurTok.token == Tokens.Token.K_BREAK) node = new BreakAST();
+                    else node = new ContinueAST();
+
+                    GetNextToken();
+                    if (CurTok == null) return node;
+                    if (CurTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
+                    return node;
+                case Tokens.Token.K_RETURN:
+                    return ParseReturn();
+                case Tokens.Token.BRACE_R:
+                    return null;
+                default:
+                    return null;
+            }
+            return null;
+        }
+
+        private static ASTNode MemberNamespace()
         {
             GetNextToken();
             if (CurTok == null) return null;
             switch (CurTok.token)
             {
-                case Tokens.Token.BRACE_R: // найден конец области имен (если все правильно)
+                case Tokens.Token.BRACE_R:
                     return null;
-                case Tokens.Token.TYPE: // тип
-                    return null;
-                case Tokens.Token.K_CLASS: // класс
-                    return ParseClass();
+                case Tokens.Token.K_CLASS:
+                    return ParseMainArea(Area.CLASS);
                 default:
                     ConsoleHelper.WriteErrorAST("Impossible token in this area", CurTok.y, CurTok.x);
                     return null;
             }
         }
 
-        //---------------------
-        // Парсер класса
-        //---------------------
-
-        private static ASTNode ParseClass()
+        private static ASTNode MemberClass()
         {
             GetNextToken();
-            if (CurTok == null) return null;
-            if (CurTok.token != Tokens.Token.ID) ConsoleHelper.WriteErrorAST("Expected 'identificator' for class", CurTok.y, CurTok.x);
-
-            string idName = CurTok.subString;
-
-            GetNextToken();
-            if (CurTok == null) return null;
-            if (CurTok.token != Tokens.Token.BRACE_L) ConsoleHelper.WriteErrorAST("Expected '{'", CurTok.y, CurTok.x);
-
-            List<ASTNode> memberClass = ParseBraceClass();
-
-            if (CurTok == null) return null;
-            if (CurTok.token != Tokens.Token.BRACE_R) ConsoleHelper.WriteErrorAST("Expected '}'", CurTok.y, CurTok.x);
-
-            return new ClassAST(memberClass, idName);
-        }
-
-        private static List<ASTNode> ParseBraceClass()
-        {
-            List<ASTNode> memmbersClass = new List<ASTNode>();
-            GetNextToken();
-            if (CurTok == null) return null;
-            while (true)
-            {
-                ASTNode memmberClass = MemmberClass();
-                if (memmberClass == null) return memmbersClass;
-                memmbersClass.Add(memmberClass);
-            }
-        }
-
-        private static ASTNode MemmberClass()
-        {
-            //GetNextToken();
             if (CurTok == null) return null;
             switch (CurTok.token)
             {
                 case Tokens.Token.TYPE:
-                    return ParseType(false, true);
+                    return ParseType(false, true, Tokens.Token.SEMILICON);
                 case Tokens.Token.BRACE_R:
                     return null;
                 default:
@@ -175,8 +189,94 @@ namespace lab1
         }
 
         //---------------------
+        // Парсер скобки (
+        //---------------------
+
+        private static ASTNode ParseParenthesis()
+        {
+            ASTNode exprassion;
+            GetNextToken();
+            if (CurTok == null) return null;
+            if (CurTok.token != Tokens.Token.SEMILICON && CurTok.token != Tokens.Token.PARENTHESIS_R)
+            {
+                ASTNode leftNode = MemberBinOperation();
+                if (leftNode == null) return null;
+                if (CurTok == null) return null;
+                if (CurTok.token == Tokens.Token.OP)
+                {
+                    exprassion = ParseBinaryOperation(leftNode);
+                    return new ParenthesisExprAST(exprassion);
+                }
+                else if (CurTok.token == Tokens.Token.PARENTHESIS_L)
+                {
+                    ASTNode parenExpr = ParseParenthesis();
+                    if (parenExpr == null) return null;
+                    exprassion = ParseBinaryOperation(parenExpr);
+                    return new ParenthesisExprAST(exprassion);
+                }
+                else if (CurTok.token != Tokens.Token.SEMILICON) return null;
+            }
+            else
+            {
+                ConsoleHelper.WriteErrorAST("Expected ')' or empty ()", CurTok.y, CurTok.x);
+            }
+            return null;
+        }
+
+        //---------------------
+        // Парсер области имен и класса
+        //---------------------
+
+        private static ASTNode ParseMainArea(Area area)
+        {
+            string idName;
+            GetNextToken();
+            if (CurTok == null) return null;
+            if (CurTok.token != Tokens.Token.ID)
+            {
+                idName = "[NONAME]";
+                ConsoleHelper.WriteErrorAST("Expected 'identificator'", CurTok.y, CurTok.x);
+                SkipToToken(Tokens.Token.BRACE_L);
+            }
+            else
+            {
+                idName = CurTok.subString;
+                GetNextToken();
+            }
+
+            if (CurTok == null) return null;
+            if (CurTok.token != Tokens.Token.BRACE_L) ConsoleHelper.WriteErrorAST("Expected '{'", CurTok.y, CurTok.x);
+
+            List<ASTNode> memberArea = ParseBrace(Area.CLASS, false);
+
+            if (CurTok == null) return null;
+            if (CurTok.token != Tokens.Token.BRACE_R) ConsoleHelper.WriteErrorAST("Expected '}'", CurTok.y, CurTok.x);
+
+            if(area == Area.NAMESPACE) return new NamespaceAST(memberArea, idName);
+            else return new ClassAST(memberArea, idName);
+        }
+
+        //---------------------
         // Парсер метода
         //---------------------
+        private static ASTNode ParseArgInMethod(bool isCall)
+        {
+            if (CurTok.token == Tokens.Token.ID && isCall)
+            {
+                IdentificatorAST identificatorAST = new IdentificatorAST(CurTok.subString);
+                return identificatorAST;
+            }
+            else if (CurTok.token == Tokens.Token.TYPE && !isCall)
+            {
+                return ParseType(false, false, Tokens.Token.PARENTHESIS_R);
+            }
+            else if (CurTok.token == Tokens.Token.PARENTHESIS_R)
+            {
+                return null;
+            }
+            else ConsoleHelper.WriteErrorAST("Expected 'type' for identificator in method declaration", CurTok.y, CurTok.x);
+            return null;
+        }
 
         private static List<ASTNode> ParseArgsMethod(bool isCall)
         {
@@ -192,21 +292,27 @@ namespace lab1
                     if (CurTok.token == Tokens.Token.COMM)
                     {
                         ASTNode argMethod = ParseArgInMethod(isCall);
+                        if (CurTok == null) break;
                         if (argMethod != null) argsMethod.Add(argMethod);
+                        if (CurTok.token == Tokens.Token.COMM) continue;
+                        if (CurTok.token != Tokens.Token.PARENTHESIS_R) break;
                     }
-                    else if(CurTok.token == Tokens.Token.PARENTHESIS_R)
-                    {
-                        return argsMethod;
-                    }
-                    else ConsoleHelper.WriteErrorAST("Expected ','", CurTok.y, CurTok.x);
+                    break;
                 }
                 else
                 {
                     ASTNode argMethod = ParseArgInMethod(isCall);
-                    if (argMethod != null) argsMethod.Add(argMethod);
-                    else return argsMethod;
+                    argsMethod.Add(argMethod);
+                    break;
                 }
             }
+            if (CurTok.token != Tokens.Token.PARENTHESIS_R)
+            {
+                ConsoleHelper.WriteErrorAST("Expected ')'", CurTok.y, CurTok.x);
+                SkipToToken(Tokens.Token.BRACE_L);
+            }
+            GetNextToken();
+            return argsMethod;
         }
 
         private static ASTNode ParseMethod(string typeId, string idName, bool isCall)
@@ -216,137 +322,100 @@ namespace lab1
             List<ASTNode> bodyMethod = new List<ASTNode>();
             if (!isCall)
             {
-                GetNextToken();
                 if (CurTok == null) return null;
                 if (CurTok.token != Tokens.Token.BRACE_L) ConsoleHelper.WriteErrorAST("Expected '{'", CurTok.y, CurTok.x);
-                bodyMethod = ParseBraceMethod(false);
+                bodyMethod = ParseBrace(Area.METHOD, false);
             }
 
             if (argsMethod.Count > 0)
             {
-                if (isCall)
-                {
-                    return new MethodAST(idName, argsMethod);
-                }
-                else
-                {
-                    return new MethodAST(typeId, idName, argsMethod, new BodyMethodAST(bodyMethod));
-                }
+                if (isCall) return new MethodAST(idName, argsMethod);
+                else return new MethodAST(typeId, idName, argsMethod, new BodyMethodAST(bodyMethod));
             }
             else
             {
-                if (isCall)
-                {
-                    return new MethodAST(idName);
-                }
-                else
-                {
-                    return new MethodAST(typeId, idName, new BodyMethodAST(bodyMethod));
-                }
+                if (isCall) return new MethodAST(idName);
+                else return new MethodAST(typeId, idName, new BodyMethodAST(bodyMethod));
             }
         }
 
-        private static List<ASTNode> ParseBraceMethod(bool isCycle)
-        {
-            isCycleArea = isCycle;
-            List<ASTNode> membersBodyMethod = new List<ASTNode>();
-            while (true)
-            {
-                ASTNode member = MemmberBodyMethod(isCycle);
-                if (member != null) membersBodyMethod.Add(member);
-                if (CurTok == null) return membersBodyMethod;
-                if (CurTok.token == Tokens.Token.BRACE_R) break;
-            }
-            GetNextToken();
-            if (CurTok == null) return membersBodyMethod;
-            return membersBodyMethod;
-        }
-
-        private static ASTNode MemmberBodyMethod(bool isCycle)
-        {
-            GetNextToken();
-            if (CurTok == null) return null;
-            switch (CurTok.token)
-            {
-                case Tokens.Token.SEMILICON:
-                    break;
-                case Tokens.Token.TYPE:
-                    return ParseType(false, false);
-                case Tokens.Token.ID:
-                    return ParseId();
-                case Tokens.Token.CREMENT:
-                    return ParseCrement();
-                case Tokens.Token.K_FOR:
-                    return ParseFor();
-                case Tokens.Token.K_IF:
-                    return ParseIf();
-                case Tokens.Token.K_WHILE:
-                    return ParseWhile();
-                case Tokens.Token.K_CONTINUE:
-                    if (!isCycle) ConsoleHelper.WriteErrorAST("No external loop to interrupt or continue", CurTok.y, CurTok.x);
-                    GetNextToken();
-                    if (CurTok == null) return null;
-                    if (CurTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
-                    return new ContinueAST();
-                case Tokens.Token.K_BREAK:
-                    if (!isCycle) ConsoleHelper.WriteErrorAST("No external loop to interrupt or continue", CurTok.y, CurTok.x);
-                    GetNextToken();
-                    if (CurTok == null) return null;
-                    if(CurTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
-                    return new BreakAST();
-                case Tokens.Token.K_RETURN:
-                    return ParseReturn();
-                case Tokens.Token.BRACE_R:
-                    return null;
-                default:
-                    return null;
-            }
-            return null;
-        }
+        //---------------------
+        // Парсер while
+        //---------------------
 
         private static ASTNode ParseWhile()
         {
+            ASTNode condition = null;
+            ASTNode bodyWhile;
             GetNextToken();
             if (CurTok == null) return null;
-            if (CurTok.token != Tokens.Token.PARENTHESIS_L) ConsoleHelper.WriteErrorAST("Expected '('", CurTok.y, CurTok.x);
-            ASTNode condition = ParseConditionIf();
-            ASTNode bodyWhile = null;
+            if (CurTok.token != Tokens.Token.PARENTHESIS_L)
+            {
+                ConsoleHelper.WriteErrorAST("Expected '('", CurTok.y, CurTok.x);
+                SkipToToken(Tokens.Token.BRACE_L);
+            }
+            else
+            {
+                condition = ParseConditionIf();
+                GetNextToken();
+            }
 
-            GetNextToken();
             if (CurTok == null) return null;
             if (CurTok.token == Tokens.Token.BRACE_L)
             {
-                bodyWhile = new BodyMethodAST(ParseBraceMethod(isCycleArea));
+                bodyWhile = new BodyMethodAST(ParseBrace(Area.METHOD, true));
             }
             else
             {
                 bodyWhile = MemberBodyForSemilicon();
                 if (CurTok == null) return null;
-                if (CurTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
+                if (CurTok.token != Tokens.Token.SEMILICON)
+                {
+                    ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
+                    SkipToToken(Tokens.Token.SEMILICON);
+                }
             }
             return new WhileAST(condition, bodyWhile);
         }
 
-        private static ASTNode ParseCrement()
+        //---------------------
+        // Парсер increment и decrement
+        //---------------------
+
+        private static ASTNode ParseCrement(Tokens.Token endToken)
         {
             string crement = CurTok.subString;
             GetNextToken();
             if (CurTok == null) return null;
-            if (CurTok.token != Tokens.Token.ID) ConsoleHelper.WriteErrorAST("Expected 'type' for identificator in method declaration", CurTok.y, CurTok.x);
-            return new CrementAST(crement, ParseId());
+            if (CurTok.token != Tokens.Token.ID)
+            {
+                ConsoleHelper.WriteErrorAST("Expected 'identificator'", CurTok.y, CurTok.x);
+                SkipToToken(endToken);
+                return null;
+            }
+            else return new CrementAST(crement, ParseId(endToken));
         }
 
-        private static ASTNode ParseCrement(ASTNode id)
+        private static ASTNode ParseCrement(ASTNode id, Tokens.Token endToken)
         {
             string crement = CurTok.subString;
             GetNextToken();
             if (CurTok == null) return null;
             if (CurTok.token == Tokens.Token.OP)
                 return ParseBinaryOperation(new CrementAST(crement, id));
-            else return new CrementAST(crement, id);
+            else if(CurTok.token != endToken)
+            {
+                ConsoleHelper.WriteErrorAST("Expected '" + endToken.ToString() + "'", CurTok.y, CurTok.x);
+                SkipToToken(endToken);
+            }
+            return new CrementAST(crement, id);
         }
 
-        private static ASTNode ParseId()
+        //---------------------
+        // Парсер id
+        //---------------------
+
+        private static ASTNode ParseId(Tokens.Token endToken)
         {
             string idName = CurTok.subString;
             ASTNode id = new IdentificatorAST(idName);
@@ -357,10 +426,11 @@ namespace lab1
             if (CurTok.token == Tokens.Token.BRACKET_L)
             {
                 ASTNode memberBrackets = ParseBrackets(true);
+                if (CurTok == null) return null;
                 return new BracketsAST(memberBrackets);
             }
 
-            if (CurTok.token == Tokens.Token.CREMENT) return ParseCrement(id);
+            if (CurTok.token == Tokens.Token.CREMENT) return ParseCrement(id, endToken);
 
             if (CurTok.token == Tokens.Token.PARENTHESIS_L) // МЕТОД
             {
@@ -373,27 +443,48 @@ namespace lab1
             }
             else
             {
-                ConsoleHelper.WriteErrorAST("Expected something action with identificator", CurTok.y, CurTok.x);
+                ConsoleHelper.WriteErrorAST("Wrong token. Expected '[', '(', '++' or '='", CurTok.y, CurTok.x);
+                SkipToToken(endToken);
                 return null;
             }
         }
 
-        private static ASTNode ParseArgInMethod(bool isCall)
+        private static ASTNode ParseInitID()
         {
-            if (CurTok.token == Tokens.Token.ID && isCall)
+            GetNextToken();
+            if (CurTok == null) return null;
+            if (CurTok.token == Tokens.Token.K_NEW)
             {
-                IdentificatorAST identificatorAST = new IdentificatorAST(CurTok.subString);
-                return identificatorAST;
+                GetNextToken();
+                if (CurTok == null) return null;
+                if (CurTok.token != Tokens.Token.TYPE) ConsoleHelper.WriteErrorAST("Expected 'type' during variable initialization", CurTok.y, CurTok.x);
+                ASTNode exp = ParseType(true, false, Tokens.Token.SEMILICON);
+                if (CurTok == null) return null;
+                if (CurTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
+
+                return new NewAST(exp);
             }
-            else if (CurTok.token == Tokens.Token.TYPE && !isCall)
+            else
             {
-                return ParseType(false, false);
+                if (CurTok.token != Tokens.Token.SEMILICON || CurTok.token != Tokens.Token.COMM)
+                {
+                    ASTNode leftNode = MemberBinOperation();
+                    if (leftNode == null) return null;
+                    if (CurTok == null) return null;
+                    if (CurTok.token == Tokens.Token.OP)
+                    {
+                        return ParseBinaryOperation(leftNode);
+                    }
+                    else if (CurTok.token == Tokens.Token.PARENTHESIS_L)
+                    {
+                        ASTNode parenExpr = ParseParenthesis();
+                        if (parenExpr == null) return leftNode;
+                        return ParseBinaryOperation(parenExpr);
+                    }
+                    else if (CurTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
+                    return leftNode;
+                }
             }
-            else if(CurTok.token == Tokens.Token.PARENTHESIS_R)
-            {
-                return null;
-            }
-            else ConsoleHelper.WriteErrorAST("Expected 'type' for identificator in method declaration", CurTok.y, CurTok.x);
             return null;
         }
 
@@ -401,7 +492,7 @@ namespace lab1
         // Парсер типа
         //---------------------
 
-        private static ASTNode ParseType(bool isInit, bool isInClass)
+        private static ASTNode ParseType(bool isInit, bool isInClass, Tokens.Token endToken)
         {
             string typeId = CurTok.subString;
 
@@ -424,8 +515,11 @@ namespace lab1
                     GetNextToken();
                     if (CurTok == null) return null;
                     if (CurTok.token != Tokens.Token.BRACKET_R) ConsoleHelper.WriteErrorAST("Expected ']'", CurTok.y, CurTok.x);
-                    GetNextToken();
-                    if (CurTok == null) return null;
+                    else
+                    {
+                        GetNextToken();
+                        if (CurTok == null) return null;
+                    }
                 }
             }
             // переменная
@@ -446,13 +540,25 @@ namespace lab1
                 }
                 else if (CurTok.token == Tokens.Token.ASSIGNMENT)
                 {
-                    ASTNode expr = ParseInitID();
-                    return new IdentificatorAST(typeId, idName, expr);
+                    if(endToken != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Impossible token in this area '='", CurTok.y, CurTok.x);
+                    else
+                    {
+                        ASTNode expr = ParseInitID();
+                        if (CurTok.token != endToken)
+                        {
+                            ConsoleHelper.WriteErrorAST("Expected '" + endToken.ToString() + "'", CurTok.y, CurTok.x);
+                            SkipToToken(endToken);
+                        }
+                        return new IdentificatorAST(typeId, idName, expr);
+                    }
                 }
-                else
+
+                if (CurTok.token != endToken)
                 {
-                    return new IdentificatorAST(typeId, idName);
+                    ConsoleHelper.WriteErrorAST("Expected '" + endToken.ToString() + "'", CurTok.y, CurTok.x);
+                    SkipToToken(endToken);
                 }
+                return new IdentificatorAST(typeId, idName);
             }
             else if(CurTok.token == Tokens.Token.PARENTHESIS_L && isInit)
             {
@@ -460,93 +566,23 @@ namespace lab1
                 GetNextToken();
                 if (CurTok == null) return null;
                 if(CurTok.token != Tokens.Token.PARENTHESIS_R) ConsoleHelper.WriteErrorAST("Expected ')'", CurTok.y, CurTok.x);
+                GetNextToken();
+                if (CurTok == null) return null;
+                if (CurTok.token != Tokens.Token.PARENTHESIS_R) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
                 return new IdentificatorAST(typeId, idName);
             }
             else
             {
                 ConsoleHelper.WriteErrorAST("Expected 'identificator'", CurTok.y, CurTok.x);
+                SkipToToken(endToken);
                 return null;
             }
         }
 
         //---------------------
-        // Парсер идентификатора
-        //---------------------
-
-        private static ASTNode ParseInitID()
-        {
-            GetNextToken();
-            if (CurTok == null) return null;
-            if (CurTok.token == Tokens.Token.K_NEW)
-            {
-                GetNextToken();
-                if (CurTok == null) return null;
-                if (CurTok.token != Tokens.Token.TYPE) ConsoleHelper.WriteErrorAST("Expected 'type' during variable initialization", CurTok.y, CurTok.x);
-                ASTNode exp = ParseType(true, false);
-                if (CurTok == null) return null;
-                if (CurTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
-                
-                return new NewAST(exp);
-            }
-            else
-            {
-                if(CurTok.token != Tokens.Token.SEMILICON || CurTok.token != Tokens.Token.COMM)
-                {
-                    ASTNode leftNode = MemberBinOperation();
-                    if (leftNode == null) return null;
-                    if (CurTok == null) return null;
-                    if (CurTok.token == Tokens.Token.OP)
-                    {
-                        return ParseBinaryOperation(leftNode);
-                    }
-                    else if(CurTok.token == Tokens.Token.PARENTHESIS_L)
-                    {
-                        ASTNode parenExpr = ParseParenthesisExpr();
-                        if (parenExpr == null) return leftNode;
-                        return ParseBinaryOperation(parenExpr);
-                    }
-                    else if (CurTok.token == Tokens.Token.SEMILICON) return leftNode;
-                }
-            }
-            return null;
-        }
-
-        //---------------------
         // Парсер бинарных выражений
         //---------------------
-
-        private static ASTNode ParseParenthesisExpr()
-        {
-            ASTNode exprassion;
-            GetNextToken();
-            if (CurTok == null) return null;
-            if (CurTok.token != Tokens.Token.SEMILICON && CurTok.token != Tokens.Token.PARENTHESIS_R)
-            {
-                ASTNode leftNode = MemberBinOperation();
-                if (leftNode == null) return null;
-                if (CurTok == null) return null;
-                if (CurTok.token == Tokens.Token.OP)
-                {
-                    exprassion = ParseBinaryOperation(leftNode);
-                    return new ParenthesisExprAST(exprassion);
-                }
-                else if (CurTok.token == Tokens.Token.PARENTHESIS_L)
-                {
-                    ASTNode parenExpr = ParseParenthesisExpr();
-                    if (parenExpr == null) return null;
-                    exprassion = ParseBinaryOperation(parenExpr);
-                    return new ParenthesisExprAST(exprassion);
-                }
-                else if (CurTok.token != Tokens.Token.SEMILICON) return null;
-            }
-            else
-            {
-                ConsoleHelper.WriteErrorAST("Expected ')' or empty ()", CurTok.y, CurTok.x);
-            }
-            return null;
-        }
  
-
         private static ASTNode MemberBinOperation()
         {
             ASTNode node = null;
@@ -577,6 +613,63 @@ namespace lab1
             }
             GetNextToken();
             return node;
+        }
+
+        private static ASTNode MemberBoolBinOperation()
+        {
+            GetNextToken();
+            if (CurTok == null) return null;
+            switch (CurTok.token)
+            {
+                case Tokens.Token.BOOL:
+                    return new BoolAST(CurTok.subString);
+                case Tokens.Token.STRING:
+                case Tokens.Token.CHAR:
+                case Tokens.Token.INT_VALUE:
+                case Tokens.Token.DOUBLE_VALUE:
+                case Tokens.Token.X16_VALUE:
+                case Tokens.Token.X8_VALUE:
+                case Tokens.Token.X2_VALUE:
+                case Tokens.Token.ID:
+                    string idName = CurTok.subString;
+                    ASTNode leftNode = MemberBinOperation();
+                    ASTNode leftNodeExp;
+
+                    if (CurTok.token == Tokens.Token.OP)
+                    {
+                        leftNodeExp = ParseBinaryOperation(leftNode);
+                        GetNextToken();
+                        if (CurTok == null) return null;
+                    }
+                    else leftNodeExp = leftNode;
+
+                    if (CurTok.token == Tokens.Token.BOOL_OP)
+                    {
+                        string op = CurTok.subString;
+                        GetNextToken();
+                        if (CurTok == null) return null;
+                        ASTNode rightNodeExp = MemberBinOperation();
+                        if (rightNodeExp == null) ConsoleHelper.WriteErrorAST("Expected 'x'", CurTok.y, CurTok.x);
+
+                        if (CurTok == null) return null;
+                        if (CurTok.token == Tokens.Token.BOOL_OP_AND || CurTok.token == Tokens.Token.BOOL_OP_OR)
+                        {
+                            return new BoolAST(new BinaryExprAST(CurTok.subString, new BinaryExprAST(op, leftNodeExp, rightNodeExp), MemberBoolBinOperation()));
+                        }
+                        else
+                        {
+                            return new BoolAST(new BinaryExprAST(op, leftNodeExp, rightNodeExp));
+                        }
+                    }
+                    ConsoleHelper.WriteErrorAST("Expected 'boolean'", CurTok.y, CurTok.x);
+                    return null;
+                case Tokens.Token.PARENTHESIS_L:
+                    return ParseParenthesis();
+                default:
+                    ConsoleHelper.WriteErrorAST("Impossible token in this area", CurTok.y, CurTok.x);
+                    break;
+            }
+            return null;
         }
 
         private static Dictionary<string, int> opPriority = new Dictionary<string, int>()
@@ -633,110 +726,16 @@ namespace lab1
             return rightMember;
         }
 
-        private static ASTNode MemberBoolBinOperation()
-        {
-            GetNextToken();
-            if (CurTok == null) return null;
-            switch (CurTok.token)
-            {
-                case Tokens.Token.BOOL:
-                    return new BoolAST(CurTok.subString);
-                case Tokens.Token.STRING:
-                case Tokens.Token.CHAR:
-                case Tokens.Token.INT_VALUE:
-                case Tokens.Token.DOUBLE_VALUE:
-                case Tokens.Token.X16_VALUE:
-                case Tokens.Token.X8_VALUE:
-                case Tokens.Token.X2_VALUE:
-                case Tokens.Token.ID:
-                    string idName = CurTok.subString;
-                    ASTNode leftNode = MemberBinOperation();
-                    ASTNode leftNodeExp;
-
-                    if (CurTok.token == Tokens.Token.OP)
-                    {
-                        leftNodeExp = ParseBinaryOperation(leftNode);
-                        GetNextToken();
-                        if (CurTok == null) return null;
-                    }
-                    else leftNodeExp = leftNode;
-
-                    if (CurTok.token == Tokens.Token.BOOL_OP)
-                    {
-                        string op = CurTok.subString;
-                        GetNextToken();
-                        if (CurTok == null) return null;
-                        ASTNode rightNodeExp = MemberBinOperation();
-                        if(rightNodeExp == null) ConsoleHelper.WriteErrorAST("Expected 'x'", CurTok.y, CurTok.x);
-
-                        if (CurTok == null) return null;
-                        if (CurTok.token == Tokens.Token.BOOL_OP_AND || CurTok.token == Tokens.Token.BOOL_OP_OR)
-                        {
-                            return new BoolAST(new BinaryExprAST(CurTok.subString, new BinaryExprAST(op, leftNodeExp, rightNodeExp), MemberBoolBinOperation()));
-                        }
-                        else
-                        {
-                            return new BoolAST(new BinaryExprAST(op, leftNodeExp, rightNodeExp));
-                        }
-                    }
-                    ConsoleHelper.WriteErrorAST("Expected 'boolean'", CurTok.y, CurTok.x);
-                    return null;
-                case Tokens.Token.PARENTHESIS_L:
-                    return ParseParenthesisExpr();
-                default:
-                    ConsoleHelper.WriteErrorAST("Impossible token in this area", CurTok.y, CurTok.x);
-                    break;
-            }
-            return null;
-        }
-
-        private static ASTNode ParseBoolBinaryOperation(ASTNode leftNode)
-        {
-            if (CurTok.token != Tokens.Token.BOOL_OP) ConsoleHelper.WriteErrorAST("Expected 'bool_op'", CurTok.y, CurTok.x);
-
-            string oldOp = CurTok.subString;//+
-            ASTNode rightMember;
-
-            GetNextToken();
-            if (CurTok == null) return null;//(
-            if (CurTok.token == Tokens.Token.PARENTHESIS_L)
-            {
-                GetNextToken();
-                if (CurTok == null) return null;//5
-                rightMember = MemberBinOperation();
-                if (rightMember == null)
-                {
-                    rightMember = MemberBoolBinOperation();
-                }
-
-                if (CurTok == null) return null;//)
-                if (CurTok.token != Tokens.Token.PARENTHESIS_R) ConsoleHelper.WriteErrorAST("Expected ')'", CurTok.y, CurTok.x);
-            }
-            else rightMember = MemberBinOperation();
-
-            if (rightMember == null) ConsoleHelper.WriteErrorAST("Expected 'bool'", CurTok.y, CurTok.x);
-
-            ASTNode binaryExpr;
-
-            if (CurTok == null) return null;
-            if (CurTok.token == Tokens.Token.BOOL_OP_AND || CurTok.token == Tokens.Token.BOOL_OP_OR)
-            {
-                binaryExpr = new BinaryExprAST(oldOp, leftNode, rightMember);
-                return ParseBinaryOperation(binaryExpr);
-            }
-            return rightMember;
-        }
-
         //---------------------
-        // Парсер условной конструкции if
+        // Парсер if
         //---------------------
-
+        
         private static ASTNode ParseIf()
         {
             List<ConditionNodeAST> branching = new List<ConditionNodeAST>();
             GetNextToken();
             if (CurTok == null) return null;
-            if(CurTok.token != Tokens.Token.PARENTHESIS_L) ConsoleHelper.WriteErrorAST("Expected '('", CurTok.y, CurTok.x);
+            
             bool isCondition = true;
             while (true)
             {
@@ -753,7 +752,7 @@ namespace lab1
                 if (CurTok == null) return null;
                 if(CurTok.token == Tokens.Token.BRACE_L)
                 {
-                    bodyIf = new BodyMethodAST(ParseBraceMethod(isCycleArea));
+                    bodyIf = new BodyMethodAST(ParseBrace(Area.METHOD, isCycleArea));
                     branching.Add(new ConditionNodeAST(condition, bodyIf));
                 }
                 else
@@ -779,7 +778,7 @@ namespace lab1
                     {
                         if (CurTok.token == Tokens.Token.BRACE_L)
                         {
-                            bodyIf = new BodyMethodAST(ParseBraceMethod(isCycleArea));
+                            bodyIf = new BodyMethodAST(ParseBrace(Area.METHOD, isCycleArea));
                             branching.Add(new ConditionNodeAST(condition, bodyIf));
                             GetNextToken();
                             if (CurTok == null) return new IfAST(branching);
@@ -795,8 +794,8 @@ namespace lab1
                             break;
                         }
                     }
-
                 }
+                else isRawToken = true;
                 break;
             }
             return new IfAST(branching);
@@ -816,7 +815,7 @@ namespace lab1
         }
 
         //---------------------
-        // Парсер цикла и условной конструкции For
+        // Парсер for
         //---------------------
 
         private static ASTNode ParseFor()
@@ -843,7 +842,7 @@ namespace lab1
             GetNextToken();
             if (CurTok == null) return null;
             if (CurTok.token == Tokens.Token.BRACE_L)
-                body = new BodyMethodAST(ParseBraceMethod(true));
+                body = new BodyMethodAST(ParseBrace(Area.METHOD, true));
             else
             {
                 body = MemberBodyForSemilicon();
@@ -858,11 +857,11 @@ namespace lab1
             switch (CurTok.token)
             {
                 case Tokens.Token.TYPE:
-                    return ParseType(false, false);
+                    return ParseType(false, false, Tokens.Token.SEMILICON);
                 case Tokens.Token.ID:
-                    return ParseId();
+                    return ParseId(Tokens.Token.SEMILICON);
                 case Tokens.Token.CREMENT:
-                    return ParseCrement();
+                    return ParseCrement(Tokens.Token.SEMILICON);
                 case Tokens.Token.K_FOR:
                     return ParseFor();
                 case Tokens.Token.K_IF:
@@ -880,11 +879,16 @@ namespace lab1
             while (true)
             {
                 ASTNode member = MemberPosconditionFor();
-                if (member == null) break;
+                if (CurTok == null) return new PostconditionForAST(postcondition);
+                if (member == null && CurTok.token != Tokens.Token.PARENTHESIS_R) break;
 
                 postcondition.Add(member);
-                if (CurTok == null) return null;
-                if (CurTok.token != Tokens.Token.COMM) break;
+                if (CurTok.token != Tokens.Token.COMM)
+                {
+                    ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
+                    SkipToToken(Tokens.Token.PARENTHESIS_R);
+                    break;
+                }
             }
             return new PostconditionForAST(postcondition);
         }
@@ -896,7 +900,7 @@ namespace lab1
             switch (CurTok.token)
             {
                 case Tokens.Token.ID:
-                    return ParseId();
+                    return ParseId(Tokens.Token.PARENTHESIS_R);
                 case Tokens.Token.CREMENT:
                     GetNextToken();
                     if (CurTok == null) return null;
@@ -913,7 +917,12 @@ namespace lab1
         {
             ASTNode condition = MemberBoolBinOperation();
             if (CurTok == null) return null;
-            if (CurTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
+            if (CurTok.token != Tokens.Token.SEMILICON)
+            {
+                ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
+                SkipToToken(Tokens.Token.BRACE_L);
+                return null;
+            }
             return condition;
         }
 
@@ -930,7 +939,7 @@ namespace lab1
                 if (CurTok.token == Tokens.Token.TYPE && isComm && isFirst)
                 {
                     generalType = CurTok.subString;
-                    ASTNode id = ParseType(false, false);
+                    ASTNode id = ParseType(false, false, Tokens.Token.SEMILICON);
                     declaredVar.Add(id);
                 }
                 else if (CurTok.token == Tokens.Token.ID && isComm)
@@ -983,7 +992,7 @@ namespace lab1
 
         private static string GetTypeID()
         {
-            throw new NotImplementedException();
+            return "";//извлекает из хэш таблицы тип переменной
         }
 
         //---------------------
@@ -994,7 +1003,7 @@ namespace lab1
 
         private static ASTNode ParseReturn()
         {
-            ASTNode memberReturn = ParseMemberReturn();
+            ASTNode memberReturn = MemberReturn();
             if(memberReturn is IdentificatorAST)
             {
                 if((memberReturn as IdentificatorAST).GetTypeId() == typeMethodReturn)
@@ -1013,16 +1022,14 @@ namespace lab1
             return null;
         }
 
-        private static ASTNode ParseMemberReturn()
+        private static ASTNode MemberReturn()
         {
             GetNextToken();
             if (CurTok == null) return null;
             switch (CurTok.token)
             {
                 case Tokens.Token.ID:
-                    ASTNode idNode = ParseId();
-                    if (CurTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
-                    return idNode;
+                    return ParseId(Tokens.Token.SEMILICON);
                 case Tokens.Token.INT_VALUE:
                 case Tokens.Token.DOUBLE_VALUE:
                 case Tokens.Token.X16_VALUE:
@@ -1034,12 +1041,12 @@ namespace lab1
                     if (CurTok.token == Tokens.Token.OP) return ParseBinaryOperation(value);
                     else if (CurTok.token == Tokens.Token.SEMILICON) return value;
                     ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
+                    SkipToToken(Tokens.Token.SEMILICON);
                     return null;
                 case Tokens.Token.CREMENT:
-                    ASTNode crement = ParseCrement();
-                    if (CurTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", CurTok.y, CurTok.x);
-                    return crement;
+                    return ParseCrement(Tokens.Token.SEMILICON);
                 default:
+                    ConsoleHelper.WriteErrorAST("Impossible token this area", CurTok.y, CurTok.x);
                     return null;
             }
         }
@@ -1051,6 +1058,15 @@ namespace lab1
         private static void GetNextToken()
         {
             CurTok = Lexer.GetToken();
+        }
+
+        private static void SkipToToken(Tokens.Token token)
+        {
+            while (CurTok.token != token)
+            {
+                GetNextToken();
+                if (CurTok == null) break;
+            }
         }
     }
 }

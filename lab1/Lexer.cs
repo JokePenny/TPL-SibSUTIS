@@ -38,7 +38,6 @@ namespace lab1
         {
             // удаление комментариев и табуляции
             stringWithoutComm = StringTreatment.DeleteComments(str);
-            ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
             line = stringWithoutComm[lineMemmory];
             AbstractSyntaxTree.CreateAST();
         }
@@ -50,7 +49,7 @@ namespace lab1
             bool isFindChar = false;
             startTokenIndex = indexMemmory;
             // обработка слов
-            for (; lineMemmory < stringWithoutComm.Length; lineMemmory++, line = stringWithoutComm[lineMemmory])
+            for (; lineMemmory < stringWithoutComm.Length;)
             {
                 for (; indexMemmory < line.Length; indexMemmory++)
                 {
@@ -101,7 +100,13 @@ namespace lab1
                     }
                     return CreateNodeToken(tokenTypeMemory, tokenBuilderMemory);
                 }
-                ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
+                lineMemmory++;
+                if (lineMemmory < stringWithoutComm.Length)
+                {
+                    line = stringWithoutComm[lineMemmory];
+                    //ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
+                }
+                else return null;
             }
             return null;
         }
@@ -127,10 +132,11 @@ namespace lab1
             if (indexMemmory == line.Length)
             {
                 indexMemmory = 0;
+                ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
                 lineMemmory++;
                 if (lineMemmory < stringWithoutComm.Length)
                 {
-                    ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
+                    //ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
                     line = stringWithoutComm[lineMemmory];
                 }
             }

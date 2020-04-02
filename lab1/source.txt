@@ -1,0 +1,53 @@
+namespace lab1
+{
+    class Program
+    {
+        void Main(string[] args)
+        {
+            int 
+        }
+
+        void TestMethod()
+        {
+            // find min
+            int[] array = new int[8];
+            int tmp = array[0];
+            for (int i = 0; i < 10; i++)
+            {
+                if (tmp > array[i])
+                    tmp = array[i];
+            }
+
+            // find substroke in stroke
+            string stroke = "sdf";
+            string strokeInFind = "sasd asd sssa as sdf";
+            int doneLetter = 10;
+            int nowAccesLetter = 0;
+            int indexStartWordInStroke = 0;
+            for (int i = 0; i < 10; i++)
+            {
+                if (stroke[nowAccesLetter] == strokeInFind[i])
+                {
+                    nowAccesLetter++;
+                    if (nowAccesLetter == doneLetter)
+                    {
+                        indexStartWordInStroke = i - nowAccesLetter;
+                        break;
+                    }
+                }
+                else nowAccesLetter = 0;
+            }
+
+            // find NOD
+            int firstNum = 5;
+            int secondNum = 10;
+            while (firstNum != 0 && secondNum != 0)
+            {
+                if (firstNum > secondNum)
+                    firstNum = firstNum % secondNum;
+                else
+                    secondNum = secondNum % firstNum;
+            }
+        }
+    }
+}
