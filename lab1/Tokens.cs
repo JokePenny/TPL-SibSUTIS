@@ -23,6 +23,7 @@ namespace lab1
             K_NAMESPACE,
             K_NEW,
             K_ELSE,
+            K_ELSE_IF,
             K_BREAK,
             K_CONTINUE,
             K_WHILE,

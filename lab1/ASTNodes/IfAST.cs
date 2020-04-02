@@ -6,13 +6,13 @@ namespace lab1.ASTNodes
 {
     class IfAST : ASTNode
     {
-        private List<ConditionNodeAST> branching;
-        public IfAST(List<ConditionNodeAST> branching)
+        private ASTNode branching;
+        public IfAST(ASTNode branching)
         {
             this.branching = branching;
         }
 
-        public List<ConditionNodeAST> GetBranching()
+        public ASTNode GetBranching()
         {
             return branching;
         }
@@ -20,10 +20,7 @@ namespace lab1.ASTNodes
         public override void Print(string level)
         {
             Console.WriteLine(level + "[IF]");
-            for (int i = 0; i < branching.Count; i++)
-            {
-                branching[i].Print(level + "\t");
-            }
+            if (branching != null) branching.Print(level + "\t");
         }
     }
 }

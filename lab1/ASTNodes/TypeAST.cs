@@ -14,7 +14,7 @@ namespace lab1.ASTNodes
             this.memberBrackets = memberBrackets;
         }
 
-        public void Print(string level)
+        public override void Print(string level)
         {
             Console.WriteLine(level + "[TYPE] " + typeName);
             if(memberBrackets != null)
