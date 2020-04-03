@@ -48,6 +48,76 @@ namespace lab1
             while (GetToken() != null) ;
         }
 
+        public static TokenNode GetTokenError()
+        {
+            StringBuilder tokenBuilder = new StringBuilder();
+            bool isFindString = false;
+            bool isFindChar = false;
+            startTokenIndex = indexMemmory;
+            // обработка слов
+            for (; lineMemmory < stringWithoutComm.Length;)
+            {
+                for (; indexMemmory < line.Length; indexMemmory++)
+                {
+                    if (line[indexMemmory] == ' ' && !isFindString)
+                    {
+                        if (tokenBuilderMemory != null)
+                        {
+                            indexMemmory++;
+                            return CreateNodeToken(tokenTypeMemory, tokenBuilderMemory);
+                        }
+                        else continue;
+                    }
+                    tokenBuilder.Append(line[indexMemmory]);
+                    if (isFindString && line[indexMemmory] == '"')
+                    {
+                        isFindString = !isFindString;
+                    }
+                    else if (isFindString || line[indexMemmory] == '"')
+                    {
+                        isFindString = true;
+                        continue;
+                    }
+
+                    if (isFindChar && line[indexMemmory] == '\'')
+                    {
+                        isFindChar = !isFindChar;
+                    }
+                    else if (isFindChar || line[indexMemmory] == '\'')
+                    {
+                        isFindChar = true;
+                        continue;
+                    }
+
+                    // определения вида токена
+                    Tokens.Token tokenType = FindToken(tokenBuilder.ToString());
+                    if (Tokens.IsErrorToken(ref tokenType, tokenTypeMemory, tokenBuilder.Length) && indexMemmory != line.Length - 1)
+                    {
+                        tokenTypeMemory = tokenType;
+                        tokenBuilderMemory = tokenBuilder.ToString();
+                        continue;
+                    }
+
+                    if (indexMemmory == line.Length - 1 && tokenType != Tokens.Token.FAILED)
+                    {
+                        tokenBuilderMemory = tokenBuilder.ToString();
+                        tokenTypeMemory = tokenType;
+                        indexMemmory++;
+                    }
+                    return CreateNodeToken(tokenTypeMemory, tokenBuilderMemory);
+                }
+                lineMemmory++;
+                if (lineMemmory < stringWithoutComm.Length)
+                {
+                    indexMemmory = 0;
+                    line = stringWithoutComm[lineMemmory];
+                    ConsoleHelper.WriteError(line);
+                }
+                else return null;
+            }
+            return null;
+        }
+
         public static TokenNode GetToken()
         {
             StringBuilder tokenBuilder = new StringBuilder();

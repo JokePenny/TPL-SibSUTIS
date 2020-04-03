@@ -961,6 +961,11 @@ namespace lab1
             curTok = Lexer.GetToken();
         }
 
+        private static void GetNextTokenError()
+        {
+            curTok = Lexer.GetTokenError();
+        }
+
         private static void CheckupClosedToken(Tokens.Token closedToken)
         {
             if (curTok.token != closedToken)
@@ -972,9 +977,9 @@ namespace lab1
 
         private static void SkipToToken(Tokens.Token token)
         {
-            while (curTok.token != token)
+            while (curTok.token != token )
             {
-                GetNextToken();
+                GetNextTokenError();
                 if (curTok == null) break;
             }
         }
