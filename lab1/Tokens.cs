@@ -104,10 +104,10 @@ namespace lab1
             {"++", Token.CREMENT},
             {"--", Token.CREMENT},
             {"=", Token.ASSIGNMENT},
-            {"+=", Token.ASSIGNMENT_PLUS},
-            {"-=", Token.ASSIGNMENT_MINUS},
-            {"/=", Token.ASSIGNMENT_DIVISION},
-            {"*=", Token.ASSIGNMENT_MULTY},
+            {"+=", Token.ASSIGNMENT},
+            {"-=", Token.ASSIGNMENT},
+            {"/=", Token.ASSIGNMENT},
+            {"*=", Token.ASSIGNMENT},
             {"(", Token.PARENTHESIS_L},
             {")", Token.PARENTHESIS_R},
             {"[", Token.BRACKET_L},
@@ -161,10 +161,6 @@ namespace lab1
                 case Token.BIT_OP_OR:
                 case Token.CREMENT:
                 case Token.ASSIGNMENT:
-                case Token.ASSIGNMENT_PLUS:
-                case Token.ASSIGNMENT_MINUS:
-                case Token.ASSIGNMENT_MULTY:
-                case Token.ASSIGNMENT_DIVISION:
                     isOk = (tokenTypeMemory == Token.OP ||
                             tokenTypeMemory == Token.BOOL_OP ||
                             tokenTypeMemory == Token.BIT_OP_OR ||

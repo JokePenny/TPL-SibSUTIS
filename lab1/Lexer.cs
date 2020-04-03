@@ -38,8 +38,14 @@ namespace lab1
         {
             // удаление комментариев и табуляции
             stringWithoutComm = StringTreatment.DeleteComments(str);
+            for (int i = 0; i < stringWithoutComm.Length; i++) ConsoleHelper.WriteDefault(stringWithoutComm[i]);
             line = stringWithoutComm[lineMemmory];
-            AbstractSyntaxTree.CreateAST();
+            //AbstractSyntaxTree.CreateAST();
+        }
+
+        public static void ParseLexem()
+        {
+            while (GetToken() != null) ;
         }
 
         public static TokenNode GetToken()
@@ -103,8 +109,8 @@ namespace lab1
                 lineMemmory++;
                 if (lineMemmory < stringWithoutComm.Length)
                 {
+                    indexMemmory = 0;
                     line = stringWithoutComm[lineMemmory];
-                    //ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
                 }
                 else return null;
             }
@@ -120,7 +126,7 @@ namespace lab1
             if (Regex.IsMatch(buildToken, Tokens.X16)) return Tokens.Token.X16_VALUE;
             if (Regex.IsMatch(buildToken, Tokens.X8)) return Tokens.Token.X8_VALUE;
             if (Regex.IsMatch(buildToken, Tokens.X2)) return Tokens.Token.X2_VALUE;
-            Tokens.Token token = Tokens.Token.EMPTY;
+            Tokens.Token token;
             if (Tokens.DictionaryWord.TryGetValue(buildToken, out token)) return token;
             if (Regex.IsMatch(buildToken, Tokens.Id)) return Tokens.Token.ID;
             return Tokens.Token.FAILED;
@@ -129,17 +135,6 @@ namespace lab1
         private static TokenNode CreateNodeToken(Tokens.Token token, string subStr)
         {
             TokenNode tokenNode = new TokenNode(token, subStr, lineMemmory, startTokenIndex);
-            if (indexMemmory == line.Length)
-            {
-                indexMemmory = 0;
-                ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
-                lineMemmory++;
-                if (lineMemmory < stringWithoutComm.Length)
-                {
-                    //ConsoleHelper.WriteDefault(stringWithoutComm[lineMemmory]);
-                    line = stringWithoutComm[lineMemmory];
-                }
-            }
             listTokens.Add(tokenNode);
             tokenTypeMemory = Tokens.Token.EMPTY;
             tokenBuilderMemory = null;
@@ -155,14 +150,8 @@ namespace lab1
                 TokenNode tokenNode = listTokens[i];
                 string tokenInfo = GetTokenInfo(tokenNode);
 
-                if (tokenNode.token == Tokens.Token.FAILED)
-                {
-                    ConsoleHelper.WriteError(tokenInfo);
-                }
-                else
-                {
-                    ConsoleHelper.WriteSuccess(tokenInfo);
-                }
+                if (tokenNode.token == Tokens.Token.FAILED) ConsoleHelper.WriteError(tokenInfo);
+                else ConsoleHelper.WriteSuccess(tokenInfo);
             }
             ConsoleHelper.WriteSeparator();
         }

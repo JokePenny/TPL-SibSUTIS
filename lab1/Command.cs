@@ -6,14 +6,15 @@ namespace lab1
     {
         public static void RunCommand(string[] command)
         {
-            switch (command[3])
+            switch (command[0])
             {
                 case "--dump-asm":
                     break;
                 case "--dump-ast":
+                    DumpAST(command[1]);
                     break;
                 case "--dump-tokens":
-                    DumpTokens(command[4]);
+                    DumpTokens(command[1]);
                     break;
             }
         }
@@ -25,7 +26,17 @@ namespace lab1
 
         private static void DumpAST(string path)
         {
-
+            string source = ReadSource.ReadFile(path);
+            if (source != "")
+            {
+                Lexer.StartLexer(source);
+                AbstractSyntaxTree.CreateAST();
+            }
+            else
+            {
+                ConsoleHelper.WriteError("Исходник пустой");
+            }
+            Lexer.ViewTokens();
         }
 
         private static void DumpTokens(string path)
@@ -34,6 +45,7 @@ namespace lab1
             if (source != "")
             {
                 Lexer.StartLexer(source);
+                Lexer.ParseLexem();
                 Lexer.ViewTokens();
             }
             else
