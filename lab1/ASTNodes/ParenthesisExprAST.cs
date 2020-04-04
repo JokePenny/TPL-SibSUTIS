@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class ParenthesisExprAST : ASTNode
+    class ParenthesisExprAST : ASTNode, IStorage
     {
         private ASTNode node;
 
@@ -21,6 +23,11 @@ namespace lab1.ASTNodes
             Console.WriteLine(level + "[PARENTHESIS_L] (");
             node.Print(level + "\t");
             Console.WriteLine(level + "[PARENTHESIS_R] )");
+        }
+
+        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

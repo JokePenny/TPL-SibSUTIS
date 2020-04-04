@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class MethodAST : ASTNode
+    class MethodAST : ASTNode, IArea
     {
         private string typeMethod;
         private List<ASTNode> argsMethod;
@@ -25,17 +26,15 @@ namespace lab1.ASTNodes
             this.bodyMethod = bodyMethod;
         }
 
-        public MethodAST(string nameMethod, List<ASTNode> argsMethod) // call with args
+        public MethodAST(string nameMethod, List<ASTNode> argsMethod)
         {
             this.nameMethod = nameMethod;
             this.argsMethod = argsMethod;
-            //TODO: check hash table
         }
 
-        public MethodAST(string nameMethod) // call without args
+        public MethodAST(string nameMethod)
         {
             this.nameMethod = nameMethod;
-            //TODO: check hash table
         }
 
         public string GetName()
@@ -71,6 +70,17 @@ namespace lab1.ASTNodes
                 }
             }
             bodyMethod.Print(level + "\t");
+        }
+
+        public SymTableUse GetSymTable(string nameParent, Dictionary<string, ASTNode> parentTable)
+        {
+            Dictionary<string, ASTNode> symTable = new Dictionary<string, ASTNode>(parentTable);
+            for(int i = 0; i < argsMethod.Count; i++)
+            {
+                if (argsMethod[i] is IStorage)
+                    (argsMethod[i] as IStorage).SetNewSymbolIn(symTable);
+            }
+            return (bodyMethod as IArea).GetSymTable(nameMethod, symTable);
         }
     }
 }

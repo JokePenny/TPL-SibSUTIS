@@ -1,14 +1,11 @@
 ﻿using lab1.ASTNodes;
 using lab1.Helpers;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace lab1
 {
-    class AbstractSyntaxTree
+    sealed class AbstractSyntaxTree
     {
-        private static Hashtable hashtable = new Hashtable();
         private static TokenNode curTok;
         private static TokenNode bufferTok;
         private static ASTNode headAST;

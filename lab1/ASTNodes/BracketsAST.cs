@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
     // []
-    class BracketsAST : ASTNode
+    class BracketsAST : ASTNode, IStorage
     {
         private string type = "";
         private ASTNode expr;
@@ -41,6 +41,11 @@ namespace lab1.ASTNodes
             Console.WriteLine(level + "[BRACKET_L] [");
             expr.Print(level + "\t");
             Console.WriteLine(level + "[BRACKET_R] ]");
+        }
+
+        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

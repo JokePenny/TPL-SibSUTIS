@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class IfAST : ASTNode
+    class IfAST : ASTNode, IArea
     {
         private ASTNode branching;
         public IfAST(ASTNode branching)
@@ -15,6 +15,16 @@ namespace lab1.ASTNodes
         public ASTNode GetBranching()
         {
             return branching;
+        }
+
+        public SymTableUse GetSymTable(string nameParent, Dictionary<string, ASTNode> parentTable)
+        {
+            Dictionary<string, ASTNode> symTable = new Dictionary<string, ASTNode>(parentTable);
+            if (branching is IArea)
+                return (branching as IArea).GetSymTable("if", symTable);
+            else if (branching is IStorage)
+                (branching as IStorage).SetNewSymbolIn(symTable);
+            return new SymTableUse("if", symTable, null);
         }
 
         public override void Print(string level)

@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    // VariableExprAST - Класс узла выражения для переменных (например, "a").
-    class IdentificatorAST : ASTNode
+    class IdentificatorAST : ASTNode, IStorage
     {
         private string type = "";
         private ASTNode storage;
@@ -62,6 +63,11 @@ namespace lab1.ASTNodes
                 Console.WriteLine(level + "[STORAGE] =");
                 storage.Print(level + "\t");
             }
+        }
+
+        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

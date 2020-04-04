@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class ForAST : ASTNode
+    class ForAST : ASTNode, IArea
     {
         private List<ASTNode> declaredVar; // int a = 5, b = 7
         private ConditionNodeAST conditionWithBody; // a < b {body}
@@ -42,6 +43,19 @@ namespace lab1.ASTNodes
             }
             conditionWithBody.Print(level + "\t");
             postcondition.Print(level + "\t");
+        }
+
+        public SymTableUse GetSymTable(string nameParent, Dictionary<string, ASTNode> parentTable)
+        {
+            Dictionary<string, ASTNode> symTable = new Dictionary<string, ASTNode>(parentTable);
+            for (int i = 0; i < declaredVar.Count; i++)
+            {
+                if (declaredVar[i] is IStorage)
+                    (declaredVar[i] as IStorage).SetNewSymbolIn(symTable);
+            }
+            if (postcondition is IStorage)
+                (postcondition as IStorage).SetNewSymbolIn(symTable);
+            return (conditionWithBody as IArea).GetSymTable("for", symTable);
         }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class PostconditionForAST : ASTNode
+    class PostconditionForAST : ASTNode, IStorage
     {
         private List<ASTNode> memberPostcondition;
 
@@ -24,6 +25,11 @@ namespace lab1.ASTNodes
             {
                 memberPostcondition[i].Print(level + "\t");
             }
+        }
+
+        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

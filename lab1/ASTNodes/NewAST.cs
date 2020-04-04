@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class NewAST : ASTNode
+    class NewAST : ASTNode, IStorage
     {
         private ASTNode storageType;
 
@@ -15,6 +17,11 @@ namespace lab1.ASTNodes
         {
             Console.WriteLine(level + "[NEW]");
             storageType.Print(level + "\t");
+        }
+
+        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

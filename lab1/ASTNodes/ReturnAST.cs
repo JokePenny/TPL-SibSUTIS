@@ -1,8 +1,9 @@
 ﻿using System;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class ReturnAST : ASTNode
+    class ReturnAST : ASTNode, IStorage
     {
         private string typeReturn;
         private ASTNode returnNode;
@@ -27,6 +28,11 @@ namespace lab1.ASTNodes
         {
             Console.WriteLine(level + "[RETURN] " + typeReturn);
             returnNode.Print(level + "\t");
+        }
+
+        public void SetNewSymbolIn(System.Collections.Generic.Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

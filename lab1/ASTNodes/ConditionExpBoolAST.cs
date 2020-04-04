@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class ConditionExpBoolAST : ASTNode
+    class ConditionExpBoolAST : ASTNode, IStorage
     {
         private ASTNode leftNode;
         private ASTNode rightNode;
@@ -42,6 +44,11 @@ namespace lab1.ASTNodes
             Console.WriteLine(level + "[COND_BOOL] " + opCondition);
             leftNode.Print(level + "\t");
             rightNode.Print(level + "\t");
+        }
+
+        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

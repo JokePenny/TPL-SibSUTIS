@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class CrementAST : ASTNode
+    class CrementAST : ASTNode, IStorage
     {
         private string crement;
         private ASTNode id;
@@ -22,6 +24,11 @@ namespace lab1.ASTNodes
         {
             Console.WriteLine(level + "[CREMENT] " + crement);
             id.Print(level + "\t");
+        }
+
+        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

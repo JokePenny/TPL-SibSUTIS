@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
     // BinaryExprAST - Класс узла выражения для бинарных операторов.
-    class BinaryExprAST : ASTNode
+    class BinaryExprAST : ASTNode, IStorage
     {
         private string typeExpr;
         private string op;
@@ -49,6 +50,11 @@ namespace lab1.ASTNodes
             Console.WriteLine(level + "[OP] " + op);
             LeftNode.Print(level + "\t");
             RightNode.Print(level + "\t");
+        }
+
+        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

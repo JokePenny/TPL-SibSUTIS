@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class TypeAST : ASTNode
+    class TypeAST : ASTNode, IStorage
     {
         private string typeName;
         private List<ASTNode> memberBrackets;
@@ -25,6 +25,11 @@ namespace lab1.ASTNodes
                     memberBrackets[i].Print(level + "\t");
                 }
             }
+        }
+
+        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

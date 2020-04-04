@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class BoolAST : ASTNode
+    class BoolAST : ASTNode, IStorage
     {
         private ASTNode exp;
         private string result;
@@ -27,6 +29,11 @@ namespace lab1.ASTNodes
         {
             if(result != "") Console.WriteLine(level + "[BOOL] " + result);
             if (exp != null) exp.Print(level + "\t");
+        }
+
+        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

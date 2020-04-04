@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace lab1.ASTNodes
 {

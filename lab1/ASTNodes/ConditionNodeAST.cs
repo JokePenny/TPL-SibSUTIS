@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class ConditionNodeAST : ASTNode
+    class ConditionNodeAST : ASTNode, IArea
     {
         private ASTNode bodyCondition; // условие
         private ASTNode body; // тело
@@ -31,6 +33,11 @@ namespace lab1.ASTNodes
             }
             Console.WriteLine(level + "[BODY]");
             body.Print(level + "\t");
+        }
+
+        public SymTableUse GetSymTable(string areaName, Dictionary<string, ASTNode> symTable)
+        {
+            throw new NotImplementedException();
         }
     }
 }

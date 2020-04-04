@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class WhileAST : ASTNode
+    class WhileAST : ASTNode, IArea
     {
         private ASTNode condition;
         private ASTNode body;
@@ -11,6 +13,13 @@ namespace lab1.ASTNodes
         {
             this.condition = condition;
             this.body = body;
+        }
+
+        public SymTableUse GetSymTable(string nameParent, Dictionary<string, ASTNode> parentTable)
+        {
+            Dictionary<string, ASTNode> symTable = new Dictionary<string, ASTNode>(parentTable);
+            (condition as IStorage).SetNewSymbolIn(symTable);
+            return (body as IArea).GetSymTable("while", symTable);
         }
 
         public override void Print(string level)
