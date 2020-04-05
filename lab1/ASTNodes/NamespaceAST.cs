@@ -4,7 +4,7 @@ using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class NamespaceAST : ASTNode, IArea
+    public class NamespaceAST : ASTNode, IArea
     {
         private List<ASTNode> members;
         private string idNamespace;

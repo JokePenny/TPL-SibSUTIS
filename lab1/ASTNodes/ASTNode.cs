@@ -4,7 +4,7 @@ using System.Text;
 
 namespace lab1.ASTNodes
 {
-    class ASTNode
+    public class ASTNode
     {
         public virtual void Print(string level) { }
         ~ASTNode() { }

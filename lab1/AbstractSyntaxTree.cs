@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace lab1
 {
-    sealed class AbstractSyntaxTree
+    public sealed class AbstractSyntaxTree
     {
         private static TokenNode curTok;
         private static TokenNode bufferTok;
@@ -70,7 +70,7 @@ namespace lab1
         // Парсер скобки {
         //---------------------
 
-        private enum Area : int
+        public enum Area : int
         {
             NAMESPACE = 0,
             CLASS,
@@ -236,7 +236,7 @@ namespace lab1
         // Парсер области имен и класса
         //---------------------
 
-        private static ASTNode ParseMainArea(Area area)
+        public static ASTNode ParseMainArea(Area area)
         {
             string idName;
             GetNextToken();
@@ -312,7 +312,7 @@ namespace lab1
             return argsMethod;
         }
 
-        private static ASTNode ParseMethod(string typeId, string idName, bool isCall)
+        public static ASTNode ParseMethod(string typeId, string idName, bool isCall)
         {
             List<ASTNode> argsMethod = ParseArgsMethod(isCall);
 
@@ -340,7 +340,7 @@ namespace lab1
         // Парсер while
         //---------------------
 
-        private static ASTNode ParseWhile()
+        public static ASTNode ParseWhile()
         {
             ASTNode condition = null;
             ASTNode bodyWhile;
@@ -658,7 +658,7 @@ namespace lab1
         // Парсер if
         //---------------------
         
-        private static ASTNode ParseIf()
+        public static ASTNode ParseIf()
         {
             ASTNode branching;
             GetNextToken();
@@ -727,7 +727,7 @@ namespace lab1
         // Парсер for
         //---------------------
 
-        private static ASTNode ParseFor()
+        public static ASTNode ParseFor()
         {
             GetNextToken();
             if (curTok == null) return null;

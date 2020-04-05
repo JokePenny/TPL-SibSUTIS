@@ -36,6 +36,8 @@ namespace lab1
 
         public static void StartLexer(string str)
         {
+            lineMemmory = 0;
+            indexMemmory = 0;
             // удаление комментариев и табуляции
             stringWithoutComm = StringTreatment.DeleteComments(str);
             for (int i = 0; i < stringWithoutComm.Length; i++) ConsoleHelper.WriteDefault(stringWithoutComm[i]);

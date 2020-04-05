@@ -1,8 +1,9 @@
-﻿using lab1.Helpers;
+﻿using System;
+using lab1.Helpers;
 
 namespace lab1
 {
-    sealed class Command
+    public sealed class Command
     {
         public static void RunCommand(string[] command)
         {
@@ -16,6 +17,18 @@ namespace lab1
                 case "--dump-tokens":
                     DumpTokens(command[1]);
                     break;
+                case "--test":
+                    Test(command[1]);
+                    break;
+            }
+        }
+
+        private static void Test(string path)
+        {
+            string source = ReadSource.ReadFile(path);
+            if (source != "")
+            {
+                Lexer.StartLexer(source);
             }
         }
 

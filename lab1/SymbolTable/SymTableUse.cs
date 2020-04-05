@@ -4,7 +4,7 @@ using lab1.ASTNodes;
 
 namespace lab1.SymbolTable
 {
-    class SymTableUse
+    public class SymTableUse
     {
         private string areaName;
         private Dictionary<string, ASTNode> symUse = new Dictionary<string, ASTNode>();

@@ -4,7 +4,7 @@ namespace lab1
     {
         void Main(string[] args)
         {
-            int 
+            int a;
         }
 
         void TestMethod()
