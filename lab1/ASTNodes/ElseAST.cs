@@ -19,7 +19,7 @@ namespace lab1.ASTNodes
             if (expr is IArea)
                 return (expr as IArea).GetSymTable("else", symTable);
             else if (expr is IStorage)
-                (expr as IStorage).SetNewSymbolIn(symTable);
+                (expr as IStorage).AddAllSymbolIn(symTable);
             return new SymTableUse("else", symTable, null);
         }
 

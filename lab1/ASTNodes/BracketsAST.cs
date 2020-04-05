@@ -43,9 +43,12 @@ namespace lab1.ASTNodes
             Console.WriteLine(level + "[BRACKET_R] ]");
         }
 
-        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        public void AddAllSymbolIn(Dictionary<string, ASTNode> symTable)
         {
-            throw new NotImplementedException();
+            if (expr is IStorage)
+                (expr as IStorage).AddAllSymbolIn(symTable);
+            if (storage is IStorage)
+                (storage as IStorage).AddAllSymbolIn(symTable);
         }
     }
 }

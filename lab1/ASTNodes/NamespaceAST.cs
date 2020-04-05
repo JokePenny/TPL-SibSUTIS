@@ -6,8 +6,8 @@ namespace lab1.ASTNodes
 {
     class NamespaceAST : ASTNode, IArea
     {
-        private List<ASTNode> members; // члены области имен (только классы)
-        private string idNamespace; // имя области имен
+        private List<ASTNode> members;
+        private string idNamespace;
 
         public NamespaceAST(List<ASTNode> members, string idNamespace)
         {
@@ -27,13 +27,13 @@ namespace lab1.ASTNodes
 
         public SymTableUse GetSymTable(string nameParent, Dictionary<string, ASTNode> parentTable)
         {
-            Dictionary<string, ASTNode> symTable = new Dictionary<string, ASTNode>(parentTable);
+            Dictionary<string, ASTNode> symTable = new Dictionary<string, ASTNode>();
             List<SymTableUse> nestedArea = new List<SymTableUse>();
             for (int i = 0; i < members.Count; i++)
             {
                 if (members[i] is IStorage)
-                    (members[i] as IStorage).SetNewSymbolIn(symTable);
-                else if (members[i] is IArea)
+                    (members[i] as IStorage).AddAllSymbolIn(symTable);
+                if (members[i] is IArea)
                     nestedArea.Add((members[i] as IArea).GetSymTable("", symTable));
             }
             return new SymTableUse(idNamespace, symTable, nestedArea);

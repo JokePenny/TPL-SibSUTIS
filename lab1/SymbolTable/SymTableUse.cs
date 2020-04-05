@@ -19,9 +19,13 @@ namespace lab1.SymbolTable
 
         public void Print()
         {
-            Console.WriteLine("[AREA] " + areaName + "\n----------\nsymbol\n----------");
+            Console.WriteLine("----------\n[AREA] " + areaName + "\n----------");
             foreach(string name in symUse.Keys) Console.WriteLine(name);
-            for(int i = 0; i < nestedArea.Count; i++) nestedArea[i].Print();
+            if (nestedArea == null) return;
+            for (int i = 0; i < nestedArea.Count; i++)
+            {
+                if(nestedArea[i] != null) nestedArea[i].Print();
+            }
         }
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using lab1.Helpers;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class ClassAST : ASTNode, IArea
+    class ClassAST : ASTNode, IArea, IStorage
     {
-        private List<ASTNode> members; // члены области имен (только классы)
-        private string idClass; // имя области имен
+        private List<ASTNode> members;
+        private string idClass;
 
         public ClassAST(List<ASTNode> members, string idClass)
         {
@@ -42,11 +42,20 @@ namespace lab1.ASTNodes
             for (int i = 0; i < members.Count; i++)
             {
                 if (members[i] is IStorage)
-                    (members[i] as IStorage).SetNewSymbolIn(symTable);
-                else if (members[i] is IArea)
+                    (members[i] as IStorage).AddAllSymbolIn(symTable);
+                if (members[i] is IArea)
                     nestedArea.Add((members[i] as IArea).GetSymTable("", symTable));
             }
             return new SymTableUse(idClass, symTable, nestedArea);
+        }
+
+        public void AddAllSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            if (symTable.ContainsKey(idClass))
+            {
+                ConsoleHelper.WriteError(idClass + " - Variable is redeclared");
+            }
+            else symTable.Add(idClass, this);
         }
     }
 }

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Helpers;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class MethodAST : ASTNode, IArea
+    class MethodAST : ASTNode, IArea, IStorage
     {
         private string typeMethod;
         private List<ASTNode> argsMethod;
@@ -75,12 +76,24 @@ namespace lab1.ASTNodes
         public SymTableUse GetSymTable(string nameParent, Dictionary<string, ASTNode> parentTable)
         {
             Dictionary<string, ASTNode> symTable = new Dictionary<string, ASTNode>(parentTable);
-            for(int i = 0; i < argsMethod.Count; i++)
+            if(argsMethod != null)
             {
-                if (argsMethod[i] is IStorage)
-                    (argsMethod[i] as IStorage).SetNewSymbolIn(symTable);
+                for (int i = 0; i < argsMethod.Count; i++)
+                {
+                    if (argsMethod[i] is IStorage)
+                        (argsMethod[i] as IStorage).AddAllSymbolIn(symTable);
+                }
             }
             return (bodyMethod as IArea).GetSymTable(nameMethod, symTable);
+        }
+
+        public void AddAllSymbolIn(Dictionary<string, ASTNode> symTable)
+        {
+            if (symTable.ContainsKey(nameMethod))
+            {
+                if (typeMethod != "") ConsoleHelper.WriteError(nameMethod + " - Variable is redeclared");
+            }
+            else symTable.Add(nameMethod, this);
         }
     }
 }

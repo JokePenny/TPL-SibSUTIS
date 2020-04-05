@@ -1,5 +1,6 @@
 ﻿using lab1.ASTNodes;
 using lab1.Helpers;
+using lab1.SymbolTable;
 using System.Collections.Generic;
 
 namespace lab1
@@ -19,7 +20,8 @@ namespace lab1
             CheckupClosedToken(Tokens.Token.K_NAMESPACE);
 
             headAST = ParseMainArea(Area.NAMESPACE);
-            headAST.Print("");
+            SymTable.CreateSymTable(headAST);
+            //headAST.Print("");
         }
 
         //---------------------

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Helpers;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
@@ -65,9 +66,16 @@ namespace lab1.ASTNodes
             }
         }
 
-        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        public void AddAllSymbolIn(Dictionary<string, ASTNode> symTable)
         {
-            throw new NotImplementedException();
+            if (symTable.ContainsKey(nameID))
+            {
+                if (type != "") ConsoleHelper.WriteError(nameID + " - Variable is redeclared");
+            }
+            else symTable.Add(nameID, this);
+
+            if (storage is IStorage)
+                (storage as IStorage).AddAllSymbolIn(symTable);
         }
     }
 }

@@ -1,43 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    // BinaryExprAST - Класс узла выражения для бинарных операторов.
     class BinaryExprAST : ASTNode, IStorage
     {
         private string typeExpr;
         private string op;
-        private ASTNode LeftNode;
-        private ASTNode RightNode;
+        private ASTNode leftNode;
+        private ASTNode rightNode;
 
-        public BinaryExprAST(string op, ASTNode LeftNode, ASTNode RightNode)
+        public BinaryExprAST(string op, ASTNode leftNode, ASTNode rightNode)
         {
             this.op = op;
-            this.LeftNode = LeftNode;
-            this.RightNode = RightNode;
+            this.leftNode = leftNode;
+            this.rightNode = rightNode;
         }
 
-        public BinaryExprAST(ASTNode LeftNode)
+        public BinaryExprAST(ASTNode leftNode)
         {
-            this.LeftNode = LeftNode;
-        }
-
-        public ASTNode GetLeftNode()
-        {
-            return LeftNode;
-        }
-
-        public ASTNode GetRightNode()
-        {
-            return RightNode;
-        }
-
-        public string GetOp()
-        {
-            return op;
+            this.leftNode = leftNode;
         }
 
         public string GetTypeExp()
@@ -48,13 +31,16 @@ namespace lab1.ASTNodes
         public override void Print(string level)
         {
             Console.WriteLine(level + "[OP] " + op);
-            LeftNode.Print(level + "\t");
-            RightNode.Print(level + "\t");
+            leftNode.Print(level + "\t");
+            rightNode.Print(level + "\t");
         }
 
-        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        public void AddAllSymbolIn(Dictionary<string, ASTNode> symTable)
         {
-            throw new NotImplementedException();
+            if (leftNode is IStorage)
+                (leftNode as IStorage).AddAllSymbolIn(symTable);
+            if (rightNode is IStorage)
+                (rightNode as IStorage).AddAllSymbolIn(symTable);
         }
     }
 }

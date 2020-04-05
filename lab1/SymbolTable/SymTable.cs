@@ -6,10 +6,12 @@ namespace lab1.SymbolTable
 {
     class SymTable
     {
-        List<Dictionary<string, ASTNode>> symTabls = new List<Dictionary<string, ASTNode>>();
-        public void CreateSymTable(ASTNode head)
+        private static SymTableUse symTabls;
+        public static void CreateSymTable(ASTNode head)
         {
-
+            if(head is NamespaceAST)
+                symTabls = (head as NamespaceAST).GetSymTable("", null);
+            symTabls.Print();
         }
     }
 }

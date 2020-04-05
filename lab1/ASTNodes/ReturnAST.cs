@@ -30,9 +30,10 @@ namespace lab1.ASTNodes
             returnNode.Print(level + "\t");
         }
 
-        public void SetNewSymbolIn(System.Collections.Generic.Dictionary<string, ASTNode> symTable)
+        public void AddAllSymbolIn(System.Collections.Generic.Dictionary<string, ASTNode> symTable)
         {
-            throw new NotImplementedException();
+            if (returnNode is IStorage)
+                (returnNode as IStorage).AddAllSymbolIn(symTable);
         }
     }
 }

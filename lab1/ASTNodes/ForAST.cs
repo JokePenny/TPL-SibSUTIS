@@ -51,10 +51,10 @@ namespace lab1.ASTNodes
             for (int i = 0; i < declaredVar.Count; i++)
             {
                 if (declaredVar[i] is IStorage)
-                    (declaredVar[i] as IStorage).SetNewSymbolIn(symTable);
+                    (declaredVar[i] as IStorage).AddAllSymbolIn(symTable);
             }
             if (postcondition is IStorage)
-                (postcondition as IStorage).SetNewSymbolIn(symTable);
+                (postcondition as IStorage).AddAllSymbolIn(symTable);
             return (conditionWithBody as IArea).GetSymTable("for", symTable);
         }
     }

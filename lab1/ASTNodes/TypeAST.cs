@@ -27,9 +27,14 @@ namespace lab1.ASTNodes
             }
         }
 
-        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        public void AddAllSymbolIn(Dictionary<string, ASTNode> symTable)
         {
-            throw new NotImplementedException();
+            if (memberBrackets == null) return;
+            for (int i = 0; i < memberBrackets.Count; i++)
+            {
+                if (memberBrackets[i] is IStorage)
+                    (memberBrackets[i] as IStorage).AddAllSymbolIn(symTable);
+            }
         }
     }
 }

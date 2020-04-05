@@ -6,22 +6,12 @@ namespace lab1.ASTNodes
 {
     class ConditionNodeAST : ASTNode, IArea
     {
-        private ASTNode bodyCondition; // условие
-        private ASTNode body; // тело
+        private ASTNode bodyCondition;
+        private ASTNode body;
         public ConditionNodeAST(ASTNode bodyCondition, ASTNode body)
         {
             this.bodyCondition = bodyCondition;
             this.body = body;
-        }
-
-        public ASTNode GetCondition()
-        {
-            return bodyCondition;
-        }
-
-        public ASTNode GetBody()
-        {
-            return body;
         }
 
         public override void Print(string level)
@@ -37,7 +27,13 @@ namespace lab1.ASTNodes
 
         public SymTableUse GetSymTable(string areaName, Dictionary<string, ASTNode> symTable)
         {
-            throw new NotImplementedException();
+            if (bodyCondition is IStorage)
+                (bodyCondition as IStorage).AddAllSymbolIn(symTable);
+            if (body is IStorage)
+                (body as IStorage).AddAllSymbolIn(symTable);
+           if (body is IArea)
+                return (body as IArea).GetSymTable(areaName, symTable);
+            return new SymTableUse(areaName, symTable, null);
         }
     }
 }

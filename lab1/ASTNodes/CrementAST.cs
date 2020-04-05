@@ -26,9 +26,10 @@ namespace lab1.ASTNodes
             id.Print(level + "\t");
         }
 
-        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        public void AddAllSymbolIn(Dictionary<string, ASTNode> symTable)
         {
-            throw new NotImplementedException();
+            if (id is IStorage)
+                (id as IStorage).AddAllSymbolIn(symTable);
         }
     }
 }

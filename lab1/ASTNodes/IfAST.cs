@@ -23,7 +23,7 @@ namespace lab1.ASTNodes
             if (branching is IArea)
                 return (branching as IArea).GetSymTable("if", symTable);
             else if (branching is IStorage)
-                (branching as IStorage).SetNewSymbolIn(symTable);
+                (branching as IStorage).AddAllSymbolIn(symTable);
             return new SymTableUse("if", symTable, null);
         }
 

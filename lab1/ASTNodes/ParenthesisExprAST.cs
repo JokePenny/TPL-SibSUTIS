@@ -25,9 +25,10 @@ namespace lab1.ASTNodes
             Console.WriteLine(level + "[PARENTHESIS_R] )");
         }
 
-        public void SetNewSymbolIn(Dictionary<string, ASTNode> symTable)
+        public void AddAllSymbolIn(Dictionary<string, ASTNode> symTable)
         {
-            throw new NotImplementedException();
+            if (node is IStorage)
+                (node as IStorage).AddAllSymbolIn(symTable);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace lab1.ASTNodes
         public SymTableUse GetSymTable(string nameParent, Dictionary<string, ASTNode> parentTable)
         {
             Dictionary<string, ASTNode> symTable = new Dictionary<string, ASTNode>(parentTable);
-            (condition as IStorage).SetNewSymbolIn(symTable);
+            (condition as IStorage).AddAllSymbolIn(symTable);
             return (body as IArea).GetSymTable("while", symTable);
         }
 
