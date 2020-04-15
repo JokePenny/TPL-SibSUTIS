@@ -1,7 +1,9 @@
 ﻿using lab1.ASTNodes;
 using lab1.Helpers;
 using lab1.SymbolTable;
+using lab1.SemAnalyz;
 using System.Collections.Generic;
+using System;
 
 namespace lab1
 {
@@ -20,8 +22,12 @@ namespace lab1
             CheckupClosedToken(Tokens.Token.K_NAMESPACE);
 
             headAST = ParseMainArea(Area.NAMESPACE);
-            headAST.Print("");
-            SymTable.CreateSymTable(headAST);
+            if (headAST != null)
+            {
+                headAST.Print("");
+                SymTable.CreateSymTable(headAST);
+                SemAnalyzer.StartSemAnalyzer(headAST, SymTable.symTabls);
+            }
         }
 
         //---------------------
@@ -37,8 +43,9 @@ namespace lab1
                 if (curTok == null) return null;
 
                 if (curTok.token == Tokens.Token.BRACKET_R) ConsoleHelper.WriteErrorAST("Expected '[X]'", curTok.y, curTok.x);
-
+                
                 ASTNode exp = MemberBinOperation();
+
                 if (curTok == null) return null;
 
                 if(curTok.token == Tokens.Token.BRACKET_L)
@@ -214,6 +221,8 @@ namespace lab1
                 if (curTok.token == Tokens.Token.OP)
                 {
                     exprassion = ParseBinaryOperation(leftNode);
+                    if (curTok == null) return null;
+                    if(curTok.token != Tokens.Token.PARENTHESIS_R) ConsoleHelper.WriteErrorAST("Expected ')'", curTok.y, curTok.x);
                     return new ParenthesisExprAST(exprassion);
                 }
                 else if (curTok.token == Tokens.Token.PARENTHESIS_L)
@@ -221,6 +230,8 @@ namespace lab1
                     ASTNode parenExpr = ParseParenthesis();
                     if (parenExpr == null) return null;
                     exprassion = ParseBinaryOperation(parenExpr);
+                    if (curTok == null) return null;
+                    if (curTok.token != Tokens.Token.PARENTHESIS_R) ConsoleHelper.WriteErrorAST("Expected ')'", curTok.y, curTok.x);
                     return new ParenthesisExprAST(exprassion);
                 }
                 else if (curTok.token != Tokens.Token.SEMILICON) return null;
@@ -534,6 +545,12 @@ namespace lab1
                 case Tokens.Token.CHAR:
                     node = new CharAST(curTok.subString);
                     break;
+                case Tokens.Token.PARENTHESIS_L:
+                    node = ParseParenthesis();
+                    break;
+                case Tokens.Token.BOOL:
+                    node = new BoolAST(curTok.subString, null);
+                    break;
                 case Tokens.Token.INT_VALUE:
                 case Tokens.Token.DOUBLE_VALUE:
                 case Tokens.Token.X16_VALUE:
@@ -620,12 +637,8 @@ namespace lab1
             if (curTok == null) return null;
             if(curTok.token == Tokens.Token.PARENTHESIS_L)
             {
+                rightMember = ParseParenthesis();
                 GetNextToken();
-                if (curTok == null) return null;
-                rightMember = MemberBinOperation();
-
-                if (curTok == null) return null;
-                if (curTok.token != Tokens.Token.PARENTHESIS_R) ConsoleHelper.WriteErrorAST("Expected ')'", curTok.y, curTok.x);
             }
             else rightMember = MemberBinOperation();
 
@@ -647,11 +660,11 @@ namespace lab1
                 else
                 {
                     ASTNode rightNode = ParseBinaryOperation(rightMember);
-                    binaryExpr = new BinaryExprAST(newOp, leftNode, rightNode);
-                    return ParseBinaryOperation(binaryExpr);
+                    binaryExpr = new BinaryExprAST(oldOp, leftNode, rightNode);
+                    return binaryExpr;
                 }
             }
-            return rightMember;
+            return new BinaryExprAST(oldOp, leftNode, rightMember);
         }
 
         //---------------------

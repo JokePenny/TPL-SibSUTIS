@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
@@ -56,6 +57,25 @@ namespace lab1.ASTNodes
             if (postcondition is IStorage)
                 (postcondition as IStorage).AddAllSymbolIn(symTable);
             return (conditionWithBody as IArea).GetSymTable("for", symTable);
+        }
+
+        public void ViewMemberArea()
+        {
+            for (int i = 0; i < declaredVar.Count; i++)
+            {
+                if (declaredVar[i] is ISemantics)
+                    (declaredVar[i] as ISemantics).GetTypeMember();
+            }
+
+            if (conditionWithBody is ISemantics)
+                (conditionWithBody as ISemantics).GetTypeMember();
+            else if (conditionWithBody is IArea)
+                (conditionWithBody as IArea).ViewMemberArea();
+
+            if (postcondition is ISemantics)
+                (postcondition as ISemantics).GetTypeMember();
+            else if (postcondition is IArea)
+                (postcondition as IArea).ViewMemberArea();
         }
     }
 }

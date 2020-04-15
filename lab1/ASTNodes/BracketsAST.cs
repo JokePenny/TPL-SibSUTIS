@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Helpers;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
     // []
-    class BracketsAST : ASTNode, IStorage
+    class BracketsAST : ASTNode, IStorage, ISemantics
     {
         private string type = "";
         private ASTNode expr;
@@ -49,6 +51,17 @@ namespace lab1.ASTNodes
                 (expr as IStorage).AddAllSymbolIn(symTable);
             if (storage is IStorage)
                 (storage as IStorage).AddAllSymbolIn(symTable);
+        }
+
+        public string GetTypeMember()
+        {
+            string typeExpr = (expr as ISemantics).GetTypeMember();
+            if (typeExpr != "int")
+            {
+                ConsoleHelper.WriteError("Wrong type in brackets, expected 'int'");
+                return "['" + typeExpr + "']";
+            }
+            return type;
         }
     }
 }

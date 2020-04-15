@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Helpers;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class BinaryExprAST : ASTNode, IStorage
+    class BinaryExprAST : ASTNode, IStorage, ISemantics
     {
         private string typeExpr;
         private string op;
@@ -41,6 +43,17 @@ namespace lab1.ASTNodes
                 (leftNode as IStorage).AddAllSymbolIn(symTable);
             if (rightNode is IStorage)
                 (rightNode as IStorage).AddAllSymbolIn(symTable);
+        }
+
+        public string GetTypeMember()
+        {
+            string typeLeftNode = (leftNode as ISemantics).GetTypeMember();
+            string typerightNode = (rightNode as ISemantics).GetTypeMember();
+            if (typeLeftNode != typerightNode)
+            {
+                return typeLeftNode + "' " + op + " '" + typerightNode + "'";
+            }
+            return typeLeftNode;
         }
     }
 }

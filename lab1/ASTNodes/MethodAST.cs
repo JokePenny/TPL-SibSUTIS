@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using lab1.Helpers;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class MethodAST : ASTNode, IArea, IStorage
+    class MethodAST : ASTNode, IArea, IStorage, ISemantics
     {
         private string typeMethod;
         private List<ASTNode> argsMethod;
@@ -94,6 +95,20 @@ namespace lab1.ASTNodes
                 if (typeMethod != "") ConsoleHelper.WriteError(nameMethod + " - Variable is redeclared");
             }
             else symTable.Add(nameMethod, this);
+        }
+
+        public string GetTypeMember()
+        {
+            ViewMemberArea();
+            return typeMethod;
+        }
+
+        public void ViewMemberArea()
+        {
+            if (bodyMethod is ISemantics)
+                (bodyMethod as ISemantics).GetTypeMember();
+            else if (bodyMethod is IArea)
+                (bodyMethod as IArea).ViewMemberArea();
         }
     }
 }

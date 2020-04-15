@@ -1,8 +1,9 @@
-﻿using System;
+﻿using lab1.SemAnalyz;
+using System;
 
 namespace lab1.ASTNodes
 {
-    class NumAST : ASTNode
+    class NumAST : ASTNode, ISemantics
     {
         private string typeValue;
         private string value;
@@ -45,6 +46,11 @@ namespace lab1.ASTNodes
         public override void Print(string level)
         {
             Console.WriteLine(level + "[NUM] " + typeValue + " " + value);
+        }
+
+        public string GetTypeMember()
+        {
+            return typeValue;
         }
     }
 }

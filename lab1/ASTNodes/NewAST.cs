@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class NewAST : ASTNode, IStorage
+    class NewAST : ASTNode, IStorage, ISemantics
     {
         private ASTNode storageType;
 
@@ -23,6 +24,17 @@ namespace lab1.ASTNodes
         {
             if (storageType is IStorage)
                 (storageType as IStorage).AddAllSymbolIn(symTable);
+        }
+
+        public string GetTypeMember()
+        {
+            string typeStorage = (storageType as ISemantics).GetTypeMember();
+            return typeStorage;
+        }
+
+        public void ViewStorage()
+        {
+            throw new NotImplementedException();
         }
     }
 }

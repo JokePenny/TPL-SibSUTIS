@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using lab1.Helpers;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
@@ -56,6 +57,17 @@ namespace lab1.ASTNodes
                 ConsoleHelper.WriteError(idClass + " - Variable is redeclared");
             }
             else symTable.Add(idClass, this);
+        }
+
+        public void ViewMemberArea()
+        {
+            for (int i = 0; i < members.Count; i++)
+            {
+                if (members[i] is ISemantics)
+                    (members[i] as ISemantics).GetTypeMember();
+                else if (members[i] is IArea)
+                    (members[i] as IArea).ViewMemberArea();
+            }
         }
     }
 }

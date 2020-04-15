@@ -1,9 +1,11 @@
 ﻿using System;
+using lab1.Helpers;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class ReturnAST : ASTNode, IStorage
+    class ReturnAST : ASTNode, IStorage, ISemantics
     {
         private string typeReturn;
         private ASTNode returnNode;
@@ -35,5 +37,15 @@ namespace lab1.ASTNodes
             if (returnNode is IStorage)
                 (returnNode as IStorage).AddAllSymbolIn(symTable);
         }
+
+        public string GetTypeMember()
+        {
+            string typeReturnNode = (returnNode as ISemantics).GetTypeMember();
+            if (typeReturnNode != typeReturn)
+                ConsoleHelper.WriteError("Wrong type");
+            return typeReturn;
+        }
+
+        public void ViewStorage(){}
     }
 }

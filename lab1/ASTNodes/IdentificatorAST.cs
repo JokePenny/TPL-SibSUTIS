@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using lab1.Helpers;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class IdentificatorAST : ASTNode, IStorage
+    class IdentificatorAST : ASTNode, IStorage, ISemantics
     {
         private string type = "";
         private ASTNode storage;
         private string nameID;
+
 
         public IdentificatorAST(string type, string nameID)
         {
@@ -71,11 +73,22 @@ namespace lab1.ASTNodes
             if (symTable.ContainsKey(nameID))
             {
                 if (type != "") ConsoleHelper.WriteError(nameID + " - Variable is redeclared");
+                type = (symTable[nameID] as IdentificatorAST).GetTypeId();
             }
             else symTable.Add(nameID, this);
 
             if (storage is IStorage)
                 (storage as IStorage).AddAllSymbolIn(symTable);
+        }
+
+        public string GetTypeMember()
+        {
+            if(storage is ISemantics)
+            {
+                string typeStorage = (storage as ISemantics).GetTypeMember();
+                if (typeStorage != type) ConsoleHelper.WriteError("Wrong type [" + type + "] " + nameID + " = '" + typeStorage + "'");
+            }
+            return type;
         }
     }
 }

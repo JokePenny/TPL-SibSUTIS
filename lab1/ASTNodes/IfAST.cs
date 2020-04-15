@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
@@ -31,6 +32,14 @@ namespace lab1.ASTNodes
         {
             Console.WriteLine(level + "[IF]");
             if (branching != null) branching.Print(level + "\t");
+        }
+
+        public void ViewMemberArea()
+        {
+            if (branching is ISemantics)
+                (branching as ISemantics).GetTypeMember();
+            else if (branching is IArea)
+                (branching as IArea).ViewMemberArea();
         }
     }
 }

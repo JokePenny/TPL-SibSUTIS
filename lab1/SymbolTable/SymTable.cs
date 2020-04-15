@@ -6,7 +6,7 @@ namespace lab1.SymbolTable
 {
     public class SymTable
     {
-        private static SymTableUse symTabls;
+        public static SymTableUse symTabls;
         public static void CreateSymTable(ASTNode head)
         {
             if(head is NamespaceAST)

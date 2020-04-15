@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Helpers;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class BoolAST : ASTNode, IStorage
+    class BoolAST : ASTNode, IStorage, ISemantics
     {
         private ASTNode exp;
         private string result;
@@ -35,6 +37,17 @@ namespace lab1.ASTNodes
         {
             if (exp is IStorage)
                 (exp as IStorage).AddAllSymbolIn(symTable);
+        }
+
+        public string GetTypeMember()
+        {
+            if(exp != null)
+            {
+                string typeExp = (exp as ISemantics).GetTypeMember();
+                if (typeExp == null)
+                    ConsoleHelper.WriteError("Wrong type");
+            }
+            return "bool";
         }
     }
 }

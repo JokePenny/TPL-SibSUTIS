@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Helpers;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class ConditionExpBoolAST : ASTNode, IStorage
+    class ConditionExpBoolAST : ASTNode, IStorage, ISemantics
     {
         private ASTNode leftNode;
         private ASTNode rightNode;
@@ -52,6 +54,15 @@ namespace lab1.ASTNodes
                 (leftNode as IStorage).AddAllSymbolIn(symTable);
             if (rightNode is IStorage)
                 (rightNode as IStorage).AddAllSymbolIn(symTable);
+        }
+
+        public string GetTypeMember()
+        {
+            string typeLeftNode = (leftNode as ISemantics).GetTypeMember();
+            string typerightNode = (rightNode as ISemantics).GetTypeMember();
+            if (typeLeftNode != typerightNode)
+                ConsoleHelper.WriteError("Wrong type");
+            return typeLeftNode;
         }
     }
 }

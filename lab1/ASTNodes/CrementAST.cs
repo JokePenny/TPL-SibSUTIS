@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Helpers;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class CrementAST : ASTNode, IStorage
+    class CrementAST : ASTNode, IStorage, ISemantics
     {
         private string crement;
         private ASTNode id;
@@ -30,6 +32,16 @@ namespace lab1.ASTNodes
         {
             if (id is IStorage)
                 (id as IStorage).AddAllSymbolIn(symTable);
+        }
+
+        public string GetTypeMember()
+        {
+            string typeIdNode = (id as ISemantics).GetTypeMember();
+            if (typeIdNode == "string" ||
+                typeIdNode == "char" ||
+                typeIdNode == "bool")
+                ConsoleHelper.WriteError("Wrong type");
+            return typeIdNode;
         }
     }
 }

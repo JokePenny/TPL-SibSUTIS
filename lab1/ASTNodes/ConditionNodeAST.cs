@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
@@ -34,6 +35,19 @@ namespace lab1.ASTNodes
            if (body is IArea)
                 return (body as IArea).GetSymTable(areaName, symTable);
             return new SymTableUse(areaName, symTable, null);
+        }
+
+        public void ViewMemberArea()
+        {
+            if (bodyCondition is ISemantics)
+                (bodyCondition as ISemantics).GetTypeMember();
+            else if (bodyCondition is IArea)
+                (bodyCondition as IArea).ViewMemberArea();
+
+            if (body is ISemantics)
+                (body as ISemantics).GetTypeMember();
+            else if (body is IArea)
+                (body as IArea).ViewMemberArea();
         }
     }
 }

@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Helpers;
+using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
 namespace lab1.ASTNodes
 {
-    class ParenthesisExprAST : ASTNode, IStorage
+    class ParenthesisExprAST : ASTNode, IStorage, ISemantics
     {
         private ASTNode node;
+        private string type;
 
         public ParenthesisExprAST(ASTNode node)
         {
@@ -30,5 +33,13 @@ namespace lab1.ASTNodes
             if (node is IStorage)
                 (node as IStorage).AddAllSymbolIn(symTable);
         }
+
+        public string GetTypeMember()
+        {
+            type = (node as ISemantics).GetTypeMember();
+            return type;
+        }
+
+        public void ViewStorage(){}
     }
 }

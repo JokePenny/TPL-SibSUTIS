@@ -136,6 +136,7 @@ namespace lab1
                 case Token.K_CONTINUE:
                 case Token.K_CLASS:
                 case Token.K_NEW:
+                case Token.BOOL:
                 case Token.ID:
                 case Token.TYPE:
                     isOk =  tokenTypeMemory == Token.K_IF ||
