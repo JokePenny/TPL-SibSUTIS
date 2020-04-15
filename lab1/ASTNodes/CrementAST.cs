@@ -11,10 +11,11 @@ namespace lab1.ASTNodes
         private string crement;
         private ASTNode id;
 
-        public CrementAST(string crement, ASTNode id)
+        public CrementAST(string crement, ASTNode id, Point point)
         {
             this.crement = crement;
             this.id = id;
+            this.point = point;
         }
 
         public string GetCrement()
@@ -40,7 +41,7 @@ namespace lab1.ASTNodes
             if (typeIdNode == "string" ||
                 typeIdNode == "char" ||
                 typeIdNode == "bool")
-                ConsoleHelper.WriteError("Wrong type");
+                ConsoleHelper.WriteError("<" + point.y + "," + point.x + ">: can't use crement -> '" + typeIdNode + "'");
             return typeIdNode;
         }
     }

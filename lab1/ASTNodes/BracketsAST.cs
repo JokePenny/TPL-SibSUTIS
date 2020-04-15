@@ -13,10 +13,11 @@ namespace lab1.ASTNodes
         private ASTNode expr;
         private ASTNode storage;
 
-        public BracketsAST(string type, ASTNode expr)
+        public BracketsAST(string type, ASTNode expr, Point point)
         {
             this.type = type;
             this.expr = expr;
+            this.point = point;
         }
 
         public BracketsAST(ASTNode storage, ASTNode expr)
@@ -58,10 +59,10 @@ namespace lab1.ASTNodes
             string typeExpr = (expr as ISemantics).GetTypeMember();
             if (typeExpr != "int")
             {
-                ConsoleHelper.WriteError("Wrong type in brackets, expected 'int'");
+                ConsoleHelper.WriteError("<" + point.y + "," + point.x + ">: Wrong type in brackets, expected 'int'");
                 return "['" + typeExpr + "']";
             }
-            return type;
+            return "int";
         }
     }
 }

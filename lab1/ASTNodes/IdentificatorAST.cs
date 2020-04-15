@@ -13,29 +13,32 @@ namespace lab1.ASTNodes
         private string nameID;
 
 
-        public IdentificatorAST(string type, string nameID)
+        public IdentificatorAST(string type, string nameID, Point point)
         {
             this.nameID = nameID;
             this.type = type;
+            this.point = point;
         }
 
-        public IdentificatorAST(string type, string nameID, ASTNode storage)
+        public IdentificatorAST(string type, string nameID, ASTNode storage, Point point)
         {
             this.nameID = nameID;
             this.type = type;
             this.storage = storage;
+            this.point = point;
         }
 
-        public IdentificatorAST(string nameID, ASTNode storage)
+        public IdentificatorAST(string nameID, ASTNode storage, Point point)
         {
             this.nameID = nameID;
             this.storage = storage;
+            this.point = point;
         }
 
-        public IdentificatorAST(string nameID) //call
+        public IdentificatorAST(string nameID, Point point)
         {
             this.nameID = nameID;
-            //TODO: обращение к хэш таблице
+            this.point = point;
         }
 
         public string GetTypeId()
@@ -83,10 +86,10 @@ namespace lab1.ASTNodes
 
         public string GetTypeMember()
         {
-            if(storage is ISemantics)
+            if(storage is ISemantics && !(storage is BracketsAST))
             {
                 string typeStorage = (storage as ISemantics).GetTypeMember();
-                if (typeStorage != type) ConsoleHelper.WriteError("Wrong type [" + type + "] " + nameID + " = '" + typeStorage + "'");
+                if (typeStorage != type) ConsoleHelper.WriteError("<" + point.y + "," + point.x + ">: Wrong type storage in '" + type + "' " + nameID + " = '" + typeStorage + "'");
             }
             return type;
         }

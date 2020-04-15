@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace lab1.ASTNodes
+﻿namespace lab1.ASTNodes
 {
+    public struct Point
+    {
+        public int y;
+        public int x;
+        public Point(int y, int x)
+        {
+            this.y = y;
+            this.x = x;
+        }
+    }
+
     public class ASTNode
     {
-        public struct Point
-        {
-            int y;
-            int x;
-            public Point(int y, int x)
-            {
-                this.y = y;
-                this.x = x;
-            }
-        }
+        public Point point;
 
         public virtual void Print(string level) { }
         ~ASTNode() { }

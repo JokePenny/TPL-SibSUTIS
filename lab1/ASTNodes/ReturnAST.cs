@@ -40,12 +40,12 @@ namespace lab1.ASTNodes
 
         public string GetTypeMember()
         {
-            string typeReturnNode = (returnNode as ISemantics).GetTypeMember();
-            if (typeReturnNode != typeReturn)
-                ConsoleHelper.WriteError("Wrong type");
+            if (returnNode is ISemantics)
+            {
+                string typeReturnNode = (returnNode as ISemantics).GetTypeMember();
+                if (typeReturnNode != typeReturn) ConsoleHelper.WriteError("<" + point.y + "," + point.x + ">: Wrong type return: " + typeReturnNode + "'");
+            }
             return typeReturn;
         }
-
-        public void ViewStorage(){}
     }
 }

@@ -283,7 +283,7 @@ namespace lab1
         {
             if (curTok.token == Tokens.Token.ID && isCall)
             {
-                IdentificatorAST identificatorAST = new IdentificatorAST(curTok.subString);
+                IdentificatorAST identificatorAST = new IdentificatorAST(curTok.subString, new Point(curTok.y, curTok.x));
                 return identificatorAST;
             }
             else if (curTok.token == Tokens.Token.TYPE && !isCall) return ParseType(false, false);
@@ -390,22 +390,26 @@ namespace lab1
         {
             string crement = curTok.subString;
             GetNextToken();
+            Point point = new Point(curTok.y, curTok.x);
+
             if (curTok == null) return null;
             if (curTok.token != Tokens.Token.ID)
             {
                 ConsoleHelper.WriteErrorAST("Expected 'identificator'", curTok.y, curTok.x);
                 return null;
             }
-            else return new CrementAST(crement, ParseId(""));
+            else return new CrementAST(crement, ParseId(""), point);
         }
 
         private static ASTNode ParseCrement(ASTNode id)
         {
             string crement = curTok.subString;
             GetNextToken();
+            Point point = new Point(curTok.y, curTok.x);
+
             if (curTok == null) return null;
-            if (curTok.token == Tokens.Token.OP) return ParseBinaryOperation(new CrementAST(crement, id));
-            return new CrementAST(crement, id);
+            if (curTok.token == Tokens.Token.OP) return ParseBinaryOperation(new CrementAST(crement, id, point));
+            return new CrementAST(crement, id, point);
         }
 
         //---------------------
@@ -418,7 +422,7 @@ namespace lab1
             string idName = curTok.subString;
             string typeId = type == "" ? GetTypeID(idName) : type;
 
-            ASTNode id = new IdentificatorAST(typeId, idName);
+            ASTNode id = new IdentificatorAST(typeId, idName, new Point(curTok.y, curTok.x));
             GetNextToken();
             if (curTok == null) return null;
 
@@ -430,9 +434,11 @@ namespace lab1
                 return new BracketsAST(memberBrackets);
             }
 
+            Point point = new Point(curTok.y, curTok.x);
+
             if (curTok.token == Tokens.Token.CREMENT) return ParseCrement(id);
             if (curTok.token == Tokens.Token.PARENTHESIS_L) return ParseMethod("", idName, isCall);
-            else if (curTok.token == Tokens.Token.ASSIGNMENT) return new IdentificatorAST(typeId, idName, ParseInitID());
+            else if (curTok.token == Tokens.Token.ASSIGNMENT) return new IdentificatorAST(typeId, idName, ParseInitID(), point);
             return id;
         }
 
@@ -492,11 +498,11 @@ namespace lab1
                     ASTNode memberBrackets = ParseBrackets(isInit);
                     if (curTok == null) return null;
                     if (curTok.token != Tokens.Token.SEMILICON) ConsoleHelper.WriteErrorAST("Expected ';'", curTok.y, curTok.x);
-                    return new BracketsAST(typeId, memberBrackets);
+                    return new BracketsAST(typeId, memberBrackets, new Point(curTok.y, curTok.x));
                 }
                 else
                 {
-                    typeId = typeId + "[]";
+                    //typeId = typeId;
                     GetNextToken();
                     if (curTok == null) return null;
                     if (curTok.token != Tokens.Token.BRACKET_R) ConsoleHelper.WriteErrorAST("Expected ']'", curTok.y, curTok.x);
@@ -519,7 +525,7 @@ namespace lab1
                     ConsoleHelper.WriteErrorAST("Expected ')'", curTok.y, curTok.x);
                     return null;
                 }
-                return new IdentificatorAST(typeId, idName);
+                return new IdentificatorAST(typeId, idName, new Point(curTok.y, curTok.x));
             }
             return null;
         }
@@ -534,7 +540,7 @@ namespace lab1
             switch (curTok.token)
             {
                 case Tokens.Token.ID:
-                    node = new IdentificatorAST(curTok.subString);
+                    node = new IdentificatorAST(curTok.subString, new Point(curTok.y, curTok.x));
                     GetNextToken();
                     if (curTok == null) return node;
                     if (curTok.token == Tokens.Token.BRACKET_L) return new BracketsAST(node, ParseBrackets(true));
@@ -543,13 +549,13 @@ namespace lab1
                     node = new StringAST(curTok.subString);
                     break;
                 case Tokens.Token.CHAR:
-                    node = new CharAST(curTok.subString);
+                    node = new CharAST(curTok.subString, new Point(curTok.y, curTok.x));
                     break;
                 case Tokens.Token.PARENTHESIS_L:
                     node = ParseParenthesis();
                     break;
                 case Tokens.Token.BOOL:
-                    node = new BoolAST(curTok.subString, null);
+                    node = new BoolAST(curTok.subString, null, new Point(curTok.y, curTok.x));
                     break;
                 case Tokens.Token.INT_VALUE:
                 case Tokens.Token.DOUBLE_VALUE:
@@ -573,7 +579,7 @@ namespace lab1
             switch (curTok.token)
             {
                 case Tokens.Token.BOOL:
-                    return new BoolAST(curTok.subString);
+                    return new BoolAST(curTok.subString, new Point(curTok.y, curTok.x));
                 case Tokens.Token.STRING:
                 case Tokens.Token.CHAR:
                 case Tokens.Token.INT_VALUE:
@@ -588,7 +594,6 @@ namespace lab1
                     if (curTok.token == Tokens.Token.OP)
                     {
                         leftNodeExp = ParseBinaryOperation(leftNode);
-                        GetNextToken();
                         if (curTok == null) return null;
                     }
                     else leftNodeExp = leftNode;
@@ -603,8 +608,17 @@ namespace lab1
 
                         if (curTok == null) return null;
                         if (curTok.token == Tokens.Token.BOOL_OP_AND || curTok.token == Tokens.Token.BOOL_OP_OR)
-                            return new BoolAST(new BinaryExprAST(curTok.subString, new BinaryExprAST(op, leftNodeExp, rightNodeExp), MemberBoolBinOperation()));
-                        else return new BoolAST(new BinaryExprAST(op, leftNodeExp, rightNodeExp));
+                        {
+                            ASTNode nodeExprLeft = new BinaryExprAST(op, leftNodeExp, rightNodeExp, new Point(curTok.y, curTok.x));
+                            ASTNode boolNode = new BoolAST(nodeExprLeft, new Point(curTok.y, curTok.x));
+                            ASTNode nodeExpRight = new BinaryExprAST(curTok.subString, boolNode, MemberBoolBinOperation(), new Point(curTok.y, curTok.x));
+                            return new BoolAST(nodeExpRight, new Point(curTok.y, curTok.x));
+                        }
+                        else
+                        {
+                            ASTNode nodeExpr = new BinaryExprAST(op, leftNodeExp, rightNodeExp, new Point(curTok.y, curTok.x));
+                            return new BoolAST(nodeExpr, new Point(curTok.y, curTok.x));
+                        }
                     }
                     ConsoleHelper.WriteErrorAST("Expected 'boolean'", curTok.y, curTok.x);
                     return null;
@@ -654,17 +668,18 @@ namespace lab1
 
                 if (oldPriority > newPriority)
                 {
-                    binaryExpr = new BinaryExprAST(oldOp, leftNode, rightMember);
+                    binaryExpr = new BinaryExprAST(oldOp, leftNode, rightMember, new Point(curTok.y, curTok.x));
                     return ParseBinaryOperation(binaryExpr);
                 }
                 else
                 {
+                    Point point = new Point(curTok.y, curTok.x);
                     ASTNode rightNode = ParseBinaryOperation(rightMember);
-                    binaryExpr = new BinaryExprAST(oldOp, leftNode, rightNode);
+                    binaryExpr = new BinaryExprAST(oldOp, leftNode, rightNode, point);
                     return binaryExpr;
                 }
             }
-            return new BinaryExprAST(oldOp, leftNode, rightMember);
+            return new BinaryExprAST(oldOp, leftNode, rightMember, new Point(curTok.y, curTok.x));
         }
 
         //---------------------
@@ -730,7 +745,11 @@ namespace lab1
         private static ASTNode ParseConditionIf()
         {
             ASTNode expr = MemberBoolBinOperation();
-            if (expr == null) ConsoleHelper.WriteErrorAST("Expected '( X )'", curTok.y, curTok.x);
+            if (expr == null)
+            {
+                ConsoleHelper.WriteErrorAST("Expected '( X )'", curTok.y, curTok.x);
+                SkipToToken(Tokens.Token.PARENTHESIS_R);
+            }
             if (curTok == null) return null;
             CheckupClosedToken(Tokens.Token.PARENTHESIS_R);
             return expr;
@@ -803,10 +822,11 @@ namespace lab1
                 case Tokens.Token.ID:
                     return ParseId("");
                 case Tokens.Token.CREMENT:
+                    Point point = new Point(curTok.y, curTok.x);
                     GetNextToken();
                     if (curTok == null) return null;
                     if(curTok.token != Tokens.Token.ID) ConsoleHelper.WriteErrorAST("Expected 'identificator'", curTok.y, curTok.x);
-                    return new CrementAST(curTok.subString, new IdentificatorAST(curTok.subString));
+                    return new CrementAST(curTok.subString, new IdentificatorAST(curTok.subString, new Point(curTok.y, curTok.x)), point);
                 default:
                     ConsoleHelper.WriteErrorAST("Impossible token in this area", curTok.y, curTok.x);
                     break;
@@ -856,8 +876,9 @@ namespace lab1
                         }
                         else if(typeId == null && generalType != null && !isFirst)
                         {
+                            Point point = new Point(curTok.y, curTok.x);
                             ASTNode expr = ParseInitID();
-                            id = new IdentificatorAST(typeId, idName, expr);
+                            id = new IdentificatorAST(typeId, idName, expr, point);
                             declaredVar.Add(id);
                         }
                         else

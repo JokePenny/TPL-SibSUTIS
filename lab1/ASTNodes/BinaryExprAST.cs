@@ -13,16 +13,18 @@ namespace lab1.ASTNodes
         private ASTNode leftNode;
         private ASTNode rightNode;
 
-        public BinaryExprAST(string op, ASTNode leftNode, ASTNode rightNode)
+        public BinaryExprAST(string op, ASTNode leftNode, ASTNode rightNode, Point point)
         {
             this.op = op;
             this.leftNode = leftNode;
             this.rightNode = rightNode;
+            this.point = point;
         }
 
-        public BinaryExprAST(ASTNode leftNode)
+        public BinaryExprAST(ASTNode leftNode, Point point)
         {
             this.leftNode = leftNode;
+            this.point = point;
         }
 
         public string GetTypeExp()
@@ -49,9 +51,10 @@ namespace lab1.ASTNodes
         {
             string typeLeftNode = (leftNode as ISemantics).GetTypeMember();
             string typerightNode = (rightNode as ISemantics).GetTypeMember();
-            if (typeLeftNode != typerightNode)
+            if (typeLeftNode != typerightNode || typeLeftNode == "")
             {
-                return typeLeftNode + "' " + op + " '" + typerightNode + "'";
+                ConsoleHelper.WriteError("<" + point.y + "," + point.x + ">: different types -> '" + typeLeftNode + "' " + op + " '" + typerightNode + "'");
+                return "";
             }
             return typeLeftNode;
         }

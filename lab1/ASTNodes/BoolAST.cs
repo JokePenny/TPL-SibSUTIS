@@ -11,20 +11,23 @@ namespace lab1.ASTNodes
         private ASTNode exp;
         private string result;
 
-        public BoolAST(string result, ASTNode exp)
+        public BoolAST(string result, ASTNode exp, Point point)
         {
             this.result = result;
             this.exp = exp;
+            this.point = point;
         }
 
-        public BoolAST(ASTNode exp)
+        public BoolAST(ASTNode exp, Point point)
         {
             this.exp = exp;
+            this.point = point;
         }
 
-        public BoolAST(string result)
+        public BoolAST(string result, Point point)
         {
             this.result = result;
+            this.point = point;
         }
 
         public override void Print(string level)
@@ -43,9 +46,7 @@ namespace lab1.ASTNodes
         {
             if(exp != null)
             {
-                string typeExp = (exp as ISemantics).GetTypeMember();
-                if (typeExp == null)
-                    ConsoleHelper.WriteError("Wrong type");
+                (exp as ISemantics).GetTypeMember();
             }
             return "bool";
         }

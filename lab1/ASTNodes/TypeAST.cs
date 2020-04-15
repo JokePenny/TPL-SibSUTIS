@@ -48,8 +48,7 @@ namespace lab1.ASTNodes
         {
             for(int i = 0; i < memberBrackets.Count; i++)
             {
-                if (memberBrackets[i] is ISemantics)
-                    if ((memberBrackets[i] as ISemantics).GetTypeMember() != "int") ConsoleHelper.WriteError("Wrong type");
+                if (memberBrackets[i] is ISemantics) (memberBrackets[i] as ISemantics).GetTypeMember();
             }
         }
     }

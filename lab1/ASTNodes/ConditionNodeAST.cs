@@ -22,8 +22,7 @@ namespace lab1.ASTNodes
                 Console.WriteLine(level + "[CONDITION]");
                 bodyCondition.Print(level + "\t");
             }
-            Console.WriteLine(level + "[BODY]");
-            body.Print(level + "\t");
+            body.Print(level);
         }
 
         public SymTableUse GetSymTable(string areaName, Dictionary<string, ASTNode> symTable)

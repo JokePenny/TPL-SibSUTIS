@@ -7,9 +7,10 @@ namespace lab1.ASTNodes
     {
         private string str;
 
-        public CharAST(string str)
+        public CharAST(string str, Point point)
         {
             this.str = str;
+            this.point = point;
         }
 
         public string GetTypeMember()

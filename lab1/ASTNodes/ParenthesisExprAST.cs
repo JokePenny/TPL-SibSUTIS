@@ -39,7 +39,5 @@ namespace lab1.ASTNodes
             type = (node as ISemantics).GetTypeMember();
             return type;
         }
-
-        public void ViewStorage(){}
     }
 }
