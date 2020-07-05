@@ -4,6 +4,7 @@ using lab1.SymbolTable;
 using lab1.SemAnalyz;
 using System.Collections.Generic;
 using System;
+using lab1.Asm;
 
 namespace lab1
 {
@@ -27,7 +28,8 @@ namespace lab1
                 headAST.Print("");
                 SymTable.CreateSymTable(headAST);
                 SemAnalyzer.StartSemAnalyzer(headAST, SymTable.symTabls);
-            }
+				ASM.CreateASM(headAST);
+			}
         }
 
         //---------------------
@@ -130,7 +132,7 @@ namespace lab1
                     CheckupClosedToken(Tokens.Token.SEMILICON);
                     return node;
                 case Tokens.Token.ID:
-                    node = ParseId("");
+                    node = ParseId("", false);
                     if (curTok == null) return node;
                     CheckupClosedToken(Tokens.Token.SEMILICON);
                     return node;
@@ -398,7 +400,7 @@ namespace lab1
                 ConsoleHelper.WriteErrorAST("Expected 'identificator'", curTok.y, curTok.x);
                 return null;
             }
-            else return new CrementAST(crement, ParseId(""), point);
+            else return new CrementAST(crement, ParseId("", false), point);
         }
 
         private static ASTNode ParseCrement(ASTNode id)
@@ -416,13 +418,13 @@ namespace lab1
         // Парсер id
         //---------------------
 
-        private static ASTNode ParseId(string type)
+        private static ASTNode ParseId(string type, bool isArray)
         {
             bool isCall = type == "";
             string idName = curTok.subString;
             string typeId = type == "" ? GetTypeID(idName) : type;
 
-            ASTNode id = new IdentificatorAST(typeId, idName, new Point(curTok.y, curTok.x));
+            ASTNode id = new IdentificatorAST(typeId, idName, new Point(curTok.y, curTok.x), isArray);
             GetNextToken();
             if (curTok == null) return null;
 
@@ -438,7 +440,7 @@ namespace lab1
 
             if (curTok.token == Tokens.Token.CREMENT) return ParseCrement(id);
             if (curTok.token == Tokens.Token.PARENTHESIS_L) return ParseMethod("", idName, isCall);
-            else if (curTok.token == Tokens.Token.ASSIGNMENT) return new IdentificatorAST(typeId, idName, ParseInitID(), point);
+            else if (curTok.token == Tokens.Token.ASSIGNMENT) return new IdentificatorAST(typeId, idName, ParseInitID(), point, isArray);
             return id;
         }
 
@@ -486,6 +488,7 @@ namespace lab1
         private static ASTNode ParseType(bool isInit, bool isInClass)
         {
             string typeId = curTok.subString;
+			bool isArray = false;
 
             GetNextToken();
             if (curTok == null) return null;
@@ -502,8 +505,9 @@ namespace lab1
                 }
                 else
                 {
-                    //typeId = typeId;
-                    GetNextToken();
+					isArray = true;
+					//typeId = typeId;
+					GetNextToken();
                     if (curTok == null) return null;
                     if (curTok.token != Tokens.Token.BRACKET_R) ConsoleHelper.WriteErrorAST("Expected ']'", curTok.y, curTok.x);
                     else
@@ -514,7 +518,7 @@ namespace lab1
                 } 
             }
             // переменная
-            if(curTok.token == Tokens.Token.ID && !isInit) return ParseId(typeId);
+            if(curTok.token == Tokens.Token.ID && !isInit) return ParseId(typeId, isArray);
             else if(curTok.token == Tokens.Token.PARENTHESIS_L && isInit)
             {
                 string idName = curTok.subString;
@@ -525,7 +529,7 @@ namespace lab1
                     ConsoleHelper.WriteErrorAST("Expected ')'", curTok.y, curTok.x);
                     return null;
                 }
-                return new IdentificatorAST(typeId, idName, new Point(curTok.y, curTok.x));
+                return new IdentificatorAST(typeId, idName, new Point(curTok.y, curTok.x), isArray);
             }
             return null;
         }
@@ -820,7 +824,7 @@ namespace lab1
             switch (curTok.token)
             {
                 case Tokens.Token.ID:
-                    return ParseId("");
+                    return ParseId("", false);
                 case Tokens.Token.CREMENT:
                     Point point = new Point(curTok.y, curTok.x);
                     GetNextToken();
@@ -878,7 +882,7 @@ namespace lab1
                         {
                             Point point = new Point(curTok.y, curTok.x);
                             ASTNode expr = ParseInitID();
-                            id = new IdentificatorAST(typeId, idName, expr, point);
+                            id = new IdentificatorAST(typeId, idName, expr, point, false);
                             declaredVar.Add(id);
                         }
                         else
@@ -959,7 +963,7 @@ namespace lab1
             switch (curTok.token)
             {
                 case Tokens.Token.ID:
-                    node = ParseId("");
+                    node = ParseId("", false);
                     if (curTok == null) return node;
                     CheckupClosedToken(Tokens.Token.SEMILICON);
                     return node;

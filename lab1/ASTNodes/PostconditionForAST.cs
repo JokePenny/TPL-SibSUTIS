@@ -36,5 +36,5 @@ namespace lab1.ASTNodes
                     (memberPostcondition[i] as IStorage).AddAllSymbolIn(symTable);
             }
         }
-    }
+	}
 }

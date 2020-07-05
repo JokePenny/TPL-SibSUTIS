@@ -77,5 +77,5 @@ namespace lab1.ASTNodes
             else if (postcondition is IArea)
                 (postcondition as IArea).ViewMemberArea();
         }
-    }
+	}
 }

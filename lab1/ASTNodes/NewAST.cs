@@ -31,5 +31,10 @@ namespace lab1.ASTNodes
             string typeStorage = (storageType as ISemantics).GetTypeMember();
             return typeStorage;
         }
-    }
+
+		public void PrintASM(ref int sizeArray)
+		{
+			(storageType as TypeAST).GetSizeArray(ref sizeArray);
+		}
+	}
 }

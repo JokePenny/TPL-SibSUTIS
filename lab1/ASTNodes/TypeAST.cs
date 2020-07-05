@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Asm;
 using lab1.Helpers;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
@@ -51,5 +52,14 @@ namespace lab1.ASTNodes
                 if (memberBrackets[i] is ISemantics) (memberBrackets[i] as ISemantics).GetTypeMember();
             }
         }
-    }
+
+		public void GetSizeArray(ref int sizeArray)
+		{
+			if (memberBrackets is IEject)
+			{
+				sizeArray = Convert.ToInt32((memberBrackets as IEject).GetValue());
+			}
+			else sizeArray = 0;
+		}
+	}
 }

@@ -27,5 +27,23 @@ namespace lab1.SymbolTable
                 if(nestedArea[i] != null) nestedArea[i].Print();
             }
         }
-    }
+
+		public ASTNode FindNode(string identificator)
+		{
+			foreach (string name in symUse.Keys)
+				if(identificator == name) return symUse[name];
+			if (nestedArea == null) return null;
+			ASTNode nodeFinded;
+			for (int i = 0; i < nestedArea.Count; i++)
+			{
+				if (nestedArea[i] != null)
+				{
+					nodeFinded = nestedArea[i].FindNode(identificator);
+					if (nodeFinded == null) continue;
+					return nodeFinded;
+				}
+			}
+			return null;
+		}
+	}
 }

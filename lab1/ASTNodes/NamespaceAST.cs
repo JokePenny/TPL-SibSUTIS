@@ -59,5 +59,15 @@ namespace lab1.ASTNodes
                     (members[i] as IArea).ViewMemberArea();
             }
         }
-    }
+
+		public override void PrintASM(bool isNewLine = false)
+		{
+			Console.WriteLine("global _start");
+			Console.WriteLine("section .text");
+			for (int i = 0; i < members.Count; i++)
+			{
+				members[i].PrintASM(true);
+			}
+		}
+	}
 }

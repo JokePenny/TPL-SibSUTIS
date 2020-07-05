@@ -110,5 +110,14 @@ namespace lab1.ASTNodes
             else if (bodyMethod is IArea)
                 (bodyMethod as IArea).ViewMemberArea();
         }
-    }
+
+		public override void PrintASM(bool isNewLine)
+		{
+			Console.WriteLine("\t\tpush\trbp");
+			Console.WriteLine("\t\tmov\trbp, rsp");
+			bodyMethod.PrintASM(false);
+			Console.WriteLine("\t\tpop\trbp");
+			Console.WriteLine("\t\tret");
+		}
+	}
 }

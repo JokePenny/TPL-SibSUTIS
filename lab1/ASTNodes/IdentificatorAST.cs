@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Asm;
 using lab1.Helpers;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
@@ -12,21 +13,29 @@ namespace lab1.ASTNodes
         private ASTNode storage;
         private string nameID;
 
+		//ASM
+		private bool isArray;
+		private int startInStack;
+		private string takeRegister = "";
 
-        public IdentificatorAST(string type, string nameID, Point point)
+
+        public IdentificatorAST(string type, string nameID, Point point, bool isArray)
         {
             this.nameID = nameID;
             this.type = type;
             this.point = point;
-        }
+			this.isArray = isArray;
 
-        public IdentificatorAST(string type, string nameID, ASTNode storage, Point point)
+		}
+
+        public IdentificatorAST(string type, string nameID, ASTNode storage, Point point, bool isArray)
         {
             this.nameID = nameID;
             this.type = type;
             this.storage = storage;
             this.point = point;
-        }
+			this.isArray = isArray;
+		}
 
         public IdentificatorAST(string nameID, ASTNode storage, Point point)
         {
@@ -46,7 +55,12 @@ namespace lab1.ASTNodes
             return type;
         }
 
-        public ASTNode GetStorage()
+		public int GetAddresInStack()
+		{
+			return startInStack;
+		}
+
+		public ASTNode GetStorage()
         {
             return storage;
         }
@@ -93,5 +107,80 @@ namespace lab1.ASTNodes
             }
             return type;
         }
-    }
+
+		public override void PrintASM(bool isNewLine)
+		{
+			if (storage == null) return;
+
+			startInStack = ASMregisters.stepByte;
+			int step = ASMregisters.GetSizeStep(type);
+			ASMregisters.stepByte += step;
+			startInStack = ASMregisters.stepByte;
+			if (isArray)
+			{
+				if (storage != null)
+				{
+					if (storage is NewAST)
+					{
+						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " PTR [rbp-" + startInStack + "], ");
+					}
+					else
+					{
+						if(isNewLine)
+						{
+
+						}
+						else
+						{
+
+						}
+					}
+				}
+			}
+			else
+			{
+				if(storage != null)
+				{
+					if (storage is NewAST)
+					{
+						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " PTR [rbp-" + startInStack + "], 0");
+					}
+					else if(storage is BinaryExprAST)
+					{
+						storage.PrintASM();
+						string register = ASMregisters.GetFreeRegisterData();
+						ConsoleHelper.WriteDefault("\t\tpop\t" + register);
+						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " PTR [rbp-" + startInStack + "], " + register);
+					}
+					else
+					{
+						if (isNewLine)
+						{
+							string elementStorage;
+							if (storage is IEject)
+								elementStorage = (storage as IEject).GetValue();
+							else
+							{
+								storage.PrintASM();
+								elementStorage = ASMregisters.GetFreeRegisterData();
+							}
+
+							ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " PTR [rbp-" + startInStack + "], " + elementStorage);
+						}
+						else
+						{
+							takeRegister = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tmov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " PTR [rbp-" + (startInStack + step) + "]");
+						}
+					}
+					ASMregisters.stepByte += step;
+				}
+			}
+		}
+
+		public void FreeRegister()
+		{
+			if(takeRegister != "") ASMregisters.SetStateRegisterData(takeRegister, true);
+		}
+	}
 }

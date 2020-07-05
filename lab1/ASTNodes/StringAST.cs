@@ -21,5 +21,5 @@ namespace lab1.ASTNodes
         {
             Console.WriteLine(level + "[STRING] " + str);
         }
-    }
+	}
 }

@@ -4,7 +4,7 @@ using lab1.ASTNodes;
 
 namespace lab1.SymbolTable
 {
-    public class SymTable
+    public static class SymTable
     {
         public static SymTableUse symTabls;
         public static void CreateSymTable(ASTNode head)

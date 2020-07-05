@@ -41,5 +41,5 @@ namespace lab1.ASTNodes
             else if (branching is IArea)
                 (branching as IArea).ViewMemberArea();
         }
-    }
+	}
 }

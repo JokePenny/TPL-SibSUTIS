@@ -50,5 +50,5 @@ namespace lab1.ASTNodes
             }
             return "bool";
         }
-    }
+	}
 }

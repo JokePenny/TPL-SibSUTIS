@@ -6,5 +6,5 @@ namespace lab1.SymbolTable
     interface IStorage
     {
         void AddAllSymbolIn(Dictionary<string, ASTNode> symTable);
-    }
+	}
 }

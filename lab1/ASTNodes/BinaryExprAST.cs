@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Asm;
 using lab1.Helpers;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
@@ -56,7 +57,107 @@ namespace lab1.ASTNodes
                 ConsoleHelper.WriteError("<" + point.y + "," + point.x + ">: different types -> '" + typeLeftNode + "' " + op + " '" + typerightNode + "'");
                 return "";
             }
-            return typeLeftNode;
+			//new added
+			typeExpr = typeLeftNode;
+			return typeExpr;
         }
-    }
+
+		public override void PrintASM(bool isNewLine)
+		{
+			string registerLeft = "";
+			string registerRight = "";
+			int startInStack = 0;
+			if (leftNode is BinaryExprAST)
+			{
+				leftNode.PrintASM();
+				if (rightNode is BinaryExprAST)
+				{
+					ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
+					rightNode.PrintASM();
+					registerRight = ASMregisters.GetFreeRegisterData();
+					ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
+				}
+				else
+				{
+					registerRight = ASMregisters.GetFreeRegisterData();
+					if (rightNode is IdentificatorAST)
+					{
+						IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
+						startInStack = identificatorRight.GetAddresInStack();
+						ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " PTR [rbp-" + startInStack + "]");
+					}
+					else
+					{
+						IEject valueRight = (rightNode as IEject);
+						ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + valueRight.GetValue());
+					}
+				}
+				ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
+			}
+			else
+			{
+				registerLeft = ASMregisters.GetFreeRegisterData();
+				if (leftNode is IdentificatorAST)
+				{
+					IdentificatorAST identificatorLeft = (IdentificatorAST)SymTable.symTabls.FindNode((leftNode as IdentificatorAST).GetName());
+					startInStack = identificatorLeft.GetAddresInStack();
+					ConsoleHelper.WriteDefault("\t\tmov\t" + registerLeft + ", " + ASMregisters.GetNameType(identificatorLeft.GetTypeId()) + " PTR [rbp-" + startInStack + "]");
+					if (rightNode is BinaryExprAST)
+					{
+						ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
+						rightNode.PrintASM();
+						registerRight = ASMregisters.GetFreeRegisterData();
+						ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
+					}
+					else
+					{
+						string registeRight = ASMregisters.GetFreeRegisterData();
+						if (rightNode is IdentificatorAST)
+						{
+							IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
+							startInStack = identificatorRight.GetAddresInStack();
+							ConsoleHelper.WriteDefault("\t\tmov\t" + registeRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " PTR [rbp-" + startInStack + "]");
+						}
+						else
+						{
+							IEject valueRight = (rightNode as IEject);
+							ConsoleHelper.WriteDefault("\t\tmov\t" + registeRight + ", " + valueRight.GetValue());
+						}
+					}
+				}
+				else //value
+				{
+					IEject valueLeft = (leftNode as IEject);
+					ConsoleHelper.WriteDefault("\t\tmov\t" + registerLeft + ", " + valueLeft.GetValue());
+					if (rightNode is BinaryExprAST)
+					{
+						ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
+						rightNode.PrintASM();
+						registerRight = ASMregisters.GetFreeRegisterData();
+						ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
+					}
+					else
+					{
+						registerRight = ASMregisters.GetFreeRegisterData();
+						if (rightNode is IdentificatorAST)
+						{
+							IdentificatorAST identificator = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
+							startInStack = identificator.GetAddresInStack();
+							ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + ASMregisters.GetNameType(identificator.GetTypeId()) + " PTR [rbp-" + startInStack + "]");
+						}
+						else
+						{
+							IEject valueRight = (rightNode as IEject);
+							ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + valueRight.GetValue());
+						}
+					}
+				}
+			}
+			ConsoleHelper.WriteDefault("\t\t" + ASMregisters.GetOperation(op) + "\t" + registerLeft + ", " + registerRight);
+			ConsoleHelper.WriteDefault("\t\tpush\t" + registerLeft);
+
+			if (registerLeft != "") ASMregisters.SetStateRegisterData(registerLeft, true);
+			if (registerRight != "") ASMregisters.SetStateRegisterData(registerRight, true);
+		}
+	}
 }

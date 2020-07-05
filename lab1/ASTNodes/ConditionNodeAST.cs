@@ -48,5 +48,5 @@ namespace lab1.ASTNodes
             else if (body is IArea)
                 (body as IArea).ViewMemberArea();
         }
-    }
+	}
 }

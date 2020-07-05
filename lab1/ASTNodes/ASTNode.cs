@@ -16,6 +16,7 @@
         public Point point;
 
         public virtual void Print(string level) { }
-        ~ASTNode() { }
+		public virtual void PrintASM(bool isNewLine = false) { }
+		~ASTNode() { }
     }
 }

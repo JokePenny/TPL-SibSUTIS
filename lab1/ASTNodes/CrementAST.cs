@@ -44,5 +44,5 @@ namespace lab1.ASTNodes
                 ConsoleHelper.WriteError("<" + point.y + "," + point.x + ">: can't use crement -> '" + typeIdNode + "'");
             return typeIdNode;
         }
-    }
+	}
 }

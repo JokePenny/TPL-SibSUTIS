@@ -1,9 +1,10 @@
-﻿using lab1.SemAnalyz;
+﻿using lab1.Asm;
+using lab1.SemAnalyz;
 using System;
 
 namespace lab1.ASTNodes
 {
-    class NumAST : ASTNode, ISemantics
+    class NumAST : ASTNode, ISemantics, IEject
     {
         private string typeValue;
         private string value;
@@ -38,11 +39,6 @@ namespace lab1.ASTNodes
             return typeValue;
         }
 
-        public string GetValue()
-        {
-            return value;
-        }
-
         public override void Print(string level)
         {
             Console.WriteLine(level + "[NUM] " + typeValue + " " + value);
@@ -52,5 +48,15 @@ namespace lab1.ASTNodes
         {
             return typeValue;
         }
-    }
+
+		public override void PrintASM(bool isNewLine)
+		{
+
+		}
+
+		public string GetValue()
+		{
+			return value;
+		}
+	}
 }

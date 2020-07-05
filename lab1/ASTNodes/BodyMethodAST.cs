@@ -52,5 +52,13 @@ namespace lab1.ASTNodes
                     (memberMethod[i] as IArea).ViewMemberArea();
             }
         }
-    }
+
+		public override void PrintASM(bool isNewLine)
+		{
+			for (int i = 0; i < memberMethod.Count; i++)
+			{
+				memberMethod[i].PrintASM(true);
+			}
+		}
+	}
 }

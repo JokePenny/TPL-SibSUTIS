@@ -47,5 +47,5 @@ namespace lab1.ASTNodes
             }
             return typeReturn;
         }
-    }
+	}
 }
