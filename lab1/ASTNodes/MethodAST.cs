@@ -113,11 +113,39 @@ namespace lab1.ASTNodes
 
 		public override void PrintASM(bool isNewLine)
 		{
-			Console.WriteLine("\t\tpush\trbp");
-			Console.WriteLine("\t\tmov\trbp, rsp");
+			Console.WriteLine
+			(
+				"format PE Console\n"
+				+ "entry Start"
+				+ "include '%finc%\\win32\\win32a.inc'\n"
+				+ "uglobal\n"
+				+ "\thInstance dd ?\n"
+				+ "\thHeap     dd ?\n"
+				+ "endg\n"
+				+ "section '.data' data readable writable\n"
+				+ "\tresStr db 'Result: %d', 0\n"
+				+ "section '.idata' import data readable\n"
+				+ "\tlibrary kernel, 'kernel32.dll',\\\n"
+				+ "\t\tmsvcrt, 'msvcrt.dll'\n"
+				+ "\timport kernel,\\\n"
+				+ "\t\tExitProcess, 'ExitProcess'\n"
+				+ "\timport msvcrt,\\\n"
+				+ "\t\tprintf, 'printf',\\\n"
+				+ "\t\tscanf, 'scanf',\\\n"
+				+ "\t\tgetch, '_getch\n"
+				+ "Start:"
+			);
+
 			bodyMethod.PrintASM(false);
-			Console.WriteLine("\t\tpop\trbp");
-			Console.WriteLine("\t\tret");
+
+			Console.WriteLine
+			(
+				"Exit:"
+				+ "\tpush\teax\n"
+				+ "\tFinalizeAll\n"
+				+ "\tinvoke\tExitProcess\n"
+				+ "IncludeAllGlobals"
+			);
 		}
 	}
 }

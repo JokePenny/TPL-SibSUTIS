@@ -122,7 +122,7 @@ namespace lab1.ASTNodes
 				{
 					if (storage is NewAST)
 					{
-						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " PTR [rbp-" + startInStack + "], ");
+						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], ");
 					}
 					else
 					{
@@ -143,14 +143,14 @@ namespace lab1.ASTNodes
 				{
 					if (storage is NewAST)
 					{
-						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " PTR [rbp-" + startInStack + "], 0");
+						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], 0");
 					}
-					else if(storage is BinaryExprAST)
+					else if(storage is BinaryExprAST || storage is ParenthesisExprAST)
 					{
 						storage.PrintASM();
 						string register = ASMregisters.GetFreeRegisterData();
 						ConsoleHelper.WriteDefault("\t\tpop\t" + register);
-						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " PTR [rbp-" + startInStack + "], " + register);
+						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
 					}
 					else
 					{
@@ -165,12 +165,12 @@ namespace lab1.ASTNodes
 								elementStorage = ASMregisters.GetFreeRegisterData();
 							}
 
-							ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " PTR [rbp-" + startInStack + "], " + elementStorage);
+							ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
 						}
 						else
 						{
 							takeRegister = ASMregisters.GetFreeRegisterData();
-							ConsoleHelper.WriteDefault("\t\tmov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " PTR [rbp-" + (startInStack + step) + "]");
+							ConsoleHelper.WriteDefault("\t\tmov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + (startInStack + step) + "]");
 						}
 					}
 					ASMregisters.stepByte += step;

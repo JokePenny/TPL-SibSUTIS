@@ -99,9 +99,9 @@ namespace lab1
 				case "-":
 					return "sub";
 				case "*":
-					return "mul";
+					return "imul";
 				case "/":
-					return "dib";
+					return "div";
 				default:
 					return "";
 			}
