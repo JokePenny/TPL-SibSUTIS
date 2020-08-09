@@ -45,8 +45,6 @@ namespace lab1.ASTNodes
 		{
 			if (node == null) return;
 
-			
-
 			if (node is BinaryExprAST)
 			{
 				node.PrintASM();

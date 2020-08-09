@@ -118,63 +118,57 @@ namespace lab1.ASTNodes
 			startInStack = ASMregisters.stepByte;
 			if (isArray)
 			{
-				if (storage != null)
+				if (storage is NewAST)
 				{
-					if (storage is NewAST)
+					ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], ");
+				}
+				else
+				{
+					if (isNewLine)
 					{
-						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], ");
+
 					}
 					else
 					{
-						if(isNewLine)
-						{
 
-						}
-						else
-						{
-
-						}
 					}
 				}
 			}
 			else
 			{
-				if(storage != null)
+				if (storage is NewAST)
 				{
-					if (storage is NewAST)
+					ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], 0");
+				}
+				else if (storage is BinaryExprAST || storage is ParenthesisExprAST)
+				{
+					storage.PrintASM();
+					string register = ASMregisters.GetFreeRegisterData();
+					ConsoleHelper.WriteDefault("\t\tpop\t" + register);
+					ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
+				}
+				else
+				{
+					if (isNewLine)
 					{
-						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], 0");
-					}
-					else if(storage is BinaryExprAST || storage is ParenthesisExprAST)
-					{
-						storage.PrintASM();
-						string register = ASMregisters.GetFreeRegisterData();
-						ConsoleHelper.WriteDefault("\t\tpop\t" + register);
-						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
+						string elementStorage;
+						if (storage is IEject)
+							elementStorage = (storage as IEject).GetValue();
+						else
+						{
+							storage.PrintASM();
+							elementStorage = ASMregisters.GetFreeRegisterData();
+						}
+
+						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
 					}
 					else
 					{
-						if (isNewLine)
-						{
-							string elementStorage;
-							if (storage is IEject)
-								elementStorage = (storage as IEject).GetValue();
-							else
-							{
-								storage.PrintASM();
-								elementStorage = ASMregisters.GetFreeRegisterData();
-							}
-
-							ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
-						}
-						else
-						{
-							takeRegister = ASMregisters.GetFreeRegisterData();
-							ConsoleHelper.WriteDefault("\t\tmov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + (startInStack + step) + "]");
-						}
+						takeRegister = ASMregisters.GetFreeRegisterData();
+						ConsoleHelper.WriteDefault("\t\tmov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + (startInStack + step) + "]");
 					}
-					ASMregisters.stepByte += step;
 				}
+				ASMregisters.stepByte += step;
 			}
 		}
 
