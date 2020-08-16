@@ -111,41 +111,41 @@ namespace lab1.ASTNodes
                 (bodyMethod as IArea).ViewMemberArea();
         }
 
-		public override void PrintASM(bool isNewLine)
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
-			Console.WriteLine
-			(
-				"format PE Console\n"
-				+ "entry Start"
-				+ "include '%finc%\\win32\\win32a.inc'\n"
-				+ "uglobal\n"
-				+ "\thInstance dd ?\n"
-				+ "\thHeap     dd ?\n"
-				+ "endg\n"
-				+ "section '.data' data readable writable\n"
-				+ "\tresStr db 'Result: %d', 0\n"
-				+ "section '.idata' import data readable\n"
-				+ "\tlibrary kernel, 'kernel32.dll',\\\n"
-				+ "\t\tmsvcrt, 'msvcrt.dll'\n"
-				+ "\timport kernel,\\\n"
-				+ "\t\tExitProcess, 'ExitProcess'\n"
-				+ "\timport msvcrt,\\\n"
-				+ "\t\tprintf, 'printf',\\\n"
-				+ "\t\tscanf, 'scanf',\\\n"
-				+ "\t\tgetch, '_getch\n"
-				+ "Start:"
-			);
+			//Console.WriteLine
+			//(
+			//	"format PE Console\n"
+			//	+ "entry Start"
+			//	+ "include '%finc%\\win32\\win32a.inc'\n"
+			//	+ "uglobal\n"
+			//	+ "\thInstance dd ?\n"
+			//	+ "\thHeap     dd ?\n"
+			//	+ "endg\n"
+			//	+ "section '.data' data readable writable\n"
+			//	+ "\tresStr db 'Result: %d', 0\n"
+			//	+ "section '.idata' import data readable\n"
+			//	+ "\tlibrary kernel, 'kernel32.dll',\\\n"
+			//	+ "\t\tmsvcrt, 'msvcrt.dll'\n"
+			//	+ "\timport kernel,\\\n"
+			//	+ "\t\tExitProcess, 'ExitProcess'\n"
+			//	+ "\timport msvcrt,\\\n"
+			//	+ "\t\tprintf, 'printf',\\\n"
+			//	+ "\t\tscanf, 'scanf',\\\n"
+			//	+ "\t\tgetch, '_getch\n"
+			//	+ "Start:"
+			//);
 
-			bodyMethod.PrintASM(false);
+			//bodyMethod.PrintASM(false);
 
-			Console.WriteLine
-			(
-				"Exit:"
-				+ "\tpush\teax\n"
-				+ "\tFinalizeAll\n"
-				+ "\tinvoke\tExitProcess\n"
-				+ "IncludeAllGlobals"
-			);
+			//Console.WriteLine
+			//(
+			//	"Exit:"
+			//	+ "\tpush\teax\n"
+			//	+ "\tFinalizeAll\n"
+			//	+ "\tinvoke\tExitProcess\n"
+			//	+ "IncludeAllGlobals"
+			//);
 		}
 	}
 }

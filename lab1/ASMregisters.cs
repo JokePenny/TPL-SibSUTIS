@@ -4,10 +4,14 @@ using System.Text;
 
 namespace lab1
 {
+	/// <summary>
+	/// Глобальное хранилище ASM регистров для кодогенератора
+	/// </summary>
 	public static class ASMregisters
 	{
-		public static string[] registersData = { "eax", "ebx", "ecx", "edx" };
-		public static int[] registersDataState = { 0, 0, 0, 0 };
+		private static List<string> markerJump = new List<string>();
+		private static string[] registersData = { "eax", "ebx", "ecx", "edx" };
+		private static int[] registersDataState = { 0, 0, 0, 0 };
 
 		public static int stepByte { get; set; }
 
@@ -116,6 +120,13 @@ namespace lab1
 				default:
 					return "dec";
 			}
+		}
+
+		public static string GetNewMarkerJump()
+		{
+			string newMarker = ".L" + markerJump.Count;
+			markerJump.Add(newMarker);
+			return newMarker;
 		}
 	}
 }

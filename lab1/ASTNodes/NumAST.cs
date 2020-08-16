@@ -49,7 +49,7 @@ namespace lab1.ASTNodes
             return typeValue;
         }
 
-		public override void PrintASM(bool isNewLine)
+		public override void PrintASM(string levelTabulation, bool isNewLine)
 		{
 
 		}

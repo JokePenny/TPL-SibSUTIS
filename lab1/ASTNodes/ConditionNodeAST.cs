@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Helpers;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
@@ -48,5 +49,14 @@ namespace lab1.ASTNodes
             else if (body is IArea)
                 (body as IArea).ViewMemberArea();
         }
+
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
+		{
+			bodyCondition.PrintASM(levelTabulatiion);
+			string markerJump = ASMregisters.GetNewMarkerJump();
+			ConsoleHelper.WriteDefault(markerJump);
+			(body as BodyMethodAST).PrintASM(levelTabulatiion + "\t", isNewLine);
+			ConsoleHelper.WriteDefault(markerJump + ":");
+		}
 	}
 }

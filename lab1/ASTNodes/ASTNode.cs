@@ -16,7 +16,7 @@
         public Point point;
 
         public virtual void Print(string level) { }
-		public virtual void PrintASM(bool isNewLine = false) { }
+		public virtual void PrintASM(string leveltabulation, bool isNewLine = false) { }
 		~ASTNode() { }
     }
 }

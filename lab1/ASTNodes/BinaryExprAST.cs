@@ -33,7 +33,12 @@ namespace lab1.ASTNodes
             return typeExpr;
         }
 
-        public override void Print(string level)
+		public string GetOp()
+		{
+			return op;
+		}
+
+		public override void Print(string level)
         {
             Console.WriteLine(level + "[OP] " + op);
             leftNode.Print(level + "\t");
@@ -62,18 +67,18 @@ namespace lab1.ASTNodes
 			return typeExpr;
         }
 
-		public override void PrintASM(bool isNewLine)
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
 			string registerLeft = "";
 			string registerRight = "";
 			int startInStack = 0;
 			if (leftNode is BinaryExprAST)
 			{
-				leftNode.PrintASM();
+				leftNode.PrintASM(levelTabulatiion);
 				if (rightNode is BinaryExprAST)
 				{
 					ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
-					rightNode.PrintASM();
+					rightNode.PrintASM(levelTabulatiion);
 					registerRight = ASMregisters.GetFreeRegisterData();
 					ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
 				}
@@ -106,7 +111,7 @@ namespace lab1.ASTNodes
 					if (rightNode is BinaryExprAST)
 					{
 						ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
-						rightNode.PrintASM();
+						rightNode.PrintASM(levelTabulatiion);
 						registerRight = ASMregisters.GetFreeRegisterData();
 						ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
 						registerLeft = ASMregisters.GetFreeRegisterData();
@@ -137,7 +142,7 @@ namespace lab1.ASTNodes
 					if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
 					{
 						ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
-						rightNode.PrintASM();
+						rightNode.PrintASM(levelTabulatiion);
 						registerRight = ASMregisters.GetFreeRegisterData();
 						ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
 						registerLeft = ASMregisters.GetFreeRegisterData();

@@ -41,17 +41,17 @@ namespace lab1.ASTNodes
             return type;
         }
 
-		public override void PrintASM(bool isNewLine)
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
 			if (node == null) return;
 
 			if (node is BinaryExprAST)
 			{
-				node.PrintASM();
+				node.PrintASM(levelTabulatiion);
 			}
 			else if (node is ParenthesisExprAST)
 			{
-				node.PrintASM();
+				node.PrintASM(levelTabulatiion);
 			}
 			else
 			{
@@ -65,7 +65,7 @@ namespace lab1.ASTNodes
 				}
 				else
 				{
-					node.PrintASM();
+					node.PrintASM(levelTabulatiion);
 				}
 			}
 		}

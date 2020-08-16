@@ -41,5 +41,10 @@ namespace lab1.ASTNodes
             else if (branching is IArea)
                 (branching as IArea).ViewMemberArea();
         }
+
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
+		{
+			(branching as ConditionNodeAST).PrintASM(levelTabulatiion, isNewLine);
+		}
 	}
 }

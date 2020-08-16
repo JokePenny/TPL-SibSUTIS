@@ -576,7 +576,7 @@ namespace lab1
             return node;
         }
 
-        private static ASTNode MemberBoolBinOperation()
+        private static ASTNode MemberBoolBinOperation(bool isAndOp = false)
         {
             GetNextToken();
             if (curTok == null) return null;
@@ -609,16 +609,40 @@ namespace lab1
                         if (curTok == null) return null;
                         ASTNode rightNodeExp = MemberBinOperation();
                         if (rightNodeExp == null) ConsoleHelper.WriteErrorAST("Expected 'x'", curTok.y, curTok.x);
+						if(isAndOp)
+						{
+							ASTNode nodeExprLeft = new BinaryExprAST(op, leftNodeExp, rightNodeExp, new Point(curTok.y, curTok.x));
+							ASTNode boolNode = new BoolAST(nodeExprLeft, new Point(curTok.y, curTok.x));
+							return boolNode;
+						}
+						string opBool;
 
-                        if (curTok == null) return null;
-                        if (curTok.token == Tokens.Token.BOOL_OP_AND || curTok.token == Tokens.Token.BOOL_OP_OR)
+						if (curTok == null) return null;
+                        if (curTok.token == Tokens.Token.BOOL_OP_AND)
                         {
-                            ASTNode nodeExprLeft = new BinaryExprAST(op, leftNodeExp, rightNodeExp, new Point(curTok.y, curTok.x));
-                            ASTNode boolNode = new BoolAST(nodeExprLeft, new Point(curTok.y, curTok.x));
-                            ASTNode nodeExpRight = new BinaryExprAST(curTok.subString, boolNode, MemberBoolBinOperation(), new Point(curTok.y, curTok.x));
-                            return new BoolAST(nodeExpRight, new Point(curTok.y, curTok.x));
-                        }
-                        else
+							opBool = curTok.subString;
+							ASTNode nodeExprLeft = new BinaryExprAST(op, leftNodeExp, rightNodeExp, new Point(curTok.y, curTok.x));
+							ASTNode boolNode = new BoolAST(nodeExprLeft, new Point(curTok.y, curTok.x));
+							ASTNode nodeExpRight = new BinaryExprAST(opBool, boolNode, MemberBoolBinOperation(true), new Point(curTok.y, curTok.x));
+							ASTNode nodeBool;
+							while(curTok.token != Tokens.Token.PARENTHESIS_R)
+							{
+								string boolor = curTok.subString;
+								ASTNode memberBoolOr = MemberBoolBinOperation(curTok.token == Tokens.Token.BOOL_OP_AND);
+								nodeExpRight = new BinaryExprAST(boolor, memberBoolOr, nodeExpRight, new Point(curTok.y, curTok.x));
+							}
+							nodeBool = nodeExpRight;
+							return new BoolAST(nodeBool, new Point(curTok.y, curTok.x));
+						}
+                        else if(curTok.token == Tokens.Token.BOOL_OP_OR)
+						{
+							opBool = curTok.subString;
+							ASTNode nodeExprLeft = new BinaryExprAST(op, leftNodeExp, rightNodeExp, new Point(curTok.y, curTok.x));
+							ASTNode boolNode = new BoolAST(nodeExprLeft, new Point(curTok.y, curTok.x));
+							ASTNode nodeExpRight = new BinaryExprAST(opBool, boolNode, MemberBoolBinOperation(), new Point(curTok.y, curTok.x));
+							return new BoolAST(nodeExpRight, new Point(curTok.y, curTok.x));
+						}
+						else
                         {
                             ASTNode nodeExpr = new BinaryExprAST(op, leftNodeExp, rightNodeExp, new Point(curTok.y, curTok.x));
                             return new BoolAST(nodeExpr, new Point(curTok.y, curTok.x));

@@ -10,7 +10,7 @@ namespace lab1.Asm
 		public static void CreateASM(ASTNode head)
 		{
 			if (head is NamespaceAST)
-				(head as NamespaceAST).PrintASM(true);
+				(head as NamespaceAST).PrintASM("", true);
 		}
 	}
 }

@@ -70,11 +70,11 @@ namespace lab1.ASTNodes
             }
         }
 
-		public override void PrintASM(bool isNewLine = false)
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
 			for (int i = 0; i < members.Count; i++)
 			{
-				members[i].PrintASM(true);
+				members[i].PrintASM(levelTabulatiion, true);
 			}
 		}
 	}

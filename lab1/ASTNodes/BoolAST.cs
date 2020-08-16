@@ -9,7 +9,7 @@ namespace lab1.ASTNodes
     class BoolAST : ASTNode, IStorage, ISemantics
     {
         private ASTNode exp;
-        private string result;
+        private string result = "";
 
         public BoolAST(string result, ASTNode exp, Point point)
         {
@@ -29,6 +29,11 @@ namespace lab1.ASTNodes
             this.result = result;
             this.point = point;
         }
+
+		public ASTNode GetExpression()
+		{
+			return exp;
+		}
 
         public override void Print(string level)
         {
@@ -50,5 +55,17 @@ namespace lab1.ASTNodes
             }
             return "bool";
         }
+
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
+		{
+			if(result == "")
+			{
+				ConsoleHelper.WriteDefault(levelTabulatiion + "\t");
+			}
+			else
+			{
+				(exp as BinaryExprAST).PrintASM(levelTabulatiion, isNewLine);
+			}
+		}
 	}
 }

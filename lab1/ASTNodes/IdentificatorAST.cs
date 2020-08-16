@@ -108,7 +108,7 @@ namespace lab1.ASTNodes
             return type;
         }
 
-		public override void PrintASM(bool isNewLine)
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
 			if (storage == null) return;
 
@@ -142,7 +142,7 @@ namespace lab1.ASTNodes
 				}
 				else if (storage is BinaryExprAST || storage is ParenthesisExprAST)
 				{
-					storage.PrintASM();
+					storage.PrintASM(levelTabulatiion);
 					string register = ASMregisters.GetFreeRegisterData();
 					ConsoleHelper.WriteDefault("\t\tpop\t" + register);
 					ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
@@ -156,7 +156,7 @@ namespace lab1.ASTNodes
 							elementStorage = (storage as IEject).GetValue();
 						else
 						{
-							storage.PrintASM();
+							storage.PrintASM(levelTabulatiion);
 							elementStorage = ASMregisters.GetFreeRegisterData();
 						}
 
