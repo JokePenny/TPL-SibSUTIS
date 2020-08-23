@@ -1,4 +1,5 @@
-﻿using System;
+﻿using lab1.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,12 +10,18 @@ namespace lab1
 	/// </summary>
 	public static class ASMregisters
 	{
-		private static List<string> markerJump = new List<string>();
+		public static string MarkerJumpPrevBody { get; private set; }
+		public static string MarkerJumpAfterBody { get; private set; }
+
+		private static int countMarkers = 1;
 		private static string[] registersData = { "eax", "ebx", "ecx", "edx" };
 		private static int[] registersDataState = { 0, 0, 0, 0 };
 
 		public static int stepByte { get; set; }
 
+		/// <summary>
+		/// Выдает первый свободный регистр
+		/// </summary>
 		public static string GetFreeRegisterData()
 		{
 			for(int i = 0; i < registersDataState.Length; i++)
@@ -28,6 +35,9 @@ namespace lab1
 			return registersData[0];
 		}
 
+		/// <summary>
+		/// Выдает первый занятый регистр
+		/// </summary>
 		public static string GetFirstFillRegister()
 		{
 			for (int i = 0; i < registersDataState.Length; i++)
@@ -41,6 +51,9 @@ namespace lab1
 			return registersData[0];
 		}
 
+		/// <summary>
+		/// Установить состояние для регистра занят/незанят
+		/// </summary>
 		public static void SetStateRegisterData(string register, bool isFree)
 		{
 			for (int i = 0; i < registersDataState.Length; i++)
@@ -53,6 +66,9 @@ namespace lab1
 			}
 		}
 
+		/// <summary>
+		/// Размер сдвига для переменных, для размещения на стеке
+		/// </summary>
 		public static int GetSizeStep(string type)
 		{
 			switch(type)
@@ -74,6 +90,18 @@ namespace lab1
 			}
 		}
 
+		/// <summary>
+		/// Очищает занятые маркеры под условные переходы
+		/// </summary>
+		public static void ClearMarkerks()
+		{
+			MarkerJumpPrevBody = "";
+			MarkerJumpAfterBody = "";
+		}
+
+		/// <summary>
+		/// Возвращает код для типа переменной
+		/// </summary>
 		public static string GetNameType(string type)
 		{
 			switch (type)
@@ -94,6 +122,9 @@ namespace lab1
 			}
 		}
 
+		/// <summary>
+		/// Возвращает код арифметической операции
+		/// </summary>
 		public static string GetOperation(string op)
 		{
 			switch (op)
@@ -111,6 +142,9 @@ namespace lab1
 			}
 		}
 
+		/// <summary>
+		/// Возвращает код инкремента/декремента
+		/// </summary>
 		public static string GetCrement(string crement)
 		{
 			switch (crement)
@@ -122,11 +156,65 @@ namespace lab1
 			}
 		}
 
-		public static string GetNewMarkerJump()
+		/// <summary>
+		/// Новую метку для условного перехода к начлу тела
+		/// </summary>
+		public static string GetNewMarkerJumpPrevBody()
 		{
-			string newMarker = ".L" + markerJump.Count;
-			markerJump.Add(newMarker);
+			if (MarkerJumpPrevBody == null || MarkerJumpPrevBody == "") MarkerJumpAfterBody = GetNewNameMarker();
+			return MarkerJumpPrevBody;
+		}
+
+		/// <summary>
+		/// Новую метку для условного перехода к концу тела
+		/// </summary>
+		public static string GetNewMarkerJumpAfterBody()
+		{
+			if (MarkerJumpAfterBody == null || MarkerJumpAfterBody == "") MarkerJumpAfterBody = GetNewNameMarker();
+			return MarkerJumpAfterBody;
+		}
+
+		/// <summary>
+		/// Создет новое имя для маркера условного перехода
+		/// </summary>
+		private static string GetNewNameMarker()
+		{
+			string newMarker = ".L" + countMarkers;
+			countMarkers++;
 			return newMarker;
+		}
+
+		/// <summary>
+		/// Возвращает код условного перехода
+		/// </summary>
+		public static string GetTypeConditionJump(string boolOp, bool isRevert)
+		{
+			string typeJump = "";
+			switch(boolOp)
+			{
+				case "==":
+					typeJump = isRevert ? "jne" : "je";
+					break;
+				case "!=":
+					typeJump = isRevert ? "je" : "jne";
+					break;
+				case "<=":
+					typeJump = isRevert ? "ja" : "jle";
+					break;
+				case ">=":
+					typeJump = isRevert ? "jb" : "jge";
+					break;
+				case "<":
+					typeJump = isRevert ? "jge" : "jb";
+					break;
+				case ">":
+					typeJump = isRevert ? "jle" : "ja";
+					break;
+				default:
+					ConsoleHelper.WriteError("Not find asm-code for this bool operation: " + boolOp);
+					break;
+			}
+			return typeJump;
 		}
 	}
 }

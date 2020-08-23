@@ -62,100 +62,47 @@ namespace lab1.ASTNodes
                 ConsoleHelper.WriteError("<" + point.y + "," + point.x + ">: different types -> '" + typeLeftNode + "' " + op + " '" + typerightNode + "'");
                 return "";
             }
-			//new added
-			typeExpr = typeLeftNode;
+
+			if (CheckBoolOp())
+				typeExpr = "bool";
+			else
+				typeExpr = typeLeftNode;
+
 			return typeExpr;
         }
 
 		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
-			string registerLeft = "";
+			string registerLeft;
 			string registerRight = "";
-			int startInStack = 0;
-			if (leftNode is BinaryExprAST)
+			int startInStack;
+			if(typeExpr == "bool")
 			{
-				leftNode.PrintASM(levelTabulatiion);
-				if (rightNode is BinaryExprAST)
+				if (leftNode is BoolAST)
 				{
-					ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
-					rightNode.PrintASM(levelTabulatiion);
-					registerRight = ASMregisters.GetFreeRegisterData();
-					ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
-				}
-				else
-				{
-					registerRight = ASMregisters.GetFreeRegisterData();
-					if (rightNode is IdentificatorAST)
-					{
-						IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
-						startInStack = identificatorRight.GetAddresInStack();
-						ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "]");
-					}
-					else
-					{
-						IEject valueRight = (rightNode as IEject);
-						ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + valueRight.GetValue());
-					}
-				}
-				registerLeft = ASMregisters.GetFreeRegisterData();
-				ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
-			}
-			else
-			{
-				registerLeft = ASMregisters.GetFreeRegisterData();
-				if (leftNode is IdentificatorAST)
-				{
-					IdentificatorAST identificatorLeft = (IdentificatorAST)SymTable.symTabls.FindNode((leftNode as IdentificatorAST).GetName());
-					startInStack = identificatorLeft.GetAddresInStack();
-					ConsoleHelper.WriteDefault("\t\tmov\t" + registerLeft + ", " + ASMregisters.GetNameType(identificatorLeft.GetTypeId()) + " [ebp-" + startInStack + "]");
-					if (rightNode is BinaryExprAST)
+					leftNode.PrintASM(levelTabulatiion);
+					if(rightNode is BinaryExprAST)
 					{
 						ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
 						rightNode.PrintASM(levelTabulatiion);
 						registerRight = ASMregisters.GetFreeRegisterData();
 						ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
-						registerLeft = ASMregisters.GetFreeRegisterData();
-						ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
+					}
+					else if (rightNode is BoolAST)
+					{
+						ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
+						rightNode.PrintASM(levelTabulatiion);
+						registerRight = ASMregisters.GetFreeRegisterData();
+						ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
 					}
 					else
 					{
-						string registeRight = ASMregisters.GetFreeRegisterData();
+						registerRight = ASMregisters.GetFreeRegisterData();
 						if (rightNode is IdentificatorAST)
 						{
 							IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
 							startInStack = identificatorRight.GetAddresInStack();
-							ConsoleHelper.WriteDefault("\t\tmov\t" + registeRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "]");
-						}
-						else
-						{
-							IEject valueRight = (rightNode as IEject);
-							ConsoleHelper.WriteDefault("\t\tmov\t" + registeRight + ", " + valueRight.GetValue());
-						}
-						registerLeft = ASMregisters.GetFreeRegisterData();
-						ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
-					}
-				}
-				else //value
-				{
-					IEject valueLeft = (leftNode as IEject);
-					ConsoleHelper.WriteDefault("\t\tmov\t" + registerLeft + ", " + valueLeft.GetValue());
-					if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
-					{
-						ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
-						rightNode.PrintASM(levelTabulatiion);
-						registerRight = ASMregisters.GetFreeRegisterData();
-						ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
-						registerLeft = ASMregisters.GetFreeRegisterData();
-						ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
-					}
-					else
-					{
-						registerRight = ASMregisters.GetFreeRegisterData();
-						if (rightNode is IdentificatorAST)
-						{
-							IdentificatorAST identificator = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
-							startInStack = identificator.GetAddresInStack();
-							ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + ASMregisters.GetNameType(identificator.GetTypeId()) + " [ebp-" + startInStack + "]");
+							ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "]");
 						}
 						else
 						{
@@ -163,13 +110,194 @@ namespace lab1.ASTNodes
 							ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + valueRight.GetValue());
 						}
 					}
+					registerLeft = ASMregisters.GetFreeRegisterData();
+					ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
 				}
+				else
+				{
+					registerLeft = ASMregisters.GetFreeRegisterData();
+					if (leftNode is IdentificatorAST)
+					{
+						IdentificatorAST identificatorLeft = (IdentificatorAST)SymTable.symTabls.FindNode((leftNode as IdentificatorAST).GetName());
+						startInStack = identificatorLeft.GetAddresInStack();
+						ConsoleHelper.WriteDefault("\t\tmov\t" + registerLeft + ", " + ASMregisters.GetNameType(identificatorLeft.GetTypeId()) + " [ebp-" + startInStack + "]");
+						if (rightNode is BinaryExprAST)
+						{
+							ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
+							rightNode.PrintASM(levelTabulatiion);
+							registerRight = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
+							registerLeft = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
+						}
+						else
+						{
+							string registeRight = ASMregisters.GetFreeRegisterData();
+							if (rightNode is IdentificatorAST)
+							{
+								IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
+								startInStack = identificatorRight.GetAddresInStack();
+								ConsoleHelper.WriteDefault("\t\tmov\t" + registeRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "]");
+							}
+							else
+							{
+								IEject valueRight = (rightNode as IEject);
+								ConsoleHelper.WriteDefault("\t\tmov\t" + registeRight + ", " + valueRight.GetValue());
+							}
+							registerLeft = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
+						}
+					}
+					else //value
+					{
+						IEject valueLeft = (leftNode as IEject);
+						ConsoleHelper.WriteDefault("\t\tmov\t" + registerLeft + ", " + valueLeft.GetValue());
+						if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
+						{
+							ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
+							rightNode.PrintASM(levelTabulatiion);
+							registerRight = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
+							registerLeft = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
+						}
+						else
+						{
+							registerRight = ASMregisters.GetFreeRegisterData();
+							if (rightNode is IdentificatorAST)
+							{
+								IdentificatorAST identificator = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
+								startInStack = identificator.GetAddresInStack();
+								ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + ASMregisters.GetNameType(identificator.GetTypeId()) + " [ebp-" + startInStack + "]");
+							}
+							else
+							{
+								IEject valueRight = (rightNode as IEject);
+								ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + valueRight.GetValue());
+							}
+						}
+					}
+				}
+				ConsoleHelper.WriteDefault(levelTabulatiion + "cmp\t" + registerLeft + ", " + registerRight);
+				bool isCheckNextBoolOperations = op == "&&";
+				string marker = isCheckNextBoolOperations ? ASMregisters.GetNewMarkerJumpAfterBody() : ASMregisters.GetNewMarkerJumpPrevBody();
+				ConsoleHelper.WriteDefault(levelTabulatiion + ASMregisters.GetTypeConditionJump(op, isCheckNextBoolOperations) + "\t" + marker);
 			}
-			ConsoleHelper.WriteDefault("\t\t" + ASMregisters.GetOperation(op) + "\t" + registerLeft + ", " + registerRight);
-			ConsoleHelper.WriteDefault("\t\tpush\t" + registerLeft);
-
+			else
+			{
+				if (leftNode is BinaryExprAST)
+				{
+					leftNode.PrintASM(levelTabulatiion);
+					if (rightNode is BinaryExprAST)
+					{
+						ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
+						rightNode.PrintASM(levelTabulatiion);
+						registerRight = ASMregisters.GetFreeRegisterData();
+						ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
+					}
+					else
+					{
+						registerRight = ASMregisters.GetFreeRegisterData();
+						if (rightNode is IdentificatorAST)
+						{
+							IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
+							startInStack = identificatorRight.GetAddresInStack();
+							ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "]");
+						}
+						else
+						{
+							IEject valueRight = (rightNode as IEject);
+							ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + valueRight.GetValue());
+						}
+					}
+					registerLeft = ASMregisters.GetFreeRegisterData();
+					ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
+				}
+				else
+				{
+					registerLeft = ASMregisters.GetFreeRegisterData();
+					if (leftNode is IdentificatorAST)
+					{
+						IdentificatorAST identificatorLeft = (IdentificatorAST)SymTable.symTabls.FindNode((leftNode as IdentificatorAST).GetName());
+						startInStack = identificatorLeft.GetAddresInStack();
+						ConsoleHelper.WriteDefault("\t\tmov\t" + registerLeft + ", " + ASMregisters.GetNameType(identificatorLeft.GetTypeId()) + " [ebp-" + startInStack + "]");
+						if (rightNode is BinaryExprAST)
+						{
+							ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
+							rightNode.PrintASM(levelTabulatiion);
+							registerRight = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
+							registerLeft = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
+						}
+						else
+						{
+							string registeRight = ASMregisters.GetFreeRegisterData();
+							if (rightNode is IdentificatorAST)
+							{
+								IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
+								startInStack = identificatorRight.GetAddresInStack();
+								ConsoleHelper.WriteDefault("\t\tmov\t" + registeRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "]");
+							}
+							else
+							{
+								IEject valueRight = (rightNode as IEject);
+								ConsoleHelper.WriteDefault("\t\tmov\t" + registeRight + ", " + valueRight.GetValue());
+							}
+							registerLeft = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
+						}
+					}
+					else //value
+					{
+						IEject valueLeft = (leftNode as IEject);
+						ConsoleHelper.WriteDefault("\t\tmov\t" + registerLeft + ", " + valueLeft.GetValue());
+						if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
+						{
+							ConsoleHelper.WriteDefault("\t\tpush\t" + ASMregisters.GetFirstFillRegister());
+							rightNode.PrintASM(levelTabulatiion);
+							registerRight = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tpop\t" + registerRight);
+							registerLeft = ASMregisters.GetFreeRegisterData();
+							ConsoleHelper.WriteDefault("\t\tpop\t" + registerLeft);
+						}
+						else
+						{
+							registerRight = ASMregisters.GetFreeRegisterData();
+							if (rightNode is IdentificatorAST)
+							{
+								IdentificatorAST identificator = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
+								startInStack = identificator.GetAddresInStack();
+								ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + ASMregisters.GetNameType(identificator.GetTypeId()) + " [ebp-" + startInStack + "]");
+							}
+							else
+							{
+								IEject valueRight = (rightNode as IEject);
+								ConsoleHelper.WriteDefault("\t\tmov\t" + registerRight + ", " + valueRight.GetValue());
+							}
+						}
+					}
+				}
+				ConsoleHelper.WriteDefault("\t\t" + ASMregisters.GetOperation(op) + "\t" + registerLeft + ", " + registerRight);
+				ConsoleHelper.WriteDefault("\t\tpush\t" + registerLeft);
+			}
 			if (registerLeft != "") ASMregisters.SetStateRegisterData(registerLeft, true);
 			if (registerRight != "") ASMregisters.SetStateRegisterData(registerRight, true);
+		}
+
+		private bool CheckBoolOp()
+		{
+			switch (op)
+			{
+				case "<":
+				case ">":
+				case "!=":
+				case "==":
+				case ">=":
+				case "<=":
+					return true;
+			}
+			return false;
 		}
 	}
 }

@@ -58,14 +58,16 @@ namespace lab1.ASTNodes
 
 		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
-			if(result == "")
-			{
-				ConsoleHelper.WriteDefault(levelTabulatiion + "\t");
-			}
-			else
-			{
-				(exp as BinaryExprAST).PrintASM(levelTabulatiion, isNewLine);
-			}
+			(exp as BinaryExprAST).PrintASM(levelTabulatiion, isNewLine);
+
+			//if (result == "")
+			//{
+			//	ConsoleHelper.WriteDefault(levelTabulatiion + "\t");
+			//}
+			//else
+			//{
+			//	(exp as BinaryExprAST).PrintASM(levelTabulatiion, isNewLine);
+			//}
 		}
 	}
 }

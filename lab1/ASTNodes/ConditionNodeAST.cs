@@ -53,10 +53,21 @@ namespace lab1.ASTNodes
 		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
 			bodyCondition.PrintASM(levelTabulatiion);
-			string markerJump = ASMregisters.GetNewMarkerJump();
-			ConsoleHelper.WriteDefault(markerJump);
+			string markerJumpPrevBody = ASMregisters.MarkerJumpPrevBody;
+			string markerJumpAfterBody = ASMregisters.MarkerJumpAfterBody;
+			ASMregisters.ClearMarkerks();
+
+			if (markerJumpPrevBody != null && markerJumpPrevBody != "")
+			{
+				ConsoleHelper.WriteDefault(markerJumpPrevBody + ":");
+			}
+			
 			(body as BodyMethodAST).PrintASM(levelTabulatiion + "\t", isNewLine);
-			ConsoleHelper.WriteDefault(markerJump + ":");
+
+			if (markerJumpAfterBody != null && markerJumpAfterBody != "")
+			{
+				ConsoleHelper.WriteDefault(markerJumpAfterBody + ":");
+			}
 		}
 	}
 }
