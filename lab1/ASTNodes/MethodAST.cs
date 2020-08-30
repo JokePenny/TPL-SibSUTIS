@@ -136,7 +136,7 @@ namespace lab1.ASTNodes
 				+ "Start:"
 			);
 
-			bodyMethod.PrintASM("", false);
+			bodyMethod.PrintASM("\t\t", false);
 
 			Console.WriteLine
 			(

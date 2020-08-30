@@ -112,10 +112,13 @@ namespace lab1.ASTNodes
 		{
 			if (storage == null) return;
 
-			startInStack = ASMregisters.stepByte;
-			int step = ASMregisters.GetSizeStep(type);
-			ASMregisters.stepByte += step;
-			startInStack = ASMregisters.stepByte;
+			if(startInStack == 0)
+			{
+				startInStack = ASMregisters.stepByte;
+				ASMregisters.stepByte += ASMregisters.GetSizeStep(type);
+				startInStack = ASMregisters.stepByte;
+			}
+
 			if (isArray)
 			{
 				if (storage is NewAST)
@@ -165,10 +168,9 @@ namespace lab1.ASTNodes
 					else
 					{
 						takeRegister = ASMregisters.GetFreeRegisterData();
-						ConsoleHelper.WriteDefault("\t\tmov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + (startInStack + step) + "]");
+						ConsoleHelper.WriteDefault("\t\tmov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "]");
 					}
 				}
-				ASMregisters.stepByte += step;
 			}
 		}
 

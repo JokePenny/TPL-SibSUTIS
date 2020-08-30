@@ -161,7 +161,7 @@ namespace lab1
 		/// </summary>
 		public static string GetNewMarkerJumpPrevBody()
 		{
-			if (MarkerJumpPrevBody == null || MarkerJumpPrevBody == "") MarkerJumpAfterBody = GetNewNameMarker();
+			if (MarkerJumpPrevBody == null || MarkerJumpPrevBody == "") MarkerJumpPrevBody = GetNewNameMarker();
 			return MarkerJumpPrevBody;
 		}
 
