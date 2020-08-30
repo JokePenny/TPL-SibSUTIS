@@ -123,7 +123,7 @@ namespace lab1.ASTNodes
 			{
 				if (storage is NewAST)
 				{
-					ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], ");
+					ConsoleHelper.WriteDefault(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], ");
 				}
 				else
 				{
@@ -141,14 +141,14 @@ namespace lab1.ASTNodes
 			{
 				if (storage is NewAST)
 				{
-					ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], 0");
+					ConsoleHelper.WriteDefault(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], 0");
 				}
 				else if (storage is BinaryExprAST || storage is ParenthesisExprAST)
 				{
 					storage.PrintASM(levelTabulatiion);
 					string register = ASMregisters.GetFreeRegisterData();
-					ConsoleHelper.WriteDefault("\t\tpop\t" + register);
-					ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
+					ConsoleHelper.WriteDefault(levelTabulatiion + "pop\t" + register);
+					ConsoleHelper.WriteDefault(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
 				}
 				else
 				{
@@ -163,12 +163,12 @@ namespace lab1.ASTNodes
 							elementStorage = ASMregisters.GetFreeRegisterData();
 						}
 
-						ConsoleHelper.WriteDefault("\t\tmov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
+						ConsoleHelper.WriteDefault(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
 					}
 					else
 					{
 						takeRegister = ASMregisters.GetFreeRegisterData();
-						ConsoleHelper.WriteDefault("\t\tmov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "]");
+						ConsoleHelper.WriteDefault(levelTabulatiion + "mov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "]");
 					}
 				}
 			}

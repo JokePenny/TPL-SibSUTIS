@@ -100,6 +100,14 @@ namespace lab1
 		}
 
 		/// <summary>
+		/// Очищает занятые маркеры под условные переходы
+		/// </summary>
+		public static void ClearMarkerPrevBody()
+		{
+			MarkerJumpPrevBody = "";
+		}
+
+		/// <summary>
 		/// Возвращает код для типа переменной
 		/// </summary>
 		public static string GetNameType(string type)
@@ -150,9 +158,9 @@ namespace lab1
 			switch (crement)
 			{
 				case "++":
-					return "inc";
+					return "add";
 				default:
-					return "dec";
+					return "sub";
 			}
 		}
 

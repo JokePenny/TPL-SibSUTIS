@@ -36,5 +36,13 @@ namespace lab1.ASTNodes
                     (memberPostcondition[i] as IStorage).AddAllSymbolIn(symTable);
             }
         }
+
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
+		{
+			for (int i = 0; i < memberPostcondition.Count; i++)
+			{
+				memberPostcondition[i].PrintASM(levelTabulatiion, false);
+			}
+		}
 	}
 }

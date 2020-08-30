@@ -44,5 +44,12 @@ namespace lab1.ASTNodes
                 ConsoleHelper.WriteError("<" + point.y + "," + point.x + ">: can't use crement -> '" + typeIdNode + "'");
             return typeIdNode;
         }
+
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
+		{
+			IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode((id as IdentificatorAST).GetName());
+			int startInStack = identificatorRight.GetAddresInStack();
+			ConsoleHelper.WriteDefault(levelTabulatiion + ASMregisters.GetCrement(crement) + "\t" + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "], 1");
+		}
 	}
 }

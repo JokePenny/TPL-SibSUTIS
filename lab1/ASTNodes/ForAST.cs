@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Helpers;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
@@ -77,5 +78,25 @@ namespace lab1.ASTNodes
             else if (postcondition is IArea)
                 (postcondition as IArea).ViewMemberArea();
         }
+
+		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
+		{
+			for(int i = 0; i < declaredVar.Count; i++)
+			{
+				declaredVar[i].PrintASM(levelTabulatiion, true);
+			}
+
+			string markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
+			string markerJumpAfterBody = ASMregisters.GetNewMarkerJumpAfterBody();
+			ASMregisters.ClearMarkerks();
+
+			ConsoleHelper.WriteDefault(levelTabulatiion + markerJumpPrevBody + ":");
+
+			conditionWithBody.PrintASM(levelTabulatiion + "\t", false);
+			postcondition.PrintASM(levelTabulatiion + "\t", false);
+			ConsoleHelper.WriteDefault(levelTabulatiion + "\t" + "jmp" + "\t" + markerJumpPrevBody);
+
+			ConsoleHelper.WriteDefault(levelTabulatiion + markerJumpAfterBody + ":");
+		}
 	}
 }

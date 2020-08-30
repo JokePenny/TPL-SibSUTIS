@@ -59,14 +59,14 @@ namespace lab1.ASTNodes
 
 			if (markerJumpPrevBody != null && markerJumpPrevBody != "")
 			{
-				ConsoleHelper.WriteDefault(markerJumpPrevBody + ":");
+				ConsoleHelper.WriteDefault(levelTabulatiion + markerJumpPrevBody + ":");
 			}
 			
 			(body as BodyMethodAST).PrintASM(levelTabulatiion + "\t", isNewLine);
 
 			if (markerJumpAfterBody != null && markerJumpAfterBody != "")
 			{
-				ConsoleHelper.WriteDefault(markerJumpAfterBody + ":");
+				ConsoleHelper.WriteDefault(levelTabulatiion + markerJumpAfterBody + ":");
 			}
 		}
 	}
