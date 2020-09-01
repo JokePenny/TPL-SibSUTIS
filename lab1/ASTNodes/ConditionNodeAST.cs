@@ -52,6 +52,8 @@ namespace lab1.ASTNodes
 
 		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
+			bool isConditionBelongToCicle = ASMregisters.isContitionBelongsToCicle;
+			ASMregisters.isContitionBelongsToCicle = false;
 			bodyCondition.PrintASM(levelTabulatiion);
 			string markerJumpPrevBody = ASMregisters.MarkerJumpPrevBody;
 			string markerJumpAfterBody = ASMregisters.MarkerJumpAfterBody;
@@ -64,7 +66,7 @@ namespace lab1.ASTNodes
 			
 			(body as BodyMethodAST).PrintASM(levelTabulatiion + "\t", isNewLine);
 
-			if (markerJumpAfterBody != null && markerJumpAfterBody != "")
+			if (markerJumpAfterBody != null && markerJumpAfterBody != "" && !isConditionBelongToCicle)
 			{
 				ConsoleHelper.WriteDefault(levelTabulatiion + markerJumpAfterBody + ":");
 			}

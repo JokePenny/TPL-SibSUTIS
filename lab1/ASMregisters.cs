@@ -12,6 +12,7 @@ namespace lab1
 	{
 		public static string MarkerJumpPrevBody { get; private set; }
 		public static string MarkerJumpAfterBody { get; private set; }
+		public static bool isContitionBelongsToCicle;
 
 		private static int countMarkers = 1;
 		private static string[] registersData = { "eax", "ebx", "ecx", "edx" };

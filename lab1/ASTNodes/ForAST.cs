@@ -88,9 +88,10 @@ namespace lab1.ASTNodes
 
 			string markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
 			string markerJumpAfterBody = ASMregisters.GetNewMarkerJumpAfterBody();
-			ASMregisters.ClearMarkerks();
+			ASMregisters.ClearMarkerPrevBody();
 
 			ConsoleHelper.WriteDefault(levelTabulatiion + markerJumpPrevBody + ":");
+			ASMregisters.isContitionBelongsToCicle = true;
 
 			conditionWithBody.PrintASM(levelTabulatiion + "\t", false);
 			postcondition.PrintASM(levelTabulatiion + "\t", false);
