@@ -60,8 +60,8 @@ namespace lab1.ASTNodes
 				{
 					elementStorage = (node as IEject).GetValue();
 					string register = ASMregisters.GetFreeRegisterData();
-					ConsoleHelper.WriteDefault("\t\tmov\t" + register + ", " + elementStorage);
-					ConsoleHelper.WriteDefault("\t\tpush\t" + register);
+					ASM.WriteASMCode(levelTabulatiion + "mov\t" + register + ", " + elementStorage);
+					ASM.WriteASMCode(levelTabulatiion + "push\t" + register);
 				}
 				else
 				{

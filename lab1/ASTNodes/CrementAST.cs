@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Asm;
 using lab1.Helpers;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
@@ -49,7 +50,7 @@ namespace lab1.ASTNodes
 		{
 			IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode((id as IdentificatorAST).GetName());
 			int startInStack = identificatorRight.GetAddresInStack();
-			ConsoleHelper.WriteDefault(levelTabulatiion + ASMregisters.GetCrement(crement) + "\t" + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "], 1");
+			ASM.WriteASMCode(levelTabulatiion + ASMregisters.GetCrement(crement) + "\t" + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "], 1");
 		}
 	}
 }

@@ -123,7 +123,7 @@ namespace lab1.ASTNodes
 			{
 				if (storage is NewAST)
 				{
-					ConsoleHelper.WriteDefault(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], ");
+					ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], ");
 				}
 				else
 				{
@@ -141,14 +141,14 @@ namespace lab1.ASTNodes
 			{
 				if (storage is NewAST)
 				{
-					ConsoleHelper.WriteDefault(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], 0");
+					ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], 0");
 				}
 				else if (storage is BinaryExprAST || storage is ParenthesisExprAST)
 				{
 					storage.PrintASM(levelTabulatiion);
 					string register = ASMregisters.GetFreeRegisterData();
-					ConsoleHelper.WriteDefault(levelTabulatiion + "pop\t" + register);
-					ConsoleHelper.WriteDefault(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
+					ASM.WriteASMCode(levelTabulatiion + "pop\t" + register);
+					ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
 				}
 				else
 				{
@@ -163,12 +163,12 @@ namespace lab1.ASTNodes
 							elementStorage = ASMregisters.GetFreeRegisterData();
 						}
 
-						ConsoleHelper.WriteDefault(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
+						ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
 					}
 					else
 					{
 						takeRegister = ASMregisters.GetFreeRegisterData();
-						ConsoleHelper.WriteDefault(levelTabulatiion + "mov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "]");
+						ASM.WriteASMCode(levelTabulatiion + "mov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "]");
 					}
 				}
 			}

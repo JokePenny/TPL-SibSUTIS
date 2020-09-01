@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Asm;
 using lab1.Helpers;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
@@ -113,7 +114,7 @@ namespace lab1.ASTNodes
 
 		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
-			Console.WriteLine
+			ASM.WriteASMCode
 			(
 				"format PE Console\n"
 				+ "entry Start"
@@ -138,7 +139,7 @@ namespace lab1.ASTNodes
 
 			bodyMethod.PrintASM("\t\t", false);
 
-			Console.WriteLine
+			ASM.WriteASMCode
 			(
 				"Exit:"
 				+ "\tpush\teax\n"

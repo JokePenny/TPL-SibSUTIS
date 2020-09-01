@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Asm;
 using lab1.Helpers;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
@@ -61,14 +62,14 @@ namespace lab1.ASTNodes
 
 			if (markerJumpPrevBody != null && markerJumpPrevBody != "")
 			{
-				ConsoleHelper.WriteDefault(levelTabulatiion + markerJumpPrevBody + ":");
+				ASM.WriteASMCode(levelTabulatiion + markerJumpPrevBody + ":");
 			}
 			
 			(body as BodyMethodAST).PrintASM(levelTabulatiion + "\t", isNewLine);
 
 			if (markerJumpAfterBody != null && markerJumpAfterBody != "" && !isConditionBelongToCicle)
 			{
-				ConsoleHelper.WriteDefault(levelTabulatiion + markerJumpAfterBody + ":");
+				ASM.WriteASMCode(levelTabulatiion + markerJumpAfterBody + ":");
 			}
 		}
 	}
