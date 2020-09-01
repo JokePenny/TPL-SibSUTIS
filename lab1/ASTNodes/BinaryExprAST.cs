@@ -13,6 +13,7 @@ namespace lab1.ASTNodes
         private string op;
         private ASTNode leftNode;
         private ASTNode rightNode;
+		private bool isRightLastNode;
 
         public BinaryExprAST(string op, ASTNode leftNode, ASTNode rightNode, Point point)
         {
@@ -72,12 +73,19 @@ namespace lab1.ASTNodes
         }
 
 		private static bool isBoolNodeAnd = false;
+		private static bool headNested = false;
 		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
 			string registerLeft = "";
 			string registerRight = "";
 			int startInStack;
-			if(typeExpr == "bool")
+			if(!headNested)
+			{
+				headNested = true;
+				FindLastRightNode(rightNode);
+			}
+
+			if (typeExpr == "bool")
 			{
 				if (leftNode is BoolAST)
 				{
@@ -160,11 +168,13 @@ namespace lab1.ASTNodes
 						}
 					}
 				}
+
 				if(op != "&&" && op != "||")
 				{
 					ConsoleHelper.WriteDefault(levelTabulatiion + "cmp\t" + registerLeft + ", " + registerRight);
-					string marker = isBoolNodeAnd ? ASMregisters.GetNewMarkerJumpAfterBody() : ASMregisters.GetNewMarkerJumpPrevBody();
-					ConsoleHelper.WriteDefault(levelTabulatiion + ASMregisters.GetTypeConditionJump(op, isBoolNodeAnd) + "\t" + marker);
+					string marker = !isBoolNodeAnd && !isRightLastNode ? ASMregisters.GetNewMarkerJumpPrevBody() : ASMregisters.GetNewMarkerJumpAfterBody();
+					//string marker = isBoolNodeAnd ? ASMregisters.GetNewMarkerJumpAfterBody() : ASMregisters.GetNewMarkerJumpPrevBody();
+					ConsoleHelper.WriteDefault(levelTabulatiion + ASMregisters.GetTypeConditionJump(op, isBoolNodeAnd || isRightLastNode) + "\t" + marker);
 				}
 			}
 			else
@@ -285,6 +295,22 @@ namespace lab1.ASTNodes
 					return true;
 			}
 			return false;
+		}
+
+		public void FindLastRightNode(ASTNode node)
+		{
+			if (node is BinaryExprAST)
+			{
+				(node as BinaryExprAST).FindLastRightNode(rightNode);
+			}
+			else if (node is BoolAST)
+			{
+				((node as BoolAST).GetExpression() as BinaryExprAST).FindLastRightNode(rightNode);
+			}
+			else
+			{
+				isRightLastNode = true;
+			}
 		}
 	}
 }
