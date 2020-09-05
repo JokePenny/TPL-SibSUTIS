@@ -23,21 +23,10 @@ namespace lab1.ASTNodes
             this.point = point;
         }
 
-        public BinaryExprAST(ASTNode leftNode, Point point)
-        {
-            this.leftNode = leftNode;
-            this.point = point;
-        }
-
         public string GetTypeExp()
         {
             return typeExpr;
         }
-
-		public string GetOp()
-		{
-			return op;
-		}
 
 		public override void Print(string level)
         {

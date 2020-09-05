@@ -59,9 +59,14 @@ namespace lab1
             SEMILICON,
             STRING,
             CHAR,
-            DOT,
-            DOUBLE_DOTS,
-            EMPTY,
+			DOUBLE_DOTS,
+			DOT,
+			CONSOLE,
+			CONSOLE_WRITE,
+			CONSOLE_WRITELINE,
+			CONSOLE_READ_KEY,
+			CONSOLE_READLINE,
+			EMPTY,
             FAILED
         }
 
@@ -118,7 +123,12 @@ namespace lab1
             {",", Token.COMM},
             {";", Token.SEMILICON},
             {":", Token.DOUBLE_DOTS},
-        };
+			{"Console", Token.CONSOLE},
+			{"ReadLine", Token.CONSOLE_READLINE},
+			{"ReadKey", Token.CONSOLE_READ_KEY},
+			{"Write", Token.CONSOLE_WRITE},
+			{"WriteLine", Token.CONSOLE_WRITELINE},
+		};
 
         public static bool IsErrorToken(ref Token tokenType, Token tokenTypeMemory, int length)
         {
@@ -139,7 +149,12 @@ namespace lab1
                 case Token.BOOL:
                 case Token.ID:
                 case Token.TYPE:
-                    isOk =  tokenTypeMemory == Token.K_IF ||
+				case Token.CONSOLE:
+				case Token.CONSOLE_READLINE:
+				case Token.CONSOLE_READ_KEY:
+				case Token.CONSOLE_WRITE:
+				case Token.CONSOLE_WRITELINE:
+					isOk =  tokenTypeMemory == Token.K_IF ||
                             tokenTypeMemory == Token.K_WHILE ||
                             tokenTypeMemory == Token.K_FOR ||
                             tokenTypeMemory == Token.K_ELSE ||
@@ -151,7 +166,12 @@ namespace lab1
                             tokenTypeMemory == Token.K_BREAK ||
                             tokenTypeMemory == Token.ID ||
                             tokenTypeMemory == Token.TYPE ||
-                            tokenTypeMemory == Token.EMPTY ||
+							tokenTypeMemory == Token.CONSOLE ||
+							tokenTypeMemory == Token.CONSOLE_READLINE ||
+							tokenTypeMemory == Token.CONSOLE_READ_KEY ||
+							tokenTypeMemory == Token.CONSOLE_WRITE ||
+							tokenTypeMemory == Token.CONSOLE_WRITELINE ||
+							tokenTypeMemory == Token.EMPTY ||
                             tokenTypeMemory == Token.FAILED;
                     break;
                 case Token.OP:
