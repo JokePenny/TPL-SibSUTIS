@@ -32,9 +32,17 @@ namespace lab1.ASTNodes
             return typeStorage;
         }
 
-		public void PrintASM(ref int sizeArray)
+		public int GetSizeArray()
 		{
-			(storageType as TypeAST).GetSizeArray(ref sizeArray);
+			if(storageType is TypeAST)
+			{
+				return (storageType as TypeAST).GetSizeArray();
+			}
+			else if (storageType is BracketsAST)
+			{
+				return (storageType as BracketsAST).GetSizeArray();
+			}
+			return 0;
 		}
 	}
 }

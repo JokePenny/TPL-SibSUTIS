@@ -53,13 +53,13 @@ namespace lab1.ASTNodes
             }
         }
 
-		public void GetSizeArray(ref int sizeArray)
+		public int GetSizeArray()
 		{
 			if (memberBrackets is IEject)
 			{
-				sizeArray = Convert.ToInt32((memberBrackets as IEject).GetValue());
+				return Convert.ToInt32((memberBrackets as IEject).GetValue());
 			}
-			else sizeArray = 0;
+			return 0;
 		}
 	}
 }

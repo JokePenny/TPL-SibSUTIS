@@ -65,7 +65,12 @@ namespace lab1.ASTNodes
             return storage;
         }
 
-        public string GetName()
+		public void SetStorage(ASTNode node)
+		{
+			storage = node;
+		}
+
+		public string GetName()
         {
             return nameID;
         }
@@ -112,7 +117,7 @@ namespace lab1.ASTNodes
 		{
 			if (storage == null) return;
 
-			if(startInStack == 0)
+			if (startInStack == 0)
 			{
 				startInStack = ASMregisters.stepByte;
 				ASMregisters.stepByte += ASMregisters.GetSizeStep(type);
@@ -123,7 +128,12 @@ namespace lab1.ASTNodes
 			{
 				if (storage is NewAST)
 				{
-					ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], ");
+					int sizeArray = (storage as NewAST).GetSizeArray();
+					for(int i = 0; i < sizeArray; i++)
+					{
+						int locateStack = startInStack + (ASMregisters.GetSizeStep(type) * i);
+						ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], 0");
+					}
 				}
 				else
 				{
@@ -172,6 +182,12 @@ namespace lab1.ASTNodes
 					}
 				}
 			}
+		}
+
+		public void PrintASM(string levelTabulatiion, int offesetLocateStack)
+		{
+			int locateStack = startInStack + (ASMregisters.GetSizeStep(type) * (offesetLocateStack + 1));
+			ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], 0");
 		}
 
 		public void FreeRegister()

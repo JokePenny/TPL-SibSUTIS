@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Asm;
 using lab1.Helpers;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
@@ -64,5 +65,24 @@ namespace lab1.ASTNodes
             }
             return "int";
         }
+
+		public int GetSizeArray()
+		{
+			if (expr is IEject)
+			{
+				return Convert.ToInt32((expr as IEject).GetValue());
+			}
+			return 0;
+		}
+
+		public override void PrintASM(string levelTabulation, bool isNewLine)
+		{
+			int sizeArray = Convert.ToInt32((storage as IEject).GetValue());
+			(expr as IdentificatorAST).PrintASM(levelTabulation, sizeArray);
+			//for (int i = 0; i < memberMethod.Count; i++)
+			//{
+			//	memberMethod[i].PrintASM(levelTabulation, true);
+			//}
+		}
 	}
 }

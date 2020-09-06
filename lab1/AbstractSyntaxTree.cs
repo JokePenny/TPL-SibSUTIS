@@ -398,15 +398,16 @@ namespace lab1
 
             ASTNode id = new IdentificatorAST(typeId, idName, new Point(curTok.y, curTok.x), isArray);
             GetNextToken();
-
-            // массив
-            if (curTok.token == Tokens.Token.BRACKET_L)
+			Point point = new Point(curTok.y, curTok.x);
+			// массив
+			if (curTok.token == Tokens.Token.BRACKET_L)
             {
                 ASTNode memberBrackets = ParseBrackets(true);
-                return new BracketsAST(memberBrackets);
-            }
+				isArray = true;
+				if (curTok.token == Tokens.Token.ASSIGNMENT) return new BracketsAST(memberBrackets, new IdentificatorAST(typeId, idName, ParseInitID(), point, true));
+				//return new BracketsAST(memberBrackets);
+			}
 
-            Point point = new Point(curTok.y, curTok.x);
             if (curTok.token == Tokens.Token.CREMENT) return ParseCrement(id);
             if (curTok.token == Tokens.Token.PARENTHESIS_L) return ParseMethod("", idName, isCall);
             else if (curTok.token == Tokens.Token.ASSIGNMENT) return new IdentificatorAST(typeId, idName, ParseInitID(), point, isArray);
