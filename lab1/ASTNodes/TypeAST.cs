@@ -9,13 +9,8 @@ namespace lab1.ASTNodes
 {
     class TypeAST : ASTNode, IStorage, ISemantics
     {
-        private string typeName;
-        private List<ASTNode> memberBrackets;
-        public TypeAST(string typeName, List<ASTNode> memberBrackets)
-        {
-            this.typeName = typeName;
-            this.memberBrackets = memberBrackets;
-        }
+        private readonly string typeName;
+        private readonly List<ASTNode> memberBrackets;
 
         public override void Print(string level)
         {

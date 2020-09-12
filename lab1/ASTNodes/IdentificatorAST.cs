@@ -10,8 +10,9 @@ namespace lab1.ASTNodes
     class IdentificatorAST : ASTNode, IStorage, ISemantics
     {
         private string type = "";
-        private ASTNode storage;
-        private string nameID;
+        private readonly ASTNode storage;
+		private readonly BracketsAST brackets;
+        private readonly string nameID;
 
 		//ASM
 		private bool isArray;
@@ -25,7 +26,6 @@ namespace lab1.ASTNodes
             this.type = type;
             this.point = point;
 			this.isArray = isArray;
-
 		}
 
         public IdentificatorAST(string type, string nameID, ASTNode storage, Point point, bool isArray)
@@ -37,14 +37,17 @@ namespace lab1.ASTNodes
 			this.isArray = isArray;
 		}
 
-        public IdentificatorAST(string nameID, ASTNode storage, Point point)
-        {
-            this.nameID = nameID;
-            this.storage = storage;
-            this.point = point;
-        }
+		public IdentificatorAST(string type, string nameID, ASTNode storage, BracketsAST brackets, Point point, bool isArray)
+		{
+			this.nameID = nameID;
+			this.type = type;
+			this.storage = storage;
+			this.brackets = brackets;
+			this.point = point;
+			this.isArray = isArray;
+		}
 
-        public IdentificatorAST(string nameID, Point point)
+		public IdentificatorAST(string nameID, Point point)
         {
             this.nameID = nameID;
             this.point = point;
@@ -60,16 +63,6 @@ namespace lab1.ASTNodes
 			return startInStack;
 		}
 
-		public ASTNode GetStorage()
-        {
-            return storage;
-        }
-
-		public void SetStorage(ASTNode node)
-		{
-			storage = node;
-		}
-
 		public string GetName()
         {
             return nameID;
@@ -83,6 +76,9 @@ namespace lab1.ASTNodes
                 level = level + "\t";
             }
             Console.WriteLine(level + "[ID] " + nameID);
+
+			if(brackets != null) brackets.Print(level);
+
             if (storage != null)
             {
                 Console.WriteLine(level + "[STORAGE] =");
@@ -126,9 +122,9 @@ namespace lab1.ASTNodes
 
 			if (isArray)
 			{
-				if (storage is NewAST)
+				if (storage is NewAST newASTArray)
 				{
-					int sizeArray = (storage as NewAST).GetSizeArray();
+					int sizeArray = newASTArray.GetSizeArray();
 					for(int i = 0; i < sizeArray; i++)
 					{
 						int locateStack = startInStack + (ASMregisters.GetSizeStep(type) * i);
@@ -137,13 +133,49 @@ namespace lab1.ASTNodes
 				}
 				else
 				{
-					if (isNewLine)
+					if (storage is NewAST)
 					{
-
+						ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], 0");
+					}
+					else if (storage is BinaryExprAST || storage is ParenthesisExprAST)
+					{
+						storage.PrintASM(levelTabulatiion);
+						string register = ASMregisters.GetFreeRegisterData();
+						ASM.WriteASMCode(levelTabulatiion + "pop\t" + register);
+						ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
 					}
 					else
 					{
-
+						if (isNewLine)
+						{
+							string elementStorage;
+							if (storage is StringAST stringAST)
+							{
+								isArray = true;
+								string str = stringAST.GetString();
+								for (int i = 0; i < str.Length; i++)
+								{
+									int locateStack = startInStack + (ASMregisters.GetSizeStep(type) * i);
+									ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], '" + str[i] + "'");
+								}
+							}
+							else if (storage is IEject ejectedStorage)
+							{
+								elementStorage = ejectedStorage.GetValue();
+								ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
+							}
+							else
+							{
+								storage.PrintASM(levelTabulatiion);
+								elementStorage = ASMregisters.GetFreeRegisterData();
+								ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
+							}
+						}
+						else
+						{
+							takeRegister = ASMregisters.GetFreeRegisterData();
+							ASM.WriteASMCode(levelTabulatiion + "mov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "]");
+						}
 					}
 				}
 			}
@@ -165,15 +197,27 @@ namespace lab1.ASTNodes
 					if (isNewLine)
 					{
 						string elementStorage;
-						if (storage is IEject)
-							elementStorage = (storage as IEject).GetValue();
+						if(storage is StringAST stringAST)
+						{
+							isArray = true;
+							string str = stringAST.GetString();
+							for (int i = 0; i < str.Length; i++)
+							{
+								int locateStack = startInStack + (ASMregisters.GetSizeStep(type) * i);
+								ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], '" + str[i] + "'");
+							}
+						}
+						else if (storage is IEject ejectedStorage)
+						{
+							elementStorage = ejectedStorage.GetValue();
+							ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
+						}
 						else
 						{
 							storage.PrintASM(levelTabulatiion);
 							elementStorage = ASMregisters.GetFreeRegisterData();
+							ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
 						}
-
-						ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
 					}
 					else
 					{

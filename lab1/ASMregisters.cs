@@ -81,7 +81,7 @@ namespace lab1
 				case "float":
 					return 8;
 				case "string":
-					return 8;
+					//return 8;
 				case "char":
 					return 2;
 				case "bool":
@@ -122,7 +122,7 @@ namespace lab1
 				case "float":
 					return "DWORD";
 				case "string":
-					return "QWORD";
+					//return "QWORD";
 				case "char":
 				case "bool":
 					return "BYTE";

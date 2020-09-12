@@ -7,7 +7,7 @@ namespace lab1.ASTNodes
 {
     class NewAST : ASTNode, IStorage, ISemantics
     {
-        private ASTNode storageType;
+        private readonly ASTNode storageType;
 
         public NewAST(ASTNode storageType)
         {

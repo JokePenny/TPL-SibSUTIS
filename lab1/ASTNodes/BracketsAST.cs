@@ -10,9 +10,9 @@ namespace lab1.ASTNodes
     // []
     class BracketsAST : ASTNode, IStorage, ISemantics
     {
-        private string type = "";
-        private ASTNode expr;
-        private ASTNode storage;
+        private readonly string type = "";
+        private readonly ASTNode expr;
+        private readonly ASTNode storage;
 
         public BracketsAST(string type, ASTNode expr, Point point)
         {
@@ -34,10 +34,6 @@ namespace lab1.ASTNodes
 
         public BracketsAST() {}
 
-        public ASTNode GetNode()
-        {
-            return expr;
-        }
         public override void Print(string level)
         {
             if (storage != null) storage.Print(level);
@@ -75,14 +71,10 @@ namespace lab1.ASTNodes
 			return 0;
 		}
 
-		public override void PrintASM(string levelTabulation, bool isNewLine)
-		{
-			int sizeArray = Convert.ToInt32((storage as IEject).GetValue());
-			(expr as IdentificatorAST).PrintASM(levelTabulation, sizeArray);
-			//for (int i = 0; i < memberMethod.Count; i++)
-			//{
-			//	memberMethod[i].PrintASM(levelTabulation, true);
-			//}
-		}
+		//public override void PrintASM(string levelTabulation, bool isNewLine)
+		//{
+		//	int sizeArray = Convert.ToInt32((storage as IEject).GetValue());
+		//	(expr as IdentificatorAST).PrintASM(levelTabulation, sizeArray);
+		//}
 	}
 }

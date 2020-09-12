@@ -6,16 +6,11 @@ namespace lab1.ASTNodes
 {
     class PostconditionForAST : ASTNode, IStorage
     {
-        private List<ASTNode> memberPostcondition;
+        private readonly List<ASTNode> memberPostcondition;
 
         public PostconditionForAST(List<ASTNode> memberPostcondition)
         {
             this.memberPostcondition = memberPostcondition;
-        }
-
-        public List<ASTNode> GetMemberPostcondition()
-        {
-            return memberPostcondition;
         }
 
         public override void Print(string level)

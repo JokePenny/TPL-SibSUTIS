@@ -7,23 +7,13 @@ namespace lab1.ASTNodes
 {
     class ReturnAST : ASTNode, IStorage, ISemantics
     {
-        private string typeReturn;
-        private ASTNode returnNode;
+        private readonly string typeReturn;
+        private readonly ASTNode returnNode;
         
         public ReturnAST(string typeReturn, ASTNode returnNode)
         {
             this.typeReturn = typeReturn;
             this.returnNode = returnNode;
-        }
-
-        public ASTNode GetReturnNode()
-        {
-            return returnNode;
-        }
-
-        public string GetTypeReturn()
-        {
-            return typeReturn;
         }
 
         public override void Print(string level)

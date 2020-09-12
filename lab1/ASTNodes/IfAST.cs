@@ -7,15 +7,10 @@ namespace lab1.ASTNodes
 {
     class IfAST : ASTNode, IArea
     {
-        private ASTNode branching;
+        private readonly ASTNode branching;
         public IfAST(ASTNode branching)
         {
             this.branching = branching;
-        }
-
-        public ASTNode GetBranching()
-        {
-            return branching;
         }
 
         public SymTableUse GetSymTable(string nameParent, Dictionary<string, ASTNode> parentTable)

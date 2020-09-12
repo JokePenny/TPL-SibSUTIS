@@ -10,9 +10,9 @@ namespace lab1.ASTNodes
     class BinaryExprAST : ASTNode, IStorage, ISemantics
     {
         private string typeExpr;
-        private string op;
-        private ASTNode leftNode;
-        private ASTNode rightNode;
+        private readonly string op;
+        private readonly ASTNode leftNode;
+        private readonly ASTNode rightNode;
 		private bool isRightLastNode;
 
         public BinaryExprAST(string op, ASTNode leftNode, ASTNode rightNode, Point point)

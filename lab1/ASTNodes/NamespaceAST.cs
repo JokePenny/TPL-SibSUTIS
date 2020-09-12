@@ -7,23 +7,13 @@ namespace lab1.ASTNodes
 {
     public class NamespaceAST : ASTNode, IArea
     {
-        private List<ASTNode> members;
-        private string idNamespace;
+        private readonly List<ASTNode> members;
+        private readonly string idNamespace;
 
         public NamespaceAST(List<ASTNode> members, string idNamespace)
         {
             this.members = members;
             this.idNamespace = idNamespace;
-        }
-
-        public List<ASTNode> GetMembers()
-        {
-            return members;
-        }
-
-        public string GetName()
-        {
-            return idNamespace;
         }
 
         public SymTableUse GetSymTable(string nameParent, Dictionary<string, ASTNode> parentTable)

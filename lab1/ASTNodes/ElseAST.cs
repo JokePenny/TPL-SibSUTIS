@@ -7,7 +7,7 @@ namespace lab1.ASTNodes
 {
     class ElseAST : ASTNode, IArea
     {
-        private ASTNode expr;
+        private readonly ASTNode expr;
 
         public ElseAST(ASTNode expr)
         {

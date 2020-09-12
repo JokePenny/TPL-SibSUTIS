@@ -404,9 +404,11 @@ namespace lab1
             {
                 ASTNode memberBrackets = ParseBrackets(true);
 				isArray = true;
-				if (curTok.token == Tokens.Token.ASSIGNMENT) return new BracketsAST(memberBrackets, new IdentificatorAST(typeId, idName, ParseInitID(), point, true));
-				//return new BracketsAST(memberBrackets);
-			}
+                BracketsAST brackets = new BracketsAST(memberBrackets);
+                // if (curTok.token == Tokens.Token.ASSIGNMENT) return new BracketsAST(memberBrackets, new IdentificatorAST(typeId, idName, ParseInitID(), point, true));
+                if (curTok.token == Tokens.Token.ASSIGNMENT) return new IdentificatorAST(typeId, idName, ParseInitID(), brackets, point, true);
+                
+            }
 
             if (curTok.token == Tokens.Token.CREMENT) return ParseCrement(id);
             if (curTok.token == Tokens.Token.PARENTHESIS_L) return ParseMethod("", idName, isCall);
@@ -1068,7 +1070,7 @@ namespace lab1
 
         private static void SkipToToken(Tokens.Token token)
         {
-            while (curTok.token != token )
+            while (curTok.token != token)
             {
                 GetNextTokenError();
             }

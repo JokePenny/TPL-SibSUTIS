@@ -9,8 +9,9 @@ namespace lab1.ASTNodes
 {
     class ConditionNodeAST : ASTNode, IArea
     {
-        private ASTNode bodyCondition;
-        private ASTNode body;
+        private readonly ASTNode bodyCondition;
+        private readonly ASTNode body;
+
         public ConditionNodeAST(ASTNode bodyCondition, ASTNode body)
         {
             this.bodyCondition = bodyCondition;

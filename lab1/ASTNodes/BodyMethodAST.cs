@@ -7,7 +7,7 @@ namespace lab1.ASTNodes
 {
     class BodyMethodAST : ASTNode, IArea
     {
-        private List<ASTNode> memberMethod;
+        private readonly List<ASTNode> memberMethod;
 
         public BodyMethodAST(List<ASTNode> memberMethod)
         {

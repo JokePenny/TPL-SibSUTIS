@@ -6,8 +6,8 @@ namespace lab1.ASTNodes
 {
     class NumAST : ASTNode, ISemantics, IEject
     {
-        private string typeValue;
-        private string value;
+        private readonly string typeValue;
+        private readonly string value;
 
         public NumAST(Tokens.Token typeValue, string value)
         {

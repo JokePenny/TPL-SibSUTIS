@@ -9,17 +9,12 @@ namespace lab1.ASTNodes
 {
     class ParenthesisExprAST : ASTNode, IStorage, ISemantics
     {
-        private ASTNode node;
+        private readonly ASTNode node;
         private string type;
 
         public ParenthesisExprAST(ASTNode node)
         {
             this.node = node;
-        }
-
-        public ASTNode GetNode()
-        {
-            return node;
         }
 
         public override void Print(string level)

@@ -7,8 +7,8 @@ namespace lab1.ASTNodes
 {
     class WhileAST : ASTNode, IArea
     {
-        private ASTNode condition;
-        private ASTNode body;
+        private readonly ASTNode condition;
+        private readonly ASTNode body;
 
         public WhileAST(ASTNode condition, ASTNode body)
         {

@@ -9,10 +9,10 @@ namespace lab1.ASTNodes
 {
     class MethodAST : ASTNode, IArea, IStorage, ISemantics
     {
-        private string typeMethod;
-        private List<ASTNode> argsMethod;
-        private BodyMethodAST bodyMethod;
-        private string nameMethod;
+        private readonly string typeMethod;
+        private readonly List<ASTNode> argsMethod;
+        private readonly BodyMethodAST bodyMethod;
+        private readonly string nameMethod;
 
         public MethodAST(string typeMethod, string nameMethod, List<ASTNode> argsMethod, BodyMethodAST bodyMethod)
         {
@@ -40,24 +40,9 @@ namespace lab1.ASTNodes
             this.nameMethod = nameMethod;
         }
 
-        public string GetName()
-        {
-            return nameMethod;
-        }
-
         public string GetTypeMethod()
         {
             return typeMethod;
-        }
-
-        public BodyMethodAST GetBodyMethod()
-        {
-            return bodyMethod;
-        }
-
-        public List<ASTNode> GetArgsMethod()
-        {
-            return argsMethod;
         }
 
         public override void Print(string level)

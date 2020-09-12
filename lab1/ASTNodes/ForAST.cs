@@ -9,30 +9,15 @@ namespace lab1.ASTNodes
 {
     class ForAST : ASTNode, IArea
     {
-        private List<ASTNode> declaredVar; // int a = 5, b = 7
-        private ConditionNodeAST conditionWithBody; // a < b {body}
-        private ASTNode postcondition; // a++
+        private readonly List<ASTNode> declaredVar; // int a = 5, b = 7
+        private readonly ConditionNodeAST conditionWithBody; // a < b {body}
+        private readonly ASTNode postcondition; // a++
 
         public ForAST(List<ASTNode> declaredVar, ConditionNodeAST conditionWithBody, ASTNode postcondition) // if(a > b) || if((a > s) > (b && s))
         {
             this.declaredVar = declaredVar;
             this.conditionWithBody = conditionWithBody;
             this.postcondition = postcondition;
-        }
-
-        public List<ASTNode> GetDeclaredVar()
-        {
-            return declaredVar;
-        }
-
-        public ConditionNodeAST GetCondWithBody()
-        {
-            return conditionWithBody;
-        }
-
-        public ASTNode GetPostcondition()
-        {
-            return postcondition;
         }
 
         public override void Print(string level)

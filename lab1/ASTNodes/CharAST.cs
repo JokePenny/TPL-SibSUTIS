@@ -5,7 +5,7 @@ namespace lab1.ASTNodes
 {
     class CharAST : ASTNode, ISemantics
     {
-        private string str;
+        private readonly string str;
 
         public CharAST(string str, Point point)
         {

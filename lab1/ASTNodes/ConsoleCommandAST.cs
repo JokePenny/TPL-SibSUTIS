@@ -7,8 +7,8 @@ namespace lab1.ASTNodes
 {
 	class ConsoleCommandAST : ASTNode
 	{
-		private ASTNode storage;
-		private Tokens.Token command;
+		private readonly ASTNode storage;
+		private readonly Tokens.Token command;
 
 		public override void Print(string level)
 		{
@@ -22,7 +22,7 @@ namespace lab1.ASTNodes
 
 		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
-			string code;
+			//string code;
 			switch(command)
 			{
 				case Tokens.Token.CONSOLE_READLINE:

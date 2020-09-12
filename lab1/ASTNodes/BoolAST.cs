@@ -8,8 +8,8 @@ namespace lab1.ASTNodes
 {
     class BoolAST : ASTNode, IStorage, ISemantics
     {
-        private ASTNode exp;
-        private string result = "";
+        private readonly ASTNode exp;
+        private readonly string result = "";
 
         public BoolAST(string result, ASTNode exp, Point point)
         {

@@ -2,8 +2,8 @@
 {
     public struct Point
     {
-        public int y;
-        public int x;
+        public readonly int y;
+        public readonly int x;
         public Point(int y, int x)
         {
             this.y = y;

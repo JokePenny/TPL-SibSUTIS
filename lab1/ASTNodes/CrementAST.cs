@@ -9,19 +9,14 @@ namespace lab1.ASTNodes
 {
     class CrementAST : ASTNode, IStorage, ISemantics
     {
-        private string crement;
-        private ASTNode id;
+        private readonly string crement;
+        private readonly ASTNode id;
 
         public CrementAST(string crement, ASTNode id, Point point)
         {
             this.crement = crement;
             this.id = id;
             this.point = point;
-        }
-
-        public string GetCrement()
-        {
-            return crement;
         }
 
         public override void Print(string level)

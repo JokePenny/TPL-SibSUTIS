@@ -8,23 +8,13 @@ namespace lab1.ASTNodes
 {
     class ClassAST : ASTNode, IArea, IStorage
     {
-        private List<ASTNode> members;
-        private string idClass;
+        private readonly List<ASTNode> members;
+        private readonly string idClass;
 
         public ClassAST(List<ASTNode> members, string idClass)
         {
             this.members = members;
             this.idClass = idClass;
-        }
-
-        public string GetName()
-        {
-            return idClass;
-        }
-
-        public List<ASTNode> GetMembers()
-        {
-            return members;
         }
 
         public override void Print(string level)
