@@ -405,9 +405,7 @@ namespace lab1
                 ASTNode memberBrackets = ParseBrackets(true);
 				isArray = true;
                 BracketsAST brackets = new BracketsAST(memberBrackets);
-                // if (curTok.token == Tokens.Token.ASSIGNMENT) return new BracketsAST(memberBrackets, new IdentificatorAST(typeId, idName, ParseInitID(), point, true));
                 if (curTok.token == Tokens.Token.ASSIGNMENT) return new IdentificatorAST(typeId, idName, ParseInitID(), brackets, point, true);
-                
             }
 
             if (curTok.token == Tokens.Token.CREMENT) return ParseCrement(id);
@@ -508,9 +506,12 @@ namespace lab1
             switch (curTok.token)
             {
                 case Tokens.Token.ID:
-                    node = new IdentificatorAST(curTok.subString, new Point(curTok.y, curTok.x));
+                    string nameID = curTok.subString;
+                    Point point = new Point(curTok.y, curTok.x);
+                    node = new IdentificatorAST(nameID, point);
                     GetNextToken();
-                    if (curTok.token == Tokens.Token.BRACKET_L) return new BracketsAST(node, ParseBrackets(true));
+                    if (curTok.token == Tokens.Token.BRACKET_L) return new IdentificatorAST(nameID, point, new BracketsAST(ParseBrackets(true)), true);
+                    //return new BracketsAST(node, ParseBrackets(true));
                     return node;
                 case Tokens.Token.STRING:
                     node = new StringAST(curTok.subString);

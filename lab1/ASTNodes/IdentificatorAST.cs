@@ -8,19 +8,18 @@ using lab1.SymbolTable;
 namespace lab1.ASTNodes
 {
     class IdentificatorAST : ASTNode, IStorage, ISemantics
-    {
+	{
         private string type = "";
         private readonly ASTNode storage;
 		private readonly BracketsAST brackets;
         private readonly string nameID;
 
-		//ASM
-		private bool isArray;
+		//for ASM codegen
 		private int startInStack;
 		private string takeRegister = "";
+		private bool isArray;
 
-
-        public IdentificatorAST(string type, string nameID, Point point, bool isArray)
+		public IdentificatorAST(string type, string nameID, Point point, bool isArray)
         {
             this.nameID = nameID;
             this.type = type;
@@ -47,11 +46,13 @@ namespace lab1.ASTNodes
 			this.isArray = isArray;
 		}
 
-		public IdentificatorAST(string nameID, Point point)
+		public IdentificatorAST(string nameID, Point point, BracketsAST brackets = null, bool isArray = false)
         {
             this.nameID = nameID;
             this.point = point;
-        }
+			this.brackets = brackets;
+			this.isArray = isArray;
+		}
 
         public string GetTypeId()
         {
@@ -67,6 +68,11 @@ namespace lab1.ASTNodes
         {
             return nameID;
         }
+
+		public int GetOffseIfTtArray()
+		{
+			return (isArray && brackets != null ? brackets.GetSizeArray() : 0) * ASMregisters.GetSizeStep(type);
+		}
 
         public override void Print(string level)
         {
@@ -115,9 +121,18 @@ namespace lab1.ASTNodes
 
 			if (startInStack == 0)
 			{
-				startInStack = ASMregisters.stepByte;
-				ASMregisters.stepByte += ASMregisters.GetSizeStep(type);
-				startInStack = ASMregisters.stepByte;
+				IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode(GetName());
+				int offsetInStack = GetOffseIfTtArray();
+
+				if(identificatorRight != null)
+				{
+					startInStack = identificatorRight.GetAddresInStack() + offsetInStack;
+				}
+				else
+				{
+					ASMregisters.stepByte += ASMregisters.GetSizeStep(type);
+					startInStack = ASMregisters.stepByte;
+				}
 			}
 
 			if (isArray)
@@ -226,17 +241,6 @@ namespace lab1.ASTNodes
 					}
 				}
 			}
-		}
-
-		public void PrintASM(string levelTabulatiion, int offesetLocateStack)
-		{
-			int locateStack = startInStack + (ASMregisters.GetSizeStep(type) * (offesetLocateStack + 1));
-			ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], 0");
-		}
-
-		public void FreeRegister()
-		{
-			if(takeRegister != "") ASMregisters.SetStateRegisterData(takeRegister, true);
 		}
 	}
 }

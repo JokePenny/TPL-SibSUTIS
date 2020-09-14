@@ -70,11 +70,5 @@ namespace lab1.ASTNodes
 			}
 			return 0;
 		}
-
-		//public override void PrintASM(string levelTabulation, bool isNewLine)
-		//{
-		//	int sizeArray = Convert.ToInt32((storage as IEject).GetValue());
-		//	(expr as IdentificatorAST).PrintASM(levelTabulation, sizeArray);
-		//}
 	}
 }

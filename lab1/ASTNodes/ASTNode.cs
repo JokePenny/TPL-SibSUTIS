@@ -1,4 +1,6 @@
-﻿namespace lab1.ASTNodes
+﻿using System;
+
+namespace lab1.ASTNodes
 {
     public struct Point
     {
@@ -12,7 +14,7 @@
     }
 
     public class ASTNode
-    {
+    { 
         public Point point;
 
         public virtual void Print(string level) { }
