@@ -471,13 +471,9 @@ namespace lab1
                 else
                 {
 					isArray = true;
-					//typeId = typeId;
 					GetNextToken();
                     if (curTok.token != Tokens.Token.BRACKET_R) ConsoleHelper.WriteErrorAST("Expected ']'", curTok.y, curTok.x);
-                    else
-                    {
-                        GetNextToken();
-                    }
+                    else GetNextToken();
                 } 
             }
             // переменная
