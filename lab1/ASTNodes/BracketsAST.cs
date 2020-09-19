@@ -14,6 +14,8 @@ namespace lab1.ASTNodes
         private readonly ASTNode expr;
         private readonly ASTNode storage;
 
+        public string Type => type;
+
         public BracketsAST(string type, ASTNode expr, Point point)
         {
             this.type = type;
@@ -62,13 +64,29 @@ namespace lab1.ASTNodes
             return "int";
         }
 
-		public int GetSizeArray()
+		public int GetSizeArrayInt()
 		{
 			if (expr is IEject)
 			{
 				return Convert.ToInt32((expr as IEject).GetValue());
 			}
+
 			return 0;
 		}
-	}
+
+        public string GetSizeArrayString()
+        {
+            if (expr is IEject)
+            {
+                return (expr as IEject).GetValue();
+            }
+
+            if(expr is IdentificatorAST identificator)
+			{
+                return identificator.GetCodegenASM();
+            }
+
+            return "0";
+        }
+    }
 }

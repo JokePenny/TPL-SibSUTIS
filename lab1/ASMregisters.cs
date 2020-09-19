@@ -16,40 +16,50 @@ namespace lab1
 
 		private static int countMarkers = 1;
 		private static string[] registersData = { "eax", "ebx", "ecx", "edx" };
-		private static int[] registersDataState = { 0, 0, 0, 0 };
+		private static string[] registersSpecial = { "esi"};
+		private static List<int> registersSpecialState = new List<int>{ 0 };
+		private static List<int> registersDataState = new List<int> { 0, 0, 0, 0 };
 
 		public static int stepByte { get; set; }
+
+		/// <summary>
+		/// Выдает первый свободный специальный регистр
+		/// </summary>
+		public static string GetFreeRegisterSpecial()
+		{
+			return GetFreeRegister(registersSpecial, registersSpecialState);
+		}
+
+		/// <summary>
+		/// Выдает первый занятый специальный регистр
+		/// </summary>
+		public static string GetFirstFillRegisterSpecial()
+		{
+			return GetFirstFillRegister(registersSpecial, registersSpecialState);
+		}
+
+		/// <summary>
+		/// Установить состояние для специального регистра занят/незанят
+		/// </summary>
+		public static void SetStateRegisterSpecial(string register, bool isFree)
+		{
+			SetStateRegister(registersSpecial, registersSpecialState, register, isFree);
+		}
 
 		/// <summary>
 		/// Выдает первый свободный регистр
 		/// </summary>
 		public static string GetFreeRegisterData()
 		{
-			for(int i = 0; i < registersDataState.Length; i++)
-			{
-				if (registersDataState[i] == 0)
-				{
-					registersDataState[i] = 1;
-					return registersData[i];
-				}
-			}
-			return registersData[0];
+			return GetFreeRegister(registersData, registersDataState);
 		}
 
 		/// <summary>
 		/// Выдает первый занятый регистр
 		/// </summary>
-		public static string GetFirstFillRegister()
+		public static string GetFirstFillRegisterData()
 		{
-			for (int i = 0; i < registersDataState.Length; i++)
-			{
-				if (registersDataState[i] == 1)
-				{
-					registersDataState[i] = 0;
-					return registersData[i];
-				}
-			}
-			return registersData[0];
+			return GetFirstFillRegister(registersData, registersDataState);
 		}
 
 		/// <summary>
@@ -57,14 +67,45 @@ namespace lab1
 		/// </summary>
 		public static void SetStateRegisterData(string register, bool isFree)
 		{
-			for (int i = 0; i < registersDataState.Length; i++)
+			SetStateRegister(registersData, registersDataState, register, isFree);
+		}
+
+		private static string GetFirstFillRegister(string[] arrayRegisters, List<int> arrayStateRegisters)
+		{
+			for (int i = 0; i < arrayStateRegisters.Count; i++)
 			{
-				if (registersData[i] == register)
+				if (arrayStateRegisters[i] == 1)
 				{
-					registersDataState[i] = isFree ? 0 : 1;
+					arrayStateRegisters[i] = 0;
+					return arrayRegisters[i];
+				}
+			}
+			return arrayRegisters[0];
+		}
+
+		private static void SetStateRegister(string[] arrayRegisters, List<int> arrayStateRegisters, string register, bool isFree)
+		{
+			for (int i = 0; i < arrayStateRegisters.Count; i++)
+			{
+				if (arrayRegisters[i] == register)
+				{
+					arrayStateRegisters[i] = isFree ? 0 : 1;
 					return;
 				}
 			}
+		}
+
+		private static string GetFreeRegister(string[] arrayRegisters, List<int> arrayStateRegisters)
+		{
+			for (int i = 0; i < arrayStateRegisters.Count; i++)
+			{
+				if (arrayStateRegisters[i] == 0)
+				{
+					arrayStateRegisters[i] = 1;
+					return arrayRegisters[i];
+				}
+			}
+			return arrayRegisters[0];
 		}
 
 		/// <summary>

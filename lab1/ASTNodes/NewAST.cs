@@ -40,7 +40,7 @@ namespace lab1.ASTNodes
 			}
 			else if (storageType is BracketsAST)
 			{
-				return (storageType as BracketsAST).GetSizeArray();
+				return (storageType as BracketsAST).GetSizeArrayInt();
 			}
 			return 0;
 		}

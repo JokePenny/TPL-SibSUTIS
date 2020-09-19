@@ -118,7 +118,7 @@ namespace lab1.ASTNodes
 				+ "\timport msvcrt,\\\n"
 				+ "\t\tprintf, 'printf',\\\n"
 				+ "\t\tscanf, 'scanf',\\\n"
-				+ "\t\tgetch, '_getch\n"
+				+ "\t\tgetch, '_getch'\n"
 				+ "Start:"
 			);
 
