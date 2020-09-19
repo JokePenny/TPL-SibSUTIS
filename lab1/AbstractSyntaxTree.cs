@@ -105,6 +105,37 @@ namespace lab1
             }
             return null;
         }
+
+		private static ASTNode MemberNamespace()
+        {
+            GetNextToken();
+            switch (curTok.token)
+            {
+                case Tokens.Token.BRACE_R:
+                    return null;
+                case Tokens.Token.K_CLASS:
+                    return ParseMainArea(Area.CLASS);
+                default:
+                    ConsoleHelper.WriteErrorAST("Impossible token in this area", curTok.y, curTok.x);
+                    return null;
+            }
+        }
+
+        private static ASTNode MemberClass()
+        {
+            GetNextToken();
+            switch (curTok.token)
+            {
+                case Tokens.Token.TYPE:
+                    return ParseType(false, true);
+                case Tokens.Token.BRACE_R:
+                    return null;
+                default:
+                    ConsoleHelper.WriteErrorAST("Impossible token in this area", curTok.y, curTok.x);
+                    return null;
+            }
+        }
+
         private static ASTNode MemberMethod(bool isCycle)
         {
             ASTNode node;
@@ -135,7 +166,7 @@ namespace lab1
                     bufferTok = curTok;
                     return ParseIf();
                 case Tokens.Token.K_ELSE:
-                    if(bufferTok.token != Tokens.Token.K_IF) ConsoleHelper.WriteErrorAST("No condition if", curTok.y, curTok.x);
+                    if (bufferTok.token != Tokens.Token.K_IF) ConsoleHelper.WriteErrorAST("No condition if", curTok.y, curTok.x);
                     return ParseElse();
                 case Tokens.Token.K_WHILE:
                     return ParseWhile();
@@ -152,47 +183,17 @@ namespace lab1
                     node = ParseReturn();
                     CheckupClosedToken(Tokens.Token.SEMILICON);
                     return node;
-				case Tokens.Token.CONSOLE:
-					node = ParseConsoleCommand();
-					GetNextToken();
-					CheckupClosedToken(Tokens.Token.SEMILICON);
-					return node;
-				case Tokens.Token.BRACE_R:
+                case Tokens.Token.CONSOLE:
+                    node = ParseConsoleCommand();
+                    GetNextToken();
+                    CheckupClosedToken(Tokens.Token.SEMILICON);
+                    return node;
+                case Tokens.Token.BRACE_R:
                     return null;
                 default:
                     return null;
             }
             return null;
-        }
-
-		private static ASTNode MemberNamespace()
-        {
-            GetNextToken();
-            switch (curTok.token)
-            {
-                case Tokens.Token.BRACE_R:
-                    return null;
-                case Tokens.Token.K_CLASS:
-                    return ParseMainArea(Area.CLASS);
-                default:
-                    ConsoleHelper.WriteErrorAST("Impossible token in this area", curTok.y, curTok.x);
-                    return null;
-            }
-        }
-
-        private static ASTNode MemberClass()
-        {
-            GetNextToken();
-            switch (curTok.token)
-            {
-                case Tokens.Token.TYPE:
-                    return ParseType(false, true);
-                case Tokens.Token.BRACE_R:
-                    return null;
-                default:
-                    ConsoleHelper.WriteErrorAST("Impossible token in this area", curTok.y, curTok.x);
-                    return null;
-            }
         }
 
         //---------------------
@@ -891,24 +892,24 @@ namespace lab1
                 ConsoleHelper.WriteErrorAST("Wrong type return", curTok.y, curTok.x);
             else
             {
-                if (memberReturn is IdentificatorAST)
+                if (memberReturn is IdentificatorAST memberReturnIdentificatorAST)
                 {
-                    if ((memberReturn as IdentificatorAST).GetTypeId() == typeMethodReturn)
+                    if (memberReturnIdentificatorAST.GetTypeId() == typeMethodReturn)
                         return new ReturnAST(typeMethodReturn, memberReturn);
                 }
-                if (memberReturn is MethodAST)
+                if (memberReturn is MethodAST memberReturnMethorAST)
                 {
-                    if ((memberReturn as MethodAST).GetTypeMethod() == typeMethodReturn)
+                    if (memberReturnMethorAST.GetTypeMethod() == typeMethodReturn)
                         return new ReturnAST(typeMethodReturn, memberReturn);
                 }
-                if (memberReturn is NumAST)
+                if (memberReturn is NumAST memberReturnNumAST)
                 {
-                    if ((memberReturn as NumAST).GetTypeValue() == typeMethodReturn)
+                    if (memberReturnNumAST.GetTypeValue() == typeMethodReturn)
                         return new ReturnAST(typeMethodReturn, memberReturn);
                 }
-                if (memberReturn is BinaryExprAST)
+                if (memberReturn is BinaryExprAST memberReturnBinaryExprAST)
                 {
-                    if ((memberReturn as BinaryExprAST).GetTypeExp() == typeMethodReturn)
+                    if (memberReturnBinaryExprAST.TypeExpr == typeMethodReturn)
                         return new ReturnAST(typeMethodReturn, memberReturn);
                 }
             }
@@ -958,9 +959,6 @@ namespace lab1
 				GetNextToken();
 				switch (curTok.token)
 				{
-					case Tokens.Token.CONSOLE_READLINE:
-					case Tokens.Token.CONSOLE_READ_KEY:
-						return ParseReadConsoleCommand();
 					case Tokens.Token.CONSOLE_WRITE:
 					case Tokens.Token.CONSOLE_WRITELINE:
 						return ParseWriteConsoleCommand();
@@ -991,27 +989,6 @@ namespace lab1
 			}
 		}
 
-		private static ASTNode ParseReadConsoleCommand()
-		{
-			Tokens.Token tokenCommand = curTok.token;
-			GetNextToken();
-			if (curTok.token == Tokens.Token.PARENTHESIS_L)
-			{
-				GetNextToken();
-				if (curTok.token != Tokens.Token.PARENTHESIS_R)
-				{
-					ConsoleHelper.WriteErrorAST("Impossible token this area", curTok.y, curTok.x);
-					return null;
-				}
-				return new ConsoleCommandAST(tokenCommand);
-			}
-			else
-			{
-				ConsoleHelper.WriteErrorAST("Impossible token this area", curTok.y, curTok.x);
-				return null;
-			}
-		}
-
 		private static ASTNode MemberWriteConsole()
 		{
 			GetNextToken();
@@ -1031,7 +1008,9 @@ namespace lab1
 				case Tokens.Token.X8_VALUE:
 				case Tokens.Token.X2_VALUE:
 					return new NumAST(curTok.token, curTok.subString);
-				default:
+                case Tokens.Token.PARENTHESIS_R:
+                    return null;
+                default:
 					ConsoleHelper.WriteErrorAST("Impossible token in this area", curTok.y, curTok.x);
 					return null;
 			}

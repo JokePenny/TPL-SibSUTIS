@@ -12,15 +12,17 @@ namespace lab1
 	{
 		public static string MarkerJumpPrevBody { get; private set; }
 		public static string MarkerJumpAfterBody { get; private set; }
+		public static string WriteInConsole => writeInConsole;
+		public static int stepByte { get; set; }
+
 		public static bool isContitionBelongsToCicle;
 
 		private static int countMarkers = 1;
+		private static string writeInConsole = "str";
 		private static string[] registersData = { "eax", "ebx", "ecx", "edx" };
 		private static string[] registersSpecial = { "esi"};
 		private static List<int> registersSpecialState = new List<int>{ 0 };
 		private static List<int> registersDataState = new List<int> { 0, 0, 0, 0 };
-
-		public static int stepByte { get; set; }
 
 		/// <summary>
 		/// Выдает первый свободный специальный регистр

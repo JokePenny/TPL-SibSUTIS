@@ -64,8 +64,6 @@ namespace lab1
 			CONSOLE,
 			CONSOLE_WRITE,
 			CONSOLE_WRITELINE,
-			CONSOLE_READ_KEY,
-			CONSOLE_READLINE,
 			EMPTY,
             FAILED
         }
@@ -124,8 +122,6 @@ namespace lab1
             {";", Token.SEMILICON},
             {":", Token.DOUBLE_DOTS},
 			{"Console", Token.CONSOLE},
-			{"ReadLine", Token.CONSOLE_READLINE},
-			{"ReadKey", Token.CONSOLE_READ_KEY},
 			{"Write", Token.CONSOLE_WRITE},
 			{"WriteLine", Token.CONSOLE_WRITELINE},
 		};
@@ -150,8 +146,6 @@ namespace lab1
                 case Token.ID:
                 case Token.TYPE:
 				case Token.CONSOLE:
-				case Token.CONSOLE_READLINE:
-				case Token.CONSOLE_READ_KEY:
 				case Token.CONSOLE_WRITE:
 				case Token.CONSOLE_WRITELINE:
 					isOk =  tokenTypeMemory == Token.K_IF ||
@@ -167,8 +161,6 @@ namespace lab1
                             tokenTypeMemory == Token.ID ||
                             tokenTypeMemory == Token.TYPE ||
 							tokenTypeMemory == Token.CONSOLE ||
-							tokenTypeMemory == Token.CONSOLE_READLINE ||
-							tokenTypeMemory == Token.CONSOLE_READ_KEY ||
 							tokenTypeMemory == Token.CONSOLE_WRITE ||
 							tokenTypeMemory == Token.CONSOLE_WRITELINE ||
 							tokenTypeMemory == Token.EMPTY ||

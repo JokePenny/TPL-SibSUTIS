@@ -10,7 +10,6 @@ namespace lab1.Asm
 	class ASM
 	{
 		private static FileStream fstream;
-		private static string path;
 
 		public static void CreateASM(ASTNode head)
 		{

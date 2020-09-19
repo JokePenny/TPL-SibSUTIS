@@ -1,4 +1,5 @@
 ﻿using lab1.Asm;
+using lab1.SymbolTable;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,21 +23,19 @@ namespace lab1.ASTNodes
 
 		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
-			//string code;
-			switch(command)
+			if(storage is IdentificatorAST identificatorStorage)
 			{
-				case Tokens.Token.CONSOLE_READLINE:
-					//code = levelTabulatiion + 
-					break;
-				case Tokens.Token.CONSOLE_READ_KEY:
-					//code = 
-					break;
-				case Tokens.Token.CONSOLE_WRITE:
-					break;
-				case Tokens.Token.CONSOLE_WRITELINE:
-					break;
+				IdentificatorAST identificatorAST = (IdentificatorAST)SymTable.symTabls.FindNode(identificatorStorage.GetName());
+				if(identificatorAST.IsArray)
+				{
+					identificatorAST.PrintArrayASM(levelTabulatiion);
+				}
+			} 
+			else if (storage is StringAST stringAST)
+			{
+				//Вывод строек не работает
+				//stringAST.PrintSringArray(levelTabulatiion, stringAST.GetString(), startInStack);
 			}
-			//ASM.WriteASMCode(code);
 		}
 
 		public ConsoleCommandAST(Tokens.Token command, ASTNode storage = null)

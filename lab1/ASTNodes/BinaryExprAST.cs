@@ -9,23 +9,23 @@ namespace lab1.ASTNodes
 {
     class BinaryExprAST : ASTNode, IStorage, ISemantics
     {
-        private string typeExpr;
+		public string TypeExpr => typeExpr;
+
+		private string typeExpr;
         private readonly string op;
         private readonly ASTNode leftNode;
         private readonly ASTNode rightNode;
 		private bool isRightLastNode;
 
-        public BinaryExprAST(string op, ASTNode leftNode, ASTNode rightNode, Point point)
+		private static bool isBoolNodeAnd = false;
+		private static bool headNested = false;
+
+		public BinaryExprAST(string op, ASTNode leftNode, ASTNode rightNode, Point point)
         {
             this.op = op;
             this.leftNode = leftNode;
             this.rightNode = rightNode;
             this.point = point;
-        }
-
-        public string GetTypeExp()
-        {
-            return typeExpr;
         }
 
 		public override void Print(string level)
@@ -37,10 +37,10 @@ namespace lab1.ASTNodes
 
         public void AddAllSymbolIn(Dictionary<string, ASTNode> symTable)
         {
-            if (leftNode is IStorage)
-                (leftNode as IStorage).AddAllSymbolIn(symTable);
-            if (rightNode is IStorage)
-                (rightNode as IStorage).AddAllSymbolIn(symTable);
+            if (leftNode is IStorage leftNodeStorage)
+				leftNodeStorage.AddAllSymbolIn(symTable);
+            if (rightNode is IStorage rightNodeStorage)
+				rightNodeStorage.AddAllSymbolIn(symTable);
         }
 
         public string GetTypeMember()
@@ -61,8 +61,6 @@ namespace lab1.ASTNodes
 			return typeExpr;
         }
 
-		private static bool isBoolNodeAnd = false;
-		private static bool headNested = false;
 		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
 			string registerLeft = "";
@@ -114,12 +112,11 @@ namespace lab1.ASTNodes
 						
 						if (leftNodeIdentificatorAST.IsArray)
 						{
-							leftNodeIdentificatorAST.PrintArrayIteration(levelTabulatiion, true);
-							PrintPop(levelTabulatiion, ref registerLeft);
+							leftNodeIdentificatorAST.PrintArrayIterationASM(levelTabulatiion, isPushResult: true);
 						}
 						else
 						{
-							registerRight = ASMregisters.GetFreeRegisterData();
+							registerLeft = ASMregisters.GetFreeRegisterData();
 							offsetInStack = leftNodeIdentificatorAST.GetOffseIfTtArray();
 							startInStack = identificatorLeft.GetAddresInStack() + offsetInStack;
 							ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", " + ASMregisters.GetNameType(identificatorLeft.GetTypeId()) + " [ebp-" + startInStack + "]");
@@ -136,8 +133,7 @@ namespace lab1.ASTNodes
 								IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode(rightNodeIdentificatorAST.GetName());
 								if (rightNodeIdentificatorAST.IsArray)
 								{
-									rightNodeIdentificatorAST.PrintArrayIteration(levelTabulatiion, true);
-									PrintPop(levelTabulatiion, ref registerRight);
+									rightNodeIdentificatorAST.PrintArrayIterationASM(levelTabulatiion, isPushResult: true);
 								}
 								else
 								{
@@ -182,7 +178,10 @@ namespace lab1.ASTNodes
 					}
 				}
 
-				if(op != "&&" && op != "||")
+				if (registerLeft == "") PrintPop(levelTabulatiion, ref registerLeft);
+				if (registerRight == "") PrintPop(levelTabulatiion, ref registerRight);
+
+				if (op != "&&" && op != "||")
 				{
 					ASM.WriteASMCode(levelTabulatiion + "cmp\t" + registerLeft + ", " + registerRight);
 					string marker = !isBoolNodeAnd && !isRightLastNode ? ASMregisters.GetNewMarkerJumpPrevBody() : ASMregisters.GetNewMarkerJumpAfterBody();
@@ -315,13 +314,13 @@ namespace lab1.ASTNodes
 
 		public void FindLastRightNode(ASTNode node)
 		{
-			if (node is BinaryExprAST)
+			if (node is BinaryExprAST binaryExprNode)
 			{
-				(node as BinaryExprAST).FindLastRightNode(rightNode);
+				binaryExprNode.FindLastRightNode(rightNode);
 			}
-			else if (node is BoolAST)
+			else if (node is BoolAST boolNode)
 			{
-				((node as BoolAST).GetExpression() as BinaryExprAST).FindLastRightNode(rightNode);
+				(boolNode.GetExpression() as BinaryExprAST).FindLastRightNode(rightNode);
 			}
 			else
 			{

@@ -40,14 +40,6 @@ namespace lab1.ASTNodes
             return typeName;
         }
 
-        public void ViewStorage()
-        {
-            for(int i = 0; i < memberBrackets.Count; i++)
-            {
-                if (memberBrackets[i] is ISemantics) (memberBrackets[i] as ISemantics).GetTypeMember();
-            }
-        }
-
 		public int GetSizeArray()
 		{
 			if (memberBrackets is IEject)

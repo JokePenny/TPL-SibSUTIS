@@ -164,7 +164,7 @@ namespace lab1.ASTNodes
 				else if (storage is BinaryExprAST || storage is ParenthesisExprAST)
 				{
 					storage.PrintASM(levelTabulatiion);
-					PrintArrayIteration(levelTabulatiion);
+					PrintArrayIterationASM(levelTabulatiion);
 				}
 				else
 				{
@@ -174,7 +174,7 @@ namespace lab1.ASTNodes
 						if (storage is StringAST stringAST)
 						{
 							isArray = true;
-							PrintSringArray(levelTabulatiion, stringAST.GetString(), startInStack);
+							stringAST.PrintSringArray(levelTabulatiion, startInStack, true);
 						}
 						else if (storage is IEject ejectedStorage)
 						{
@@ -184,15 +184,12 @@ namespace lab1.ASTNodes
 						else
 						{
 							storage.PrintASM(levelTabulatiion);
-							PrintArrayIteration(levelTabulatiion);
+							PrintArrayIterationASM(levelTabulatiion);
 						}
 					}
 					else
 					{
-						takeRegister = ASMregisters.GetFreeRegisterData();
-						ASM.WriteASMCode(levelTabulatiion + "mov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "]");
-						ASM.WriteASMCode(levelTabulatiion + "push\t" + takeRegister);
-						ASMregisters.SetStateRegisterData(takeRegister, true);
+						PrintArrayIterationASM(levelTabulatiion, isPushResult: true);
 					}
 				}
 			}
@@ -217,7 +214,7 @@ namespace lab1.ASTNodes
 						if(storage is StringAST stringAST)
 						{
 							isArray = true;
-							PrintSringArray(levelTabulatiion, stringAST.GetString(), startInStack);
+							stringAST.PrintSringArray(levelTabulatiion, startInStack, true);
 						}
 						else if (storage is IEject ejectedStorage)
 						{
@@ -244,44 +241,78 @@ namespace lab1.ASTNodes
 			}
 		}
 
-		public void PrintArrayIteration(string levelTabulatiion, bool pushResult = false, bool popInArray = false)
+		/// <summary>
+		/// Вывод массива
+		/// </summary>
+		public void PrintArrayASM(string levelTabulatiion)
+		{
+			string markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
+			string markerJumpAfterBody = ASMregisters.GetNewMarkerJumpAfterBody();
+			ASMregisters.ClearMarkerPrevBody();
+
+			string registerIteration = ASMregisters.GetFreeRegisterData();
+			ASM.WriteASMCode(levelTabulatiion + "mov " + registerIteration + ", DWORD [ebp - 0]");
+			ASM.WriteASMCode(levelTabulatiion + "push " + registerIteration);
+			ASMregisters.SetStateRegisterData(registerIteration, true);
+
+			ASM.WriteASMCode(levelTabulatiion + markerJumpPrevBody + ":");
+			PrintArrayIterationASM(levelTabulatiion + "\t", "DWORD [ebp - 0]", isShowResult: true);
+			ASM.WriteASMCode(levelTabulatiion + "\t" + "jmp" + "\t" + markerJumpPrevBody);
+			ASM.WriteASMCode(levelTabulatiion + markerJumpAfterBody + ":");
+
+			registerIteration = ASMregisters.GetFreeRegisterData();
+			ASM.WriteASMCode(levelTabulatiion + "pop " + registerIteration);
+			ASM.WriteASMCode(levelTabulatiion + "mov DWORD[ebp - 0] " + registerIteration);
+			ASMregisters.SetStateRegisterData(registerIteration, true);
+		}
+
+		/// <summary>
+		/// Итерация по массиву
+		/// </summary>
+		public void PrintArrayIterationASM
+			(
+			string levelTabulatiion, 
+			string customSource = "", 
+			bool isPushResult = false, 
+			bool isPopInArray = false, 
+			bool isShowResult = false
+			)
 		{
 			string registerForOffset = ASMregisters.GetFreeRegisterData();
 			string registerBuffer = ASMregisters.GetFreeRegisterData();
 			string specialRegister = ASMregisters.GetFreeRegisterSpecial();
+			string source = isShowResult ? customSource : brackets.GetSizeArrayString();
+			int sizeType = isShowResult ? 4 : ASMregisters.GetSizeStep(brackets.Type);
 
 			ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerForOffset + ", 0");
-			ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerBuffer + ", " + brackets.GetSizeArrayString());
-			ASM.WriteASMCode(levelTabulatiion + "imul\t" + registerBuffer + ", " + ASMregisters.GetSizeStep(brackets.Type));
+			ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerBuffer + ", " + source);
+			ASM.WriteASMCode(levelTabulatiion + "imul\t" + registerBuffer + ", " + sizeType);
 			ASM.WriteASMCode(levelTabulatiion + "sub\t" + registerForOffset + ", " + registerBuffer);
 			ASM.WriteASMCode(levelTabulatiion + "mov\t" + specialRegister + ", " + registerForOffset);
 
-			if (popInArray)
+			if (isPopInArray)
 			{
 				ASM.WriteASMCode(levelTabulatiion + "pop\t" + registerForOffset);
 				ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + " + " + specialRegister + "], " + registerForOffset);
 			}
 			
-			if(pushResult)
+			if(isPushResult)
 			{
 				ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerForOffset + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + " + " + specialRegister + "]");
 				ASM.WriteASMCode(levelTabulatiion + "push\t" + registerForOffset);
 			}
 
+			if(isShowResult)
+			{
+				ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerForOffset + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + " + " + specialRegister + "]");
+				ASM.WriteASMCode(levelTabulatiion + "push\t" + registerForOffset);
+				ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.WriteInConsole);
+				ASM.WriteASMCode(levelTabulatiion + "call [printf]");
+			}
+
 			ASMregisters.SetStateRegisterData(registerBuffer, true);
 			ASMregisters.SetStateRegisterData(registerForOffset, true);
 			ASMregisters.SetStateRegisterSpecial(specialRegister, true);
-		}
-
-		private void PrintSringArray(string levelTabulatiion, string arrayString, int locateStack)
-		{
-			ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], '" + arrayString[0] + "'");
-			for (int i = 1; i < arrayString.Length; i++)
-			{
-				locateStack = startInStack + (ASMregisters.GetSizeStep(type) * i);
-				ASMregisters.stepByte += ASMregisters.GetSizeStep(type);
-				ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], '" + arrayString[i] + "'");
-			}
 		}
 	}
 }
