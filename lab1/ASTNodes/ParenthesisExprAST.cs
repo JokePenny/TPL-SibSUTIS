@@ -57,6 +57,7 @@ namespace lab1.ASTNodes
 					string register = ASMregisters.GetFreeRegisterData();
 					ASM.WriteASMCode(levelTabulatiion + "mov\t" + register + ", " + elementStorage);
 					ASM.WriteASMCode(levelTabulatiion + "push\t" + register);
+					ASMregisters.SetStateRegisterData(register, true);
 				}
 				else
 				{

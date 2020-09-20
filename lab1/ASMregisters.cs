@@ -1,6 +1,7 @@
 ﻿using lab1.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace lab1
@@ -31,9 +32,9 @@ namespace lab1
 		/// <summary>
 		/// Выдает первый свободный специальный регистр
 		/// </summary>
-		public static string GetFreeRegisterSpecial()
+		public static string GetFreeRegisterSpecial(string forceGetRegister = "")
 		{
-			return GetFreeRegister(registersSpecial, registersSpecialState);
+			return GetFreeRegister(registersSpecial, registersSpecialState, forceGetRegister);
 		}
 
 		/// <summary>
@@ -55,9 +56,9 @@ namespace lab1
 		/// <summary>
 		/// Выдает первый свободный регистр
 		/// </summary>
-		public static string GetFreeRegisterData()
+		public static string GetFreeRegisterData(string forceGetRegister = "")
 		{
-			return GetFreeRegister(registersData, registersDataState);
+			return GetFreeRegister(registersData, registersDataState, forceGetRegister);
 		}
 
 		/// <summary>
@@ -89,6 +90,13 @@ namespace lab1
 			return arrayRegisters[0];
 		}
 
+		public static void SwapJumpMarkers()
+		{
+			string tmp = MarkerJumpPrevBody;
+			MarkerJumpPrevBody = MarkerJumpAfterBody;
+			MarkerJumpAfterBody = tmp;
+		}
+
 		private static void SetStateRegister(string[] arrayRegisters, List<int> arrayStateRegisters, string register, bool isFree)
 		{
 			for (int i = 0; i < arrayStateRegisters.Count; i++)
@@ -101,11 +109,17 @@ namespace lab1
 			}
 		}
 
-		private static string GetFreeRegister(string[] arrayRegisters, List<int> arrayStateRegisters)
+		private static string GetFreeRegister(string[] arrayRegisters, List<int> arrayStateRegisters, string forceGetRegister = "")
 		{
+			bool isForceGet = forceGetRegister != "";
 			for (int i = 0; i < arrayStateRegisters.Count; i++)
 			{
-				if (arrayStateRegisters[i] == 0)
+				if (arrayStateRegisters[i] == 0 && !isForceGet)
+				{
+					arrayStateRegisters[i] = 1;
+					return arrayRegisters[i];
+				}
+				else if(isForceGet && arrayRegisters[i] == forceGetRegister)
 				{
 					arrayStateRegisters[i] = 1;
 					return arrayRegisters[i];
@@ -192,9 +206,8 @@ namespace lab1
 					return "sub";
 				case "*":
 					return "imul";
-				case "/":
-					return "div";
 				default:
+					ConsoleHelper.WriteError("Its operation not work");
 					return "";
 			}
 		}
@@ -252,7 +265,7 @@ namespace lab1
 		/// </summary>
 		public static string GetTypeConditionJump(string boolOp, bool isRevert)
 		{
-			string typeJump = "";
+			string typeJump = "jmp";
 			switch(boolOp)
 			{
 				case "==":

@@ -57,11 +57,16 @@ namespace lab1
             while (firstNum != 0 && secondNum != 0)
             {
                 if (firstNum > secondNum)
+				{
                     firstNum = firstNum % secondNum;
+                }
                 else
+				{
                     secondNum = secondNum % firstNum;
+                }
             }
-            Console.WriteLine(secondNum + firstNum);
+            Console.WriteLine(firstNum);
+            Console.WriteLine(secondNum);
         }
     }
 }

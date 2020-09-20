@@ -62,18 +62,18 @@ namespace lab1.ASTNodes
                 bodyCondition.PrintASM(levelTabulatiion);
                 markerJumpPrevBody = ASMregisters.MarkerJumpPrevBody;
                 markerJumpAfterBody = ASMregisters.MarkerJumpAfterBody;
-                ASMregisters.ClearMarkerks();
             }
             BinaryExprAST.ClearStaicFlags();
 
             bool isNextNodeElse = IsNextNodeElse(markerJumpPrevBody, markerJumpAfterBody);
+            ASMregisters.ClearMarkerks();
 
             if (markerJumpPrevBody != null && markerJumpPrevBody != "")
 			{
 				ASM.WriteASMCode(levelTabulatiion + markerJumpPrevBody + ":");
 			}
-			
-			(body as BodyMethodAST).PrintASM(levelTabulatiion + "\t", isNewLine);
+
+            (body as BodyMethodAST).PrintASM(levelTabulatiion + "\t", isNewLine);
 
 			if (!isNextNodeElse)
 			{
@@ -94,6 +94,7 @@ namespace lab1.ASTNodes
                     ASTNode nodeNext = (node as IArea).GetNextNode(parent);
                     if(nodeNext != null && nodeNext is ElseAST nodeNextElseAST)
 					{
+                        if(markerJumpPrevBody == "") markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
                         nodeNextElseAST.SetMarkersJump(markerJumpPrevBody, markerJumpAfterBody);
                         return true;
                     }
@@ -104,6 +105,7 @@ namespace lab1.ASTNodes
                 ASTNode nodeNext = (parent.parent as IArea).GetNextNode(parent);
                 if (nodeNext != null && nodeNext is ElseAST nodeNextElseAST)
                 {
+                    if (markerJumpPrevBody == "") markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
                     nodeNextElseAST.SetMarkersJump(markerJumpPrevBody, markerJumpAfterBody);
                     return true;
                 }

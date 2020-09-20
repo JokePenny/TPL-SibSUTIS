@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Asm;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
@@ -41,6 +42,51 @@ namespace lab1.ASTNodes
                 (body as ISemantics).GetTypeMember();
             else if (body is IArea)
                 (body as IArea).ViewMemberArea();
+        }
+
+        public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
+        {
+            string markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
+            string markerJumpAfterBody = ASMregisters.GetNewMarkerJumpAfterBody();
+            ASMregisters.ClearMarkerPrevBody();
+
+            ASM.WriteASMCode(levelTabulatiion + markerJumpPrevBody + ":");
+            ASMregisters.isContitionBelongsToCicle = true;
+
+            PrintCondition(levelTabulatiion + "\t", false);
+
+            ASM.WriteASMCode(levelTabulatiion + "\t" + "jmp" + "\t" + markerJumpPrevBody);
+
+            ASM.WriteASMCode(levelTabulatiion + markerJumpAfterBody + ":");
+        }
+
+        private void PrintCondition(string levelTabulatiion, bool isNewLine)
+		{
+            bool isConditionBelongToCicle = ASMregisters.isContitionBelongsToCicle;
+            ASMregisters.isContitionBelongsToCicle = false;
+            string markerJumpPrevBody = "";
+            string markerJumpAfterBody = "";
+            if (condition != null)
+            {
+                condition.PrintASM(levelTabulatiion);
+                markerJumpPrevBody = ASMregisters.MarkerJumpPrevBody;
+                markerJumpAfterBody = ASMregisters.MarkerJumpAfterBody;
+
+                ASMregisters.ClearMarkerks();
+            }
+            BinaryExprAST.ClearStaicFlags();
+
+            if (markerJumpPrevBody != null && markerJumpPrevBody != "")
+            {
+                ASM.WriteASMCode(levelTabulatiion + markerJumpPrevBody + ":");
+            }
+
+            body.PrintASM(levelTabulatiion + "\t", isNewLine);
+
+            if (markerJumpAfterBody != null && markerJumpAfterBody != "" && !isConditionBelongToCicle)
+            {
+                ASM.WriteASMCode(levelTabulatiion + markerJumpAfterBody + ":");
+            }
         }
 
         public ASTNode GetParentNode(ASTNode node, ASTNode prevNode = null)

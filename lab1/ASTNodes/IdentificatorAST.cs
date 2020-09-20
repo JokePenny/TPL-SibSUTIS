@@ -210,6 +210,7 @@ namespace lab1.ASTNodes
 					string register = ASMregisters.GetFreeRegisterData();
 					ASM.WriteASMCode(levelTabulatiion + "pop\t" + register);
 					ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
+					ASMregisters.SetStateRegisterData(register, true);
 				}
 				else
 				{

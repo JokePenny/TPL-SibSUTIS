@@ -160,6 +160,7 @@ namespace lab1.ASTNodes
 					else //value
 					{
 						IEject valueLeft = (leftNode as IEject);
+						registerLeft = ASMregisters.GetFreeRegisterData();
 						ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", " + valueLeft.GetValue());
 						if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
 						{
@@ -202,10 +203,12 @@ namespace lab1.ASTNodes
 					if (rightNode is BinaryExprAST)
 					{
 						PrintExprAST(rightNode, levelTabulatiion);
+						PrintPop(levelTabulatiion, ref registerLeft);
 						PrintPop(levelTabulatiion, ref registerRight);
 					}
 					else
 					{
+
 						registerRight = ASMregisters.GetFreeRegisterData();
 						if (rightNode is IdentificatorAST rightNodeIdentificatorAST)
 						{
@@ -220,8 +223,6 @@ namespace lab1.ASTNodes
 							ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + valueRight.GetValue());
 						}
 					}
-					registerLeft = ASMregisters.GetFreeRegisterData();
-					ASM.WriteASMCode(levelTabulatiion + "pop\t" + registerLeft);
 				}
 				else
 				{
@@ -253,7 +254,10 @@ namespace lab1.ASTNodes
 								IEject valueRight = (rightNode as IEject);
 								ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + valueRight.GetValue());
 							}
+
+							//аномальная хрень, тут ее не должно быть, но если убрать то все сломается
 							PrintPop(levelTabulatiion, ref registerRight);
+
 						}
 					}
 					else //value
@@ -284,11 +288,27 @@ namespace lab1.ASTNodes
 						}
 					}
 				}
-				ASM.WriteASMCode(levelTabulatiion + ASMregisters.GetOperation(op) + "\t" + registerLeft + ", " + registerRight);
+				if(op != "/" && op != "%")
+				{
+					ASM.WriteASMCode(levelTabulatiion + ASMregisters.GetOperation(op) + "\t" + registerLeft + ", " + registerRight);
+				}
+				else
+				{
+					string registerAdditive = ASMregisters.GetFreeRegisterData("ecx");
+					ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerAdditive + ", " + registerLeft);
+					if(op == "%") ASM.WriteASMCode(levelTabulatiion + "mov\tedx, 0");
+					ASM.WriteASMCode(levelTabulatiion + "div\t" + registerAdditive);
+					if(op == "%")
+					{
+						ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", edx");
+					}
+					ASMregisters.SetStateRegisterData(registerAdditive, true);
+				}
 				ASM.WriteASMCode(levelTabulatiion + "push\t" + registerLeft);
 			}
-			if (registerLeft != "") ASMregisters.SetStateRegisterData(registerLeft, true);
-			if (registerRight != "") ASMregisters.SetStateRegisterData(registerRight, true);
+
+			ASMregisters.SetStateRegisterData(registerLeft, true);
+			ASMregisters.SetStateRegisterData(registerRight, true);
 		}
 
 		private void PrintExprAST(ASTNode node, string levelTabulatiion)

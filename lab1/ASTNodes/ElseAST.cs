@@ -49,11 +49,17 @@ namespace lab1.ASTNodes
 
         public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
-            ASM.WriteASMCode(levelTabulatiion + "jmp\t" + markerAfterBody);
-
+            ASM.WriteASMCode(levelTabulatiion + "jmp\t" + markerPrevBody);
+            ASM.WriteASMCode(levelTabulatiion + markerAfterBody + ":");
             (expr as BodyMethodAST).PrintASM(levelTabulatiion, isNewLine);
 
-            ASM.WriteASMCode(levelTabulatiion + markerAfterBody + ":");
+            ASM.WriteASMCode(levelTabulatiion + markerPrevBody + ":");
+
+            //ASM.WriteASMCode(levelTabulatiion + "jmp\t" + markerAfterBody);
+            //ASM.WriteASMCode(levelTabulatiion + markerPrevBody + ":");
+            //(expr as BodyMethodAST).PrintASM(levelTabulatiion, isNewLine);
+
+            //ASM.WriteASMCode(levelTabulatiion + markerAfterBody + ":");
         }
 
         public ASTNode GetNextNode(ASTNode node)
