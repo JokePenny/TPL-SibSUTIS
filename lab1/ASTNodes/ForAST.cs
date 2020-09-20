@@ -9,9 +9,15 @@ namespace lab1.ASTNodes
 {
     class ForAST : ASTNode, IArea
     {
+        public string MarkerJumpPrevBody => markerJumpPrevBody;
+        public string MarkerJumpAfterBody => markerJumpAfterBody;
+
         private readonly List<ASTNode> declaredVar; // int a = 5, b = 7
         private readonly ConditionNodeAST conditionWithBody; // a < b {body}
         private readonly ASTNode postcondition; // a++
+
+        private string markerJumpPrevBody;
+        private string markerJumpAfterBody;
 
         public ForAST(List<ASTNode> declaredVar, ConditionNodeAST conditionWithBody, ASTNode postcondition) // if(a > b) || if((a > s) > (b && s))
         {
@@ -72,8 +78,8 @@ namespace lab1.ASTNodes
 				declaredVar[i].PrintASM(levelTabulatiion, true);
 			}
 
-			string markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
-			string markerJumpAfterBody = ASMregisters.GetNewMarkerJumpAfterBody();
+			markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
+			markerJumpAfterBody = ASMregisters.GetNewMarkerJumpAfterBody();
 			ASMregisters.ClearMarkerPrevBody();
 
 			ASM.WriteASMCode(levelTabulatiion + markerJumpPrevBody + ":");

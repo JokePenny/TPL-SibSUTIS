@@ -254,10 +254,6 @@ namespace lab1.ASTNodes
 								IEject valueRight = (rightNode as IEject);
 								ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + valueRight.GetValue());
 							}
-
-							//аномальная хрень, тут ее не должно быть, но если убрать то все сломается
-							PrintPop(levelTabulatiion, ref registerRight);
-
 						}
 					}
 					else //value

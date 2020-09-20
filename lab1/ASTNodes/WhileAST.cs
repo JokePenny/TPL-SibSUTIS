@@ -8,8 +8,14 @@ namespace lab1.ASTNodes
 {
     class WhileAST : ASTNode, IArea
     {
+        public string MarkerJumpPrevBody => markerJumpPrevBody;
+        public string MarkerJumpAfterBody => markerJumpAfterBody;
+
         private readonly ASTNode condition;
         private readonly ASTNode body;
+
+        private string markerJumpPrevBody;
+        private string markerJumpAfterBody;
 
         public WhileAST(ASTNode condition, ASTNode body)
         {
@@ -46,8 +52,8 @@ namespace lab1.ASTNodes
 
         public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
         {
-            string markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
-            string markerJumpAfterBody = ASMregisters.GetNewMarkerJumpAfterBody();
+            markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
+            markerJumpAfterBody = ASMregisters.GetNewMarkerJumpAfterBody();
             ASMregisters.ClearMarkerPrevBody();
 
             ASM.WriteASMCode(levelTabulatiion + markerJumpPrevBody + ":");
