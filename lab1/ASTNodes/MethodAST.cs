@@ -40,6 +40,17 @@ namespace lab1.ASTNodes
             this.nameMethod = nameMethod;
         }
 
+        public ASTNode GetParentNode(ASTNode node, ASTNode prevNode = null)
+        {
+            bodyMethod.parent = this;
+            return bodyMethod.GetParentNode(node);
+        }
+
+        public ASTNode GetNextNode(ASTNode nodePrev)
+		{
+            return bodyMethod.GetNextNode(nodePrev);
+        }
+
         public string GetTypeMethod()
         {
             return typeMethod;
@@ -99,41 +110,7 @@ namespace lab1.ASTNodes
 
 		public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
 		{
-			ASM.WriteASMCode
-			(
-				"format PE Console\n"
-				+ "entry Start"
-				+ "include '%finc%\\win32\\win32a.inc'\n"
-				+ "uglobal\n"
-				+ "\thInstance dd ?\n"
-				+ "\thHeap     dd ?\n"
-				+ "endg\n"
-				+ "section '.data' data readable writable\n"
-				+ "\tshowString db '%d', 0\n"
-                + "\tspaceString db ' ', 0\n"
-                + "\tnewString db 10, 13\n"
-                + "section '.idata' import data readable\n"
-				+ "\tlibrary kernel, 'kernel32.dll',\\\n"
-				+ "\t\tmsvcrt, 'msvcrt.dll'\n"
-				+ "\timport kernel,\\\n"
-				+ "\t\tExitProcess, 'ExitProcess'\n"
-				+ "\timport msvcrt,\\\n"
-				+ "\t\tprintf, 'printf',\\\n"
-				+ "\t\tscanf, 'scanf',\\\n"
-				+ "\t\tgetch, '_getch'\n"
-				+ "Start:"
-			);
-
 			bodyMethod.PrintASM("\t\t", false);
-
-			ASM.WriteASMCode
-			(
-				"Exit:"
-				+ "\tpush\teax\n"
-				+ "\tFinalizeAll\n"
-				+ "\tinvoke\tExitProcess\n"
-				+ "IncludeAllGlobals"
-			);
 		}
 	}
 }

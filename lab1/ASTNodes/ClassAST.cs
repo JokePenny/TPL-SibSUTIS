@@ -67,5 +67,27 @@ namespace lab1.ASTNodes
 				members[i].PrintASM(levelTabulatiion, true);
 			}
 		}
-	}
+
+		public ASTNode GetNextNode(ASTNode node)
+		{
+			throw new NotImplementedException();
+		}
+
+        public ASTNode GetParentNode(ASTNode node, ASTNode prevNode = null)
+        {
+            for (int i = 0; i < members.Count; i++)
+            {
+                members[i].parent = this;
+                if (node == members[i]) return this;
+
+                if (members[i] is IArea memberMethodAST)
+                {
+                    ASTNode findParentNode = memberMethodAST.GetParentNode(node);
+                    if (findParentNode != null) return findParentNode;
+                }
+            }
+            return null;
+        }
+
+    }
 }

@@ -7,26 +7,33 @@ namespace lab1
         static void Main(string[] args)
         {
             Command.RunCommand(args);
+            //TestMethod();
         }
 
         private static void TestMethod()
         {
             // find min
-            int[] array = new int[8];
+            int[] array = new int[3];
+            array[0] = 2;
+            array[1] = 3;
+            array[2] = 4;
             int tmp = array[0];
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 3; i++)
             {
                 if (tmp > array[i])
+				{
                     tmp = array[i];
+                }
             }
+            Console.WriteLine(tmp);
 
             // find substroke in stroke
             string stroke = "sdf";
-            string strokeInFind = "sasd asd sssa as sdf";
+            string strokeInFind = "sasdf asd";
             int doneLetter = 3;
             int nowAccesLetter = 0;
             int indexStartWordInStroke = 9999;
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 9; i++)
             {
                 if (stroke[nowAccesLetter] == strokeInFind[i])
                 {
@@ -37,8 +44,12 @@ namespace lab1
                         break;
                     }
                 }
-                else nowAccesLetter = 0;
+                else
+                {
+                    nowAccesLetter = 0;
+                }
             }
+            Console.WriteLine(indexStartWordInStroke);
 
             // find NOD
             int firstNum = 5;

@@ -14,9 +14,30 @@ namespace lab1.ASTNodes
             this.memberMethod = memberMethod;
         }
 
-        public List<ASTNode> GetMemberMethod()
+        public ASTNode GetParentNode(ASTNode node, ASTNode prevNode = null)
         {
-            return memberMethod;
+            for (int i = 0; i < memberMethod.Count; i++)
+            {
+                memberMethod[i].parent = this;
+
+                if (node == memberMethod[i]) return this;
+
+                if(memberMethod[i] is IArea memberIArea)
+				{
+                    ASTNode findParentNode = memberIArea.GetParentNode(node, this);
+                    if (findParentNode != null) return findParentNode;
+                }
+            }
+            return null;
+        }
+
+        public ASTNode GetNextNode(ASTNode nodePrev)
+        {
+            int index = memberMethod.FindIndex(obj => obj == nodePrev);
+            if (index == -1) return null;
+            index++;
+            if (index >= memberMethod.Count) return null;
+            return memberMethod[index];
         }
 
         public override void Print(string level)

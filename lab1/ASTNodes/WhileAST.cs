@@ -42,5 +42,16 @@ namespace lab1.ASTNodes
             else if (body is IArea)
                 (body as IArea).ViewMemberArea();
         }
-	}
+
+        public ASTNode GetParentNode(ASTNode node, ASTNode prevNode = null)
+        {
+            body.parent = this;
+            return (body as IArea).GetParentNode(node);
+        }
+
+        public ASTNode GetNextNode(ASTNode nodePrev)
+        {
+            return (body as IArea).GetNextNode(nodePrev);
+        }
+    }
 }

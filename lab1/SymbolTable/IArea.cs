@@ -9,5 +9,7 @@ namespace lab1.SymbolTable
     {
         void ViewMemberArea();
         SymTableUse GetSymTable(string areaName, Dictionary<string, ASTNode> symTable);
+        ASTNode GetParentNode(ASTNode node, ASTNode prevNode = null);
+        ASTNode GetNextNode(ASTNode node);
     }
 }

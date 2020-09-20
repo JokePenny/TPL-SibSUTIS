@@ -7,7 +7,6 @@ namespace lab1.ASTNodes
     class StringAST : ASTNode, ISemantics
     {
         private readonly string stringContainer;
-        private bool isInited;
 
         public StringAST(string str)
         {
@@ -30,28 +29,17 @@ namespace lab1.ASTNodes
             Console.WriteLine(level + "[STRING] " + stringContainer);
         }
 
-        public void PrintSringArray(string levelTabulatiion, int locateStack, bool isInit = false)
+        public void PrintSringArray(string levelTabulatiion, int locateStack)
         {
-            if(isInit)
-			{
-                isInited = true;
-                int startInStack = locateStack;
-                string type = "string";
-                ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], '" + stringContainer[0] + "'");
-                for (int i = 1; i < stringContainer.Length; i++)
-                {
-                    locateStack = startInStack + (ASMregisters.GetSizeStep(type) * i);
-                    ASMregisters.stepByte += ASMregisters.GetSizeStep(type);
-                    ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], '" + stringContainer[i] + "'");
-                }
-            }
-			else if(isInited)
-			{
-
-			}
-			else
-			{
-
+            int startInStack = locateStack;
+            string type = "string";
+            string cutsSting = GetString();
+            ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], '" + cutsSting[0] + "'");
+            for (int i = 1; i < cutsSting.Length; i++)
+            {
+                locateStack = startInStack + (ASMregisters.GetSizeStep(type) * i);
+                ASMregisters.stepByte += ASMregisters.GetSizeStep(type);
+                ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + locateStack + "], '" + cutsSting[i] + "'");
             }
         }
     }

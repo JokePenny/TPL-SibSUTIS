@@ -19,6 +19,7 @@ namespace lab1.ASTNodes
     public class ASTNode
     { 
         public Point point;
+        public ASTNode parent;
 
         /// <summary>
         /// Выввод в консоль построенное AST дерево
@@ -29,7 +30,5 @@ namespace lab1.ASTNodes
         /// Запсь в файл сгенерерованный АСМ код
         /// </summary>
 		public virtual void PrintASM(string leveltabulation, bool isNewLine = false) { }
-
-		~ASTNode() { }
     }
 }

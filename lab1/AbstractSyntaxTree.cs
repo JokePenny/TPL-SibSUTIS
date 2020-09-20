@@ -31,6 +31,16 @@ namespace lab1
 			}
         }
 
+        public void GetNextNode(ASTNode findNode)
+		{
+
+		}
+
+        public static ASTNode GetParentNode(ASTNode node)
+        {
+            return (headAST as NamespaceAST).GetParentNode(node);
+        }
+
         //---------------------
         // Парсер скобки [
         //---------------------
@@ -705,7 +715,8 @@ namespace lab1
             ASTNode body;
             GetNextToken();
 
-            if (curTok.token == Tokens.Token.K_IF) {
+            if (curTok.token == Tokens.Token.K_IF) 
+            {
                 bufferTok.token = Tokens.Token.K_ELSE_IF;
                 return new ElseAST(ParseIf());
             }

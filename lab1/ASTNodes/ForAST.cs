@@ -85,5 +85,16 @@ namespace lab1.ASTNodes
 
 			ASM.WriteASMCode(levelTabulatiion + markerJumpAfterBody + ":");
 		}
-	}
+
+        public ASTNode GetNextNode(ASTNode node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ASTNode GetParentNode(ASTNode node, ASTNode prevNode = null)
+        {
+            conditionWithBody.parent = this;
+            return (conditionWithBody as IArea).GetParentNode(node);
+        }
+    }
 }

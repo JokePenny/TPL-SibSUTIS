@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using lab1.Asm;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
@@ -8,6 +9,8 @@ namespace lab1.ASTNodes
     class ElseAST : ASTNode, IArea
     {
         private readonly ASTNode expr;
+        private string markerPrevBody;
+        private string markerAfterBody;
 
         public ElseAST(ASTNode expr)
         {
@@ -24,6 +27,12 @@ namespace lab1.ASTNodes
             return new SymTableUse("else", symTable, null);
         }
 
+        public void SetMarkersJump(string markerJumpPresvBody, string markerJumpAfterBody)
+		{
+            markerPrevBody = markerJumpPresvBody;
+            markerAfterBody = markerJumpAfterBody;
+        }
+
         public override void Print(string level)
         {
             Console.WriteLine(level + "[ELSE]");
@@ -37,5 +46,28 @@ namespace lab1.ASTNodes
             else if (expr is IArea)
                 (expr as IArea).ViewMemberArea();
         }
-	}
+
+        public override void PrintASM(string levelTabulatiion, bool isNewLine = false)
+		{
+            ASM.WriteASMCode(levelTabulatiion + "jmp\t" + markerAfterBody);
+
+            (expr as BodyMethodAST).PrintASM(levelTabulatiion, isNewLine);
+
+            ASM.WriteASMCode(levelTabulatiion + markerAfterBody + ":");
+        }
+
+        public ASTNode GetNextNode(ASTNode node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ASTNode GetParentNode(ASTNode node, ASTNode prevNode = null)
+        {
+            expr.parent = parent;
+            if (expr is IArea exprIArea)
+                return exprIArea.GetParentNode(node);
+            return null;
+        }
+
+    }
 }

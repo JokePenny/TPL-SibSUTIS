@@ -15,7 +15,7 @@ namespace lab1.Asm
 		{
 			if (head is NamespaceAST)
 			{
-				fstream = new FileStream(Environment.CurrentDirectory + "\\note.s", FileMode.Create);
+				fstream = new FileStream(Environment.CurrentDirectory + "\\note.asm", FileMode.Create);
 				(head as NamespaceAST).PrintASM("", true);
 			}
 			fstream.Close();

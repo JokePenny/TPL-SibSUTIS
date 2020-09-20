@@ -172,7 +172,8 @@ namespace lab1
 					//return "QWORD";
 				case "char":
 				case "bool":
-					return "BYTE";
+					//return "BYTE";
+					return "DWORD";
 				default:
 					return "DWORD";
 			}
@@ -228,6 +229,12 @@ namespace lab1
 		{
 			if (MarkerJumpAfterBody == null || MarkerJumpAfterBody == "") MarkerJumpAfterBody = GetNewNameMarker();
 			return MarkerJumpAfterBody;
+		}
+
+		public static void SetMarkersJump(string markerPrevBpdy, string markerAfterBody)
+		{
+			MarkerJumpPrevBody = markerPrevBpdy;
+			MarkerJumpAfterBody = markerAfterBody;
 		}
 
 		/// <summary>

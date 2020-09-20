@@ -30,6 +30,10 @@ namespace lab1.ASTNodes
 				{
 					identificatorAST.PrintArrayASM(levelTabulatiion);
 				}
+				else
+				{
+					identificatorAST.PrintIdentificatorASM(levelTabulatiion);
+				}
 			} 
 			else if (storage is StringAST stringAST)
 			{

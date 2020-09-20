@@ -28,6 +28,12 @@ namespace lab1.ASTNodes
             this.point = point;
         }
 
+		public static void ClearStaicFlags()
+		{
+			isBoolNodeAnd = false;
+			headNested = false;
+		}
+
 		public override void Print(string level)
         {
             Console.WriteLine(level + "[OP] " + op);

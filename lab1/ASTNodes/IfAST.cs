@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using lab1.SemAnalyz;
 using lab1.SymbolTable;
 
@@ -41,5 +42,20 @@ namespace lab1.ASTNodes
 		{
 			(branching as ConditionNodeAST).PrintASM(levelTabulatiion, isNewLine);
 		}
-	}
+
+        public ASTNode GetNextNode(ASTNode node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ASTNode GetParentNode(ASTNode node, ASTNode prevNode = null)
+        {
+            branching.parent = this;
+            if (node == branching) return prevNode;
+
+            if (branching is IArea branchingIArea)
+                return branchingIArea.GetParentNode(node, prevNode);
+            return null;
+        }
+    }
 }
