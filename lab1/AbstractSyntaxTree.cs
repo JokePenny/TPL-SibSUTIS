@@ -961,12 +961,19 @@ namespace lab1
 				{
 					case Tokens.Token.CONSOLE_WRITE:
 					case Tokens.Token.CONSOLE_WRITELINE:
-						return ParseWriteConsoleCommand();
+                        ASTNode node = ParseWriteConsoleCommand();
+                        GetNextToken();
+                        if(curTok.token != Tokens.Token.PARENTHESIS_R)
+						{
+                            ConsoleHelper.WriteErrorAST("Too many members in the console command", curTok.y, curTok.x);
+                            return null;
+                        }
+                        return node;
 					default:
 						ConsoleHelper.WriteErrorAST("Impossible token this area", curTok.y, curTok.x);
 						return null;
 				}
-			}
+            }
 			else
 			{
 				ConsoleHelper.WriteErrorAST("Impossible token this area", curTok.y, curTok.x);

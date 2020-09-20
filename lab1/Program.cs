@@ -14,7 +14,7 @@ namespace lab1
             // find min
             int[] array = new int[8];
             int tmp = array[0];
-            for (int i = 0; i < array.Length; i++)
+            for (int i = 0; i < 8; i++)
             {
                 if (tmp > array[i])
                     tmp = array[i];
@@ -23,10 +23,10 @@ namespace lab1
             // find substroke in stroke
             string stroke = "sdf";
             string strokeInFind = "sasd asd sssa as sdf";
-            int doneLetter = stroke.Length;
+            int doneLetter = 3;
             int nowAccesLetter = 0;
-            int indexStartWordInStroke = -1;
-            for (int i = 0; i < strokeInFind.Length; i++)
+            int indexStartWordInStroke = 9999;
+            for (int i = 0; i < 10; i++)
             {
                 if (stroke[nowAccesLetter] == strokeInFind[i])
                 {
