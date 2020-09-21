@@ -46,7 +46,7 @@ namespace lab1
                 }
                 else
                 {
-                    nowAccesLetter = 0;
+                   // nowAccesLetter = 0;
                 }
             }
             Console.WriteLine(indexStartWordInStroke);

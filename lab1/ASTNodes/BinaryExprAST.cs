@@ -284,9 +284,19 @@ namespace lab1.ASTNodes
 						}
 					}
 				}
+
+				
+				if(op == "-")
+				{
+					//поменял местами регистры, по другому дает неверный ответ
+					ASM.WriteASMCode(levelTabulatiion + ASMregisters.GetOperation(op) + "\t" + registerRight + ", " + registerLeft);
+					ASM.WriteASMCode(levelTabulatiion + "push\t" + registerRight);
+				}
+				else 
 				if(op != "/" && op != "%")
 				{
 					ASM.WriteASMCode(levelTabulatiion + ASMregisters.GetOperation(op) + "\t" + registerLeft + ", " + registerRight);
+					ASM.WriteASMCode(levelTabulatiion + "push\t" + registerLeft);
 				}
 				else
 				{
@@ -299,8 +309,8 @@ namespace lab1.ASTNodes
 						ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", edx");
 					}
 					ASMregisters.SetStateRegisterData(registerAdditive, true);
+					ASM.WriteASMCode(levelTabulatiion + "push\t" + registerLeft);
 				}
-				ASM.WriteASMCode(levelTabulatiion + "push\t" + registerLeft);
 			}
 
 			ASMregisters.SetStateRegisterData(registerLeft, true);

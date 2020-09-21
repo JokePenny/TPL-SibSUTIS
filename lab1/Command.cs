@@ -7,6 +7,11 @@ namespace lab1
     {
         public static void RunCommand(string[] command)
         {
+            if(!CheckCorrectFilename(command))
+			{
+                Console.WriteLine("ERROR: what could be\n-Wrong path to file\n-Not correct extension (should be text.cs)");
+			}
+
             switch (command[0])
             {
                 case "--dump-asm":
@@ -21,6 +26,21 @@ namespace lab1
                     Test(command[1]);
                     break;
             }
+        }
+
+        private static bool CheckCorrectFilename(string[] command)
+		{
+            if (command.Length <= 1) return false;
+
+            string pathToFile = command[1];
+            string[] allDiectory = pathToFile.Split('\\');
+            string nameFile = allDiectory[allDiectory.Length - 1];
+            string[] partsNameFile = nameFile.Split('.');
+
+            if (partsNameFile.Length <= 1) return false;
+            if (partsNameFile[partsNameFile.Length - 1] != "cs") return false;
+
+            return true;
         }
 
         private static void Test(string path)
