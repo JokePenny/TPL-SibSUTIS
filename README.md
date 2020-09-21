@@ -3,7 +3,7 @@
 - :white_check_mark: [Синтаксическй анализ](#Синтаксическй-анализ)
 - :white_check_mark: [Таблица символов](#Таблица-символов)
 - :white_check_mark: [Семантический анализ](#Семантический-анализ)
-- :black_square_button: [Кодогенератор](#Кодогенератор)
+- :white_check_mark: [Кодогенератор](#Кодогенератор)
 
 ____
 ### Что требуется для компилирования
@@ -23,7 +23,7 @@ dotnet test
 - Открыть командную строку и набрать
 ```
 dotnet build
-dotnet run --dump-tokens \source.txt
+dotnet run --dump-tokens \source.cs
 ```
 [:arrow_up:Оглавление](#ТЯП)
 ## Синтаксическй анализ
@@ -34,7 +34,7 @@ dotnet run --dump-tokens \source.txt
 - Открыть командную строку и набрать
 ```
 dotnet build
-dotnet run --dump-ast \source.txt
+dotnet run --dump-ast \source.cs
 ```
 [:arrow_up:Оглавление](#ТЯП)
 ## Таблица символов
@@ -45,7 +45,7 @@ dotnet run --dump-ast \source.txt
 - Открыть командную строку и набрать
 ```
 dotnet build
-dotnet run --dump-ast \source.txt
+dotnet run --dump-ast \source.cs
 ```
 
 [:arrow_up:Оглавление](#ТЯП)
@@ -57,11 +57,15 @@ dotnet run --dump-ast \source.txt
 - Открыть командную строку и набрать
 ```
 dotnet build
-dotnet run --dump-ast \source.txt
+dotnet run --dump-ast \source.cs
 ```
 
 [:arrow_up:Оглавление](#ТЯП)
 ## Кодогенератор
-В процессе
+На вход прнимается голова AST по которому алгоритм спускается и генерирует fasm в файл с расширением .asm
+```
+dotnet build
+dotnet run --dump-asm \source.cs
+```
 
 [:arrow_up:Оглавление](#ТЯП)
