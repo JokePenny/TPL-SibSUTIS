@@ -81,11 +81,7 @@ namespace lab1.ASTNodes
 			(
                 "format PE Console 4.0\n"
                 + "entry Start\n"
-				+ "include '%finc%\\win32\\win32a.inc'\n"
-                + "uglobal\n"
-				+ "\thInstance dd ?\n"
-				+ "\thHeap     dd ?\n"
-				+ "endg\n"
+				+ "include 'INCLUDE\\WIN32AX.inc'\n"
 				+ "section '.data' data readable writable\n"
 				+ "\tshowString db '%d', 0\n"
                 + "\tspaceString db ' ', 0\n"
@@ -113,9 +109,6 @@ namespace lab1.ASTNodes
 				"Exit:\n"
 				+ "\tpush\teax\n"
                 + "\tcall\t[getch]\n"
-                + "\tFinalizeAll\n"
-				+ "\tinvoke\tExitProcess\n"
-				+ "IncludeAllGlobals"
 			);
 		}
 	}

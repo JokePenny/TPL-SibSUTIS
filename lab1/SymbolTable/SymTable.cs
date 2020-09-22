@@ -11,6 +11,10 @@ namespace lab1.SymbolTable
         {
             if(head is NamespaceAST)
                 symTabls = (head as NamespaceAST).GetSymTable("", null);
+        }
+
+        public static void PrintSymTable()
+		{
             symTabls.Print();
         }
     }

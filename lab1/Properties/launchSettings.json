@@ -2,7 +2,7 @@
   "profiles": {
     "lab1": {
       "commandName": "Project",
-      "commandLineArgs": "--dump-ast \\source.txt"
+      "commandLineArgs": "--dump-asm \\source.cs C:\\Fasm\\fasm.exe"
     }
   }
 }

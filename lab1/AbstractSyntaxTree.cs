@@ -10,13 +10,15 @@ namespace lab1
 {
     public sealed class AbstractSyntaxTree
     {
+        public static ASTNode HeadAST => headAST;
+
         private static TokenNode curTok;
         private static TokenNode bufferTok;
         private static ASTNode headAST;
         private static bool isCycleArea = false;
         private static bool isRawToken = false;
 
-        public static void CreateAST()
+        public static void CreateAST(bool isShowAST = false, bool isShowSymTable = false)
         {
             GetNextToken();
             CheckupClosedToken(Tokens.Token.K_NAMESPACE);
@@ -24,10 +26,12 @@ namespace lab1
             headAST = ParseMainArea(Area.NAMESPACE);
             if (headAST != null)
             {
-                headAST.Print("");
+                if(isShowAST) headAST.Print("");
+
                 SymTable.CreateSymTable(headAST);
+                if (isShowSymTable) SymTable.PrintSymTable();
+
                 SemAnalyzer.StartSemAnalyzer(headAST, SymTable.symTabls);
-				ASM.CreateASM(headAST);
 			}
         }
 

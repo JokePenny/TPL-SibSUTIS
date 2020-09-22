@@ -144,6 +144,7 @@ namespace lab1
 					return 8;
 				case "string":
 					//return 8;
+					return 4;
 				case "char":
 					return 2;
 				case "bool":

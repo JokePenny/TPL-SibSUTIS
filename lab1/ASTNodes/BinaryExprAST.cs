@@ -286,13 +286,13 @@ namespace lab1.ASTNodes
 				}
 
 				
-				if(op == "-")
-				{
-					//поменял местами регистры, по другому дает неверный ответ
-					ASM.WriteASMCode(levelTabulatiion + ASMregisters.GetOperation(op) + "\t" + registerRight + ", " + registerLeft);
-					ASM.WriteASMCode(levelTabulatiion + "push\t" + registerRight);
-				}
-				else 
+				//if(op == "-")
+				//{
+				//	//поменял местами регистры, по другому дает неверный ответ
+				//	ASM.WriteASMCode(levelTabulatiion + ASMregisters.GetOperation(op) + "\t" + registerRight + ", " + registerLeft);
+				//	ASM.WriteASMCode(levelTabulatiion + "push\t" + registerRight);
+				//}
+				//else 
 				if(op != "/" && op != "%")
 				{
 					ASM.WriteASMCode(levelTabulatiion + ASMregisters.GetOperation(op) + "\t" + registerLeft + ", " + registerRight);

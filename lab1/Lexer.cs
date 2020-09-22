@@ -42,7 +42,6 @@ namespace lab1
             stringWithoutComm = StringTreatment.DeleteComments(str);
             for (int i = 0; i < stringWithoutComm.Length; i++) ConsoleHelper.WriteDefault(stringWithoutComm[i]);
             line = stringWithoutComm[lineMemmory];
-            //AbstractSyntaxTree.CreateAST();
         }
 
         public static void ParseLexem()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace lab1
 {
@@ -66,7 +67,6 @@ namespace lab1
                 }
             }
             Console.WriteLine(firstNum);
-            Console.WriteLine(secondNum);
         }
     }
 }

@@ -1,10 +1,18 @@
 ﻿using System;
+using lab1.Asm;
 using lab1.Helpers;
 
 namespace lab1
 {
     public sealed class Command
     {
+        private enum TypeCommand
+		{
+            DUMP_TOKENS,
+            DUMP_AST,
+            DUMP_ASM,
+        }
+
         public static void RunCommand(string[] command)
         {
             if(!CheckCorrectFilename(command))
@@ -15,15 +23,13 @@ namespace lab1
             switch (command[0])
             {
                 case "--dump-asm":
+                    ReadFile(command[1], TypeCommand.DUMP_ASM, command.Length > 2 ? command[2] : null);
                     break;
                 case "--dump-ast":
-                    DumpAST(command[1]);
+                    ReadFile(command[1], TypeCommand.DUMP_AST);
                     break;
                 case "--dump-tokens":
-                    DumpTokens(command[1]);
-                    break;
-                case "--test":
-                    Test(command[1]);
+                    ReadFile(command[1], TypeCommand.DUMP_TOKENS);
                     break;
             }
         }
@@ -43,48 +49,41 @@ namespace lab1
             return true;
         }
 
-        private static void Test(string path)
-        {
+        private static void ReadFile(string path, TypeCommand command, string pathToFasm = null)
+		{
+            if (pathToFasm != null) ReadSource.SetPathToFasm(pathToFasm);
+
             string source = ReadSource.ReadFile(path);
             if (source != "")
             {
-                Lexer.StartLexer(source);
-            }
-        }
-
-        private static void DumpASM(string path)
-        {
-
-        }
-
-        private static void DumpAST(string path)
-        {
-            string source = ReadSource.ReadFile(path);
-            if (source != "")
-            {
-                Lexer.StartLexer(source);
-                AbstractSyntaxTree.CreateAST();
-            }
-            else
-            {
-                ConsoleHelper.WriteError("Исходник пустой");
-            }
-            Lexer.ViewTokens();
-        }
-
-        private static void DumpTokens(string path)
-        {
-            string source = ReadSource.ReadFile(path);
-            if (source != "")
-            {
-                Lexer.StartLexer(source);
-                Lexer.ParseLexem();
-                Lexer.ViewTokens();
+                SwitcherCommand(source, command);
             }
             else
             {
                 ConsoleHelper.WriteError("Исходник пустой");
             }
         }
+
+        private static void SwitcherCommand(string source, TypeCommand command)
+		{
+            switch(command)
+			{
+                case TypeCommand.DUMP_TOKENS:
+                    Lexer.StartLexer(source);
+                    Lexer.ParseLexem();
+                    Lexer.ViewTokens();
+                    break;
+                case TypeCommand.DUMP_AST:
+                    Lexer.StartLexer(source);
+                    AbstractSyntaxTree.CreateAST(true, true);
+                    break;
+                case TypeCommand.DUMP_ASM:
+                    Lexer.StartLexer(source);
+                    AbstractSyntaxTree.CreateAST();
+                    ASM.CreateASM();
+                    ASM.RunCompileProgramm();
+                    break;
+            }
+		}
     }
 }
