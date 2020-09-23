@@ -11,7 +11,6 @@ namespace lab1.Asm
 	class ASM
 	{
 		private static FileStream fstream;
-
 		public static void WriteASMCode(string code)
 		{
 			ConsoleHelper.WriteDefault(code);

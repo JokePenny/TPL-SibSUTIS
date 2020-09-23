@@ -11,7 +11,6 @@ namespace lab1
 	/// </summary>
 	public static class ASMregisters
 	{
-		public static string MarkerJumpAfterBodyCicle { get; set; }
 		public static string MarkerJumpPrevBody { get; private set; }
 		public static string MarkerJumpAfterBody { get; private set; }
 		public static string ShowString => showString;

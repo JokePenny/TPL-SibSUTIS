@@ -83,9 +83,9 @@ namespace lab1.ASTNodes
                 + "entry Start\n"
 				+ "include 'INCLUDE\\WIN32AX.inc'\n"
 				+ "section '.data' data readable writable\n"
-				+ "\tshowString db '%d', 0\n"
-                + "\tspaceString db ' ', 0\n"
-                + "\tnewString db 10, 13\n"
+				+ "\tshowString dd '%d', 0\n"
+                + "\tspaceString dd ' ', 0\n"
+                + "\tnewString dd 10, 13\n"
                 + "section '.idata' import data readable\n"
 				+ "\tlibrary kernel, 'kernel32.dll',\\\n"
 				+ "\t\tmsvcrt, 'msvcrt.dll'\n"
@@ -96,7 +96,6 @@ namespace lab1.ASTNodes
 				+ "\t\tscanf, 'scanf',\\\n"
 				+ "\t\tgetch, '_getch'\n"
 				+ "Start:\n"
-                + "\t\tpush\teax"
             );
 
 			for (int i = 0; i < members.Count; i++)

@@ -281,6 +281,8 @@ namespace lab1.ASTNodes
 			string register = ASMregisters.GetFreeRegisterData();
 			PrintValueASM(levelTabulatiion, register);
 			ASMregisters.SetStateRegisterData(register, true);
+			ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.NewString);
+			ASM.WriteASMCode(levelTabulatiion + "call\t[printf]");
 		}
 
 		/// <summary>
@@ -304,7 +306,10 @@ namespace lab1.ASTNodes
 			ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerForOffset + ", 0");
 			ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerBuffer + ", " + source);
 			ASM.WriteASMCode(levelTabulatiion + "imul\t" + registerBuffer + ", " + sizeType);
+
 			ASM.WriteASMCode(levelTabulatiion + "sub\t" + registerForOffset + ", " + registerBuffer);
+			// ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerForOffset + ", " + registerBuffer);
+
 			ASM.WriteASMCode(levelTabulatiion + "mov\t" + specialRegister + ", " + registerForOffset);
 
 			if (isPopInArray)

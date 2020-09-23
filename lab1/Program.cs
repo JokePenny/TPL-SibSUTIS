@@ -30,11 +30,11 @@ namespace lab1
 
             // find substroke in stroke
             string stroke = "sdf";
-            string strokeInFind = "sasdf asd";
+            string strokeInFind = "sdf asd";
             int doneLetter = 3;
             int nowAccesLetter = 0;
             int indexStartWordInStroke = 9999;
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < strokeInFind.Length; i++)
             {
                 if (stroke[nowAccesLetter] == strokeInFind[i])
                 {
@@ -42,12 +42,13 @@ namespace lab1
                     if (nowAccesLetter == doneLetter)
                     {
                         indexStartWordInStroke = i - nowAccesLetter;
+                        indexStartWordInStroke++;
                         break;
                     }
                 }
                 else
                 {
-                   // nowAccesLetter = 0;
+                    nowAccesLetter = 0;
                 }
             }
             Console.WriteLine(indexStartWordInStroke);
