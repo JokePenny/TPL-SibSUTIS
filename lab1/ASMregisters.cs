@@ -29,54 +29,82 @@ namespace lab1
 		private static List<int> registersSpecialState = new List<int>{ 0 };
 		private static List<int> registersDataState = new List<int> { 0, 0, 0, 0 };
 
-		/// <summary>
-		/// Выдает первый свободный специальный регистр
-		/// </summary>
-		public static string GetFreeRegisterSpecial(string forceGetRegister = "")
+		public enum Register
 		{
-			return GetFreeRegister(registersSpecial, registersSpecialState, forceGetRegister);
-		}
-
-		/// <summary>
-		/// Выдает первый занятый специальный регистр
-		/// </summary>
-		public static string GetFirstFillRegisterSpecial()
-		{
-			return GetFirstFillRegister(registersSpecial, registersSpecialState);
+			SPECIAL,
+			DATA
 		}
 
 		/// <summary>
 		/// Установить состояние для специального регистра занят/незанят
 		/// </summary>
-		public static void SetStateRegisterSpecial(string register, bool isFree)
+		public static void SetStateRegister(Register typeRegister, string register, bool isFree)
 		{
-			SetStateRegister(registersSpecial, registersSpecialState, register, isFree);
+			switch (typeRegister)
+			{
+				case Register.SPECIAL: SetStateRegister(registersSpecial, registersSpecialState, register, isFree);
+					break;
+				case Register.DATA: SetStateRegister(registersData, registersDataState, register, isFree);
+					break;
+			}
 		}
 
 		/// <summary>
 		/// Выдает первый свободный регистр
 		/// </summary>
-		public static string GetFreeRegisterData(string forceGetRegister = "")
+		public static string GetFreeRegister(Register typeRegister, string forceGetRegister = "")
 		{
-			return GetFreeRegister(registersData, registersDataState, forceGetRegister);
+			switch (typeRegister)
+			{
+				case Register.SPECIAL: return GetFreeRegister(registersSpecial, registersSpecialState);
+				case Register.DATA: return GetFreeRegister(registersData, registersDataState);
+			}
+			return "";
 		}
 
 		/// <summary>
 		/// Выдает первый занятый регистр
 		/// </summary>
-		public static string GetFirstFillRegisterData()
+		public static string GetFirstFillRegister(Register typeRegister)
 		{
-			return GetFirstFillRegister(registersData, registersDataState);
+			switch(typeRegister)
+			{
+				case Register.SPECIAL: return GetFirstFillRegister(registersSpecial, registersSpecialState);
+				case Register.DATA: return GetFirstFillRegister(registersData, registersDataState);
+			}
+			return "";
 		}
 
 		/// <summary>
-		/// Установить состояние для регистра занят/незанят
+		/// Есть ли заполненные регистры
 		/// </summary>
-		public static void SetStateRegisterData(string register, bool isFree)
+		/// 
+		public static bool HasFillRegisters(Register typeRegister)
 		{
-			SetStateRegister(registersData, registersDataState, register, isFree);
+			switch (typeRegister)
+			{
+				case Register.SPECIAL: return HasFillRegisters(registersSpecial, registersSpecialState);
+				case Register.DATA: return HasFillRegisters(registersData, registersDataState);
+			}
+			return false;
 		}
 
+		public static bool HasFillRegisters(string[] arrayRegisters, List<int> arrayStateRegisters)
+		{
+			for (int i = 0; i < arrayStateRegisters.Count; i++)
+			{
+				if (arrayStateRegisters[i] == 1)
+				{
+					arrayStateRegisters[i] = 0;
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Возвращает первый заполненный регистр
+		/// </summary>
 		private static string GetFirstFillRegister(string[] arrayRegisters, List<int> arrayStateRegisters)
 		{
 			for (int i = 0; i < arrayStateRegisters.Count; i++)

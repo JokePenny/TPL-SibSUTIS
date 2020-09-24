@@ -8,7 +8,7 @@ namespace lab1
         static void Main(string[] args)
         {
             Command.RunCommand(args);
-            //TestMethod();
+           // TestMethod();
         }
 
         private static void TestMethod()
@@ -54,8 +54,8 @@ namespace lab1
             Console.WriteLine(indexStartWordInStroke);
 
             // find NOD
-            int firstNum = 5;
-            int secondNum = 10;
+            int firstNum = 30;
+            int secondNum = 135;
             while (firstNum != 0 && secondNum != 0)
             {
                 if (firstNum > secondNum)
@@ -67,7 +67,7 @@ namespace lab1
                     secondNum = secondNum % firstNum;
                 }
             }
-            Console.WriteLine(firstNum);
+            Console.WriteLine(secondNum);
         }
     }
 }

@@ -71,8 +71,6 @@ namespace lab1.ASTNodes
 		{
 			string registerLeft = "";
 			string registerRight = "";
-			int offsetInStack;
-			int startInStack;
 			if(!headNested)
 			{
 				headNested = true;
@@ -85,103 +83,32 @@ namespace lab1.ASTNodes
 				{
 					isBoolNodeAnd = op == "&&";
 					leftNode.PrintASM(levelTabulatiion);
-					if(rightNode is BinaryExprAST)
+					if(rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
 					{
 						rightNode.PrintASM(levelTabulatiion);
+						PrintPop(levelTabulatiion, ref registerLeft);
+						PrintPop(levelTabulatiion, ref registerRight);
 					}
 					else if (rightNode is BoolAST)
 					{
 						rightNode.PrintASM(levelTabulatiion);
+						PrintPop(levelTabulatiion, ref registerLeft);
+						PrintPop(levelTabulatiion, ref registerRight);
 					}
 					else
 					{
-						registerRight = ASMregisters.GetFreeRegisterData();
-						if (rightNode is IdentificatorAST)
-						{
-							IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode((rightNode as IdentificatorAST).GetName());
-							offsetInStack = identificatorRight.GetOffseIfTtArray();
-							startInStack = identificatorRight.GetAddresInStack() + offsetInStack;
-							ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "]");
-						}
-						else
-						{
-							IEject valueRight = (rightNode as IEject);
-							ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + valueRight.GetValue());
-						}
+						registerRight = IdentificatorOrValuePrint(levelTabulatiion, rightNode);
 					}
 				}
 				else
 				{
 					if (leftNode is IdentificatorAST leftNodeIdentificatorAST)
 					{
-						IdentificatorAST identificatorLeft = (IdentificatorAST)SymTable.symTabls.FindNode(leftNodeIdentificatorAST.GetName());
-						
-						if (leftNodeIdentificatorAST.IsArray)
-						{
-							leftNodeIdentificatorAST.PrintArrayIterationASM(levelTabulatiion, isPushResult: true);
-						}
-						else
-						{
-							registerLeft = ASMregisters.GetFreeRegisterData();
-							offsetInStack = leftNodeIdentificatorAST.GetOffseIfTtArray();
-							startInStack = identificatorLeft.GetAddresInStack() + offsetInStack;
-							ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", " + ASMregisters.GetNameType(identificatorLeft.GetTypeId()) + " [ebp-" + startInStack + "]");
-						}
-
-						if (rightNode is BinaryExprAST)
-						{
-							rightNode.PrintASM(levelTabulatiion);
-						}
-						else
-						{
-							if (rightNode is IdentificatorAST rightNodeIdentificatorAST)
-							{
-								IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode(rightNodeIdentificatorAST.GetName());
-								if (rightNodeIdentificatorAST.IsArray)
-								{
-									rightNodeIdentificatorAST.PrintArrayIterationASM(levelTabulatiion, isPushResult: true);
-								}
-								else
-								{
-									registerRight = ASMregisters.GetFreeRegisterData();
-									offsetInStack = rightNodeIdentificatorAST.GetOffseIfTtArray();
-									startInStack = identificatorRight.GetAddresInStack() + offsetInStack;
-									ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "]");
-								}
-							}
-							else
-							{
-								registerRight = ASMregisters.GetFreeRegisterData();
-								IEject valueRight = (rightNode as IEject);
-								ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + valueRight.GetValue());
-							}
-						}
+						IdentificatorMainPrint(levelTabulatiion, rightNode, leftNodeIdentificatorAST, ref registerLeft, ref registerRight);
 					}
 					else //value
 					{
-						IEject valueLeft = (leftNode as IEject);
-						registerLeft = ASMregisters.GetFreeRegisterData();
-						ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", " + valueLeft.GetValue());
-						if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
-						{
-							rightNode.PrintASM(levelTabulatiion);
-						}
-						else
-						{
-							registerRight = ASMregisters.GetFreeRegisterData();
-							if (rightNode is IdentificatorAST rightNodeIdentificatorAST)
-							{
-								IdentificatorAST identificator = (IdentificatorAST)SymTable.symTabls.FindNode(rightNodeIdentificatorAST.GetName());
-								offsetInStack = rightNodeIdentificatorAST.GetOffseIfTtArray();
-								startInStack = identificator.GetAddresInStack() + offsetInStack;
-								ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + ASMregisters.GetNameType(identificator.GetTypeId()) + " [ebp-" + startInStack + "]");
-							}
-							else
-							{
-								IEject valueRight = (rightNode as IEject);
-								ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + valueRight.GetValue());
-							}
-						}
+						ValuePrint(levelTabulatiion, leftNode, rightNode, ref registerLeft, ref registerRight);
 					}
 				}
 
@@ -197,10 +124,10 @@ namespace lab1.ASTNodes
 			}
 			else
 			{
-				if (leftNode is BinaryExprAST)
+				if (leftNode is BinaryExprAST || leftNode is ParenthesisExprAST)
 				{
 					leftNode.PrintASM(levelTabulatiion);
-					if (rightNode is BinaryExprAST)
+					if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
 					{
 						PrintExprAST(rightNode, levelTabulatiion);
 						PrintPop(levelTabulatiion, ref registerLeft);
@@ -208,92 +135,32 @@ namespace lab1.ASTNodes
 					}
 					else
 					{
-
-						registerRight = ASMregisters.GetFreeRegisterData();
-						if (rightNode is IdentificatorAST rightNodeIdentificatorAST)
-						{
-							IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode(rightNodeIdentificatorAST.GetName());
-							offsetInStack = rightNodeIdentificatorAST.GetOffseIfTtArray();
-							startInStack = identificatorRight.GetAddresInStack() + offsetInStack;
-							ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "]");
-						}
-						else
-						{
-							IEject valueRight = (rightNode as IEject);
-							ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + valueRight.GetValue());
-						}
+						registerRight = IdentificatorOrValuePrint(levelTabulatiion, rightNode);
 					}
 				}
 				else
 				{
-					registerLeft = ASMregisters.GetFreeRegisterData();
 					if (leftNode is IdentificatorAST leftNodeIdentificator)
 					{
-						IdentificatorAST identificatorLeft = (IdentificatorAST)SymTable.symTabls.FindNode(leftNodeIdentificator.GetName());
-						offsetInStack = leftNodeIdentificator.GetOffseIfTtArray();
-						startInStack = identificatorLeft.GetAddresInStack() + offsetInStack;
-						ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", " + ASMregisters.GetNameType(identificatorLeft.GetTypeId()) + " [ebp-" + startInStack + "]");
-						if (rightNode is BinaryExprAST)
-						{
-							PrintExprAST(rightNode, levelTabulatiion);
-							PrintPop(levelTabulatiion, ref registerRight);
-							PrintPop(levelTabulatiion, ref registerLeft);
-						}
-						else
-						{
-							registerRight = ASMregisters.GetFreeRegisterData();
-							if (rightNode is IdentificatorAST rightNodeIdentificatorAST)
-							{
-								IdentificatorAST identificatorRight = (IdentificatorAST)SymTable.symTabls.FindNode(rightNodeIdentificatorAST.GetName());
-								offsetInStack = rightNodeIdentificatorAST.GetOffseIfTtArray();
-								startInStack = identificatorRight.GetAddresInStack() + offsetInStack;
-								ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + ASMregisters.GetNameType(identificatorRight.GetTypeId()) + " [ebp-" + startInStack + "]");
-							}
-							else
-							{
-								IEject valueRight = (rightNode as IEject);
-								ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + valueRight.GetValue());
-							}
-						}
+						IdentificatorMainPrint(levelTabulatiion, rightNode, leftNodeIdentificator, ref registerLeft, ref registerRight);
 					}
 					else //value
 					{
-						IEject valueLeft = (leftNode as IEject);
-						ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", " + valueLeft.GetValue());
-						if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
-						{
-							PrintExprAST(rightNode, levelTabulatiion);
-							PrintPop(levelTabulatiion, ref registerRight);
-							PrintPop(levelTabulatiion, ref registerLeft);
-						}
-						else
-						{
-							registerRight = ASMregisters.GetFreeRegisterData();
-							if (rightNode is IdentificatorAST rightNodeIdentificatorAST)
-							{
-								IdentificatorAST identificator = (IdentificatorAST)SymTable.symTabls.FindNode(rightNodeIdentificatorAST.GetName());
-								offsetInStack = rightNodeIdentificatorAST.GetOffseIfTtArray();
-								startInStack = identificator.GetAddresInStack() + offsetInStack;
-								ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + ASMregisters.GetNameType(identificator.GetTypeId()) + " [ebp-" + startInStack + "]");
-							}
-							else
-							{
-								IEject valueRight = (rightNode as IEject);
-								ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerRight + ", " + valueRight.GetValue());
-							}
-						}
+						ValuePrint(levelTabulatiion, leftNode, rightNode, ref registerLeft, ref registerRight);
 					}
 				}
 
-				
-				if(op != "/" && op != "%")
+				if (registerLeft == "") PrintPop(levelTabulatiion, ref registerLeft);
+				if (registerRight == "") PrintPop(levelTabulatiion, ref registerRight);
+
+				if (op != "/" && op != "%")
 				{
 					ASM.WriteASMCode(levelTabulatiion + ASMregisters.GetOperation(op) + "\t" + registerLeft + ", " + registerRight);
 					ASM.WriteASMCode(levelTabulatiion + "push\t" + registerLeft);
 				}
 				else
 				{
-					string registerAdditive = ASMregisters.GetFreeRegisterData("ecx");
+					string registerAdditive = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA, "ecx");
 					ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerAdditive + ", " + registerLeft);
 					if(op == "%") ASM.WriteASMCode(levelTabulatiion + "mov\tedx, 0");
 					ASM.WriteASMCode(levelTabulatiion + "div\t" + registerAdditive);
@@ -301,25 +168,92 @@ namespace lab1.ASTNodes
 					{
 						ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", edx");
 					}
-					ASMregisters.SetStateRegisterData(registerAdditive, true);
+					ASMregisters.SetStateRegister(ASMregisters.Register.DATA, registerAdditive, true);
 					ASM.WriteASMCode(levelTabulatiion + "push\t" + registerLeft);
 				}
 			}
 
-			ASMregisters.SetStateRegisterData(registerLeft, true);
-			ASMregisters.SetStateRegisterData(registerRight, true);
+			ASMregisters.SetStateRegister(ASMregisters.Register.DATA, registerLeft, true);
+			ASMregisters.SetStateRegister(ASMregisters.Register.DATA, registerRight, true);
 		}
 
 		private void PrintExprAST(ASTNode node, string levelTabulatiion)
 		{
-			ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.GetFirstFillRegisterData());
+			if(ASMregisters.HasFillRegisters(ASMregisters.Register.DATA)) ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.GetFirstFillRegister(ASMregisters.Register.DATA));
 			node.PrintASM(levelTabulatiion);
 		}
 
 		private void PrintPop(string levelTabulatiion, ref string register)
 		{
-			register = ASMregisters.GetFreeRegisterData();
+			register = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
 			ASM.WriteASMCode(levelTabulatiion + "pop\t" + register);
+		}
+
+		private void ValuePrint(string levelTabulatiion, ASTNode leftNode, ASTNode rightNode, ref string registerLeft, ref string registerRight)
+		{
+			registerLeft = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
+			IEject valueLeft = (leftNode as IEject);
+			ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", " + valueLeft.GetValue());
+			if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
+			{
+				PrintExprAST(rightNode, levelTabulatiion);
+				PrintPop(levelTabulatiion, ref registerLeft);
+				PrintPop(levelTabulatiion, ref registerRight);
+			}
+			else
+			{
+				registerRight = IdentificatorOrValuePrint(levelTabulatiion, rightNode);
+			}
+		}
+
+		private void IdentificatorMainPrint(string levelTabulatiion, ASTNode rightNode, IdentificatorAST leftNodeIdentificator, ref string registerLeft, ref string registerRight)
+		{
+			registerLeft = IdentificatorPrint(levelTabulatiion, leftNodeIdentificator);
+
+			if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
+			{
+				PrintExprAST(rightNode, levelTabulatiion);
+				PrintPop(levelTabulatiion, ref registerLeft);
+				PrintPop(levelTabulatiion, ref registerRight);
+			}
+			else
+			{
+				registerRight = IdentificatorOrValuePrint(levelTabulatiion, rightNode);
+			}
+		}
+
+		private string IdentificatorPrint(string levelTabulatiion, IdentificatorAST sideNodeIdentificatorAST)
+		{
+			string reigster = "";
+			IdentificatorAST identificatorSide = (IdentificatorAST)SymTable.symTabls.FindNode(sideNodeIdentificatorAST.GetName());
+			if (sideNodeIdentificatorAST.IsArray)
+			{
+				sideNodeIdentificatorAST.PrintArrayIterationASM(levelTabulatiion, isPushResult: true);
+			}
+			else
+			{
+				reigster = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
+				int offsetInStack = sideNodeIdentificatorAST.GetOffseIfTtArray();
+				int startInStack = identificatorSide.GetAddresInStack() + offsetInStack;
+				ASM.WriteASMCode(levelTabulatiion + "mov\t" + reigster + ", " + ASMregisters.GetNameType(identificatorSide.GetTypeId()) + " [ebp-" + startInStack + "]");
+			}
+			return reigster;
+		}
+
+		private string IdentificatorOrValuePrint(string levelTabulatiion, ASTNode node)
+		{
+			string register = "";
+			if (node is IdentificatorAST sideNodeIdentificatorAST)
+			{
+				register = IdentificatorPrint(levelTabulatiion, sideNodeIdentificatorAST);
+			}
+			else
+			{
+				register = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
+				IEject value = (node as IEject);
+				ASM.WriteASMCode(levelTabulatiion + "mov\t" + register + ", " + value.GetValue());
+			}
+			return register;
 		}
 
 		private bool CheckBoolOp()

@@ -28,7 +28,7 @@ namespace lab1
             {
                 if(isShowAST) headAST.Print("");
 
-                SymTable.CreateSymTable(headAST);
+               SymTable.CreateSymTable(headAST);
                 if (isShowSymTable) SymTable.PrintSymTable();
 
                 SemAnalyzer.StartSemAnalyzer(headAST, SymTable.symTabls);

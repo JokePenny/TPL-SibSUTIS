@@ -207,10 +207,10 @@ namespace lab1.ASTNodes
 				else if (storage is BinaryExprAST || storage is ParenthesisExprAST)
 				{
 					storage.PrintASM(levelTabulatiion);
-					string register = ASMregisters.GetFreeRegisterData();
+					string register = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
 					ASM.WriteASMCode(levelTabulatiion + "pop\t" + register);
 					ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + register);
-					ASMregisters.SetStateRegisterData(register, true);
+					ASMregisters.SetStateRegister(ASMregisters.Register.DATA, register, true);
 				}
 				else
 				{
@@ -230,18 +230,18 @@ namespace lab1.ASTNodes
 						else
 						{
 							storage.PrintASM(levelTabulatiion);
-							elementStorage = ASMregisters.GetFreeRegisterData();
+							elementStorage = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
 							ASM.WriteASMCode(levelTabulatiion + "pop\t" + elementStorage);
 							ASM.WriteASMCode(levelTabulatiion + "mov\t" + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "], " + elementStorage);
-							ASMregisters.SetStateRegisterData(elementStorage, true);
+							ASMregisters.SetStateRegister(ASMregisters.Register.DATA, elementStorage, true);
 						}
 					}
 					else
 					{
-						takeRegister = ASMregisters.GetFreeRegisterData();
+						takeRegister = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
 						ASM.WriteASMCode(levelTabulatiion + "mov\t" + takeRegister + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + "]");
 						ASM.WriteASMCode(levelTabulatiion + "push\t" + takeRegister);
-						ASMregisters.SetStateRegisterData(takeRegister, true);
+						ASMregisters.SetStateRegister(ASMregisters.Register.DATA, takeRegister, true);
 					}
 				}
 			}
@@ -256,7 +256,7 @@ namespace lab1.ASTNodes
 			string markerJumpAfterBody = ASMregisters.GetNewMarkerJumpAfterBody();
 			ASMregisters.ClearMarkerPrevBody();
 
-			string registerIteration = ASMregisters.GetFreeRegisterData();
+			string registerIteration = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
 			ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerIteration + ", 0");
 
 			ASM.WriteASMCode(levelTabulatiion + markerJumpPrevBody + ":");
@@ -270,7 +270,7 @@ namespace lab1.ASTNodes
 			ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.NewString);
 			ASM.WriteASMCode(levelTabulatiion + "call\t[printf]");
 
-			ASMregisters.SetStateRegisterData(registerIteration, true);
+			ASMregisters.SetStateRegister(ASMregisters.Register.DATA, registerIteration, true);
 		}
 
 		/// <summary>
@@ -278,9 +278,9 @@ namespace lab1.ASTNodes
 		/// </summary>
 		public void PrintIdentificatorASM(string levelTabulatiion)
 		{
-			string register = ASMregisters.GetFreeRegisterData();
+			string register = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
 			PrintValueASM(levelTabulatiion, register);
-			ASMregisters.SetStateRegisterData(register, true);
+			ASMregisters.SetStateRegister(ASMregisters.Register.DATA, register, true);
 			ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.NewString);
 			ASM.WriteASMCode(levelTabulatiion + "call\t[printf]");
 		}
@@ -297,9 +297,9 @@ namespace lab1.ASTNodes
 			bool isShowResult = false
 			)
 		{
-			string registerForOffset = ASMregisters.GetFreeRegisterData();
-			string registerBuffer = ASMregisters.GetFreeRegisterData();
-			string specialRegister = ASMregisters.GetFreeRegisterSpecial();
+			string registerForOffset = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
+			string registerBuffer = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
+			string specialRegister = ASMregisters.GetFreeRegister(ASMregisters.Register.SPECIAL);
 			string source = isShowResult ? customSource : brackets.GetSizeArrayString();
 			int sizeType = isShowResult ? 4 : ASMregisters.GetSizeStep(brackets.Type);
 
@@ -329,9 +329,9 @@ namespace lab1.ASTNodes
 				PrintValueASM(levelTabulatiion, registerForOffset, " + " + specialRegister);
 			}
 
-			ASMregisters.SetStateRegisterData(registerBuffer, true);
-			ASMregisters.SetStateRegisterData(registerForOffset, true);
-			ASMregisters.SetStateRegisterSpecial(specialRegister, true);
+			ASMregisters.SetStateRegister(ASMregisters.Register.DATA, registerBuffer, true);
+			ASMregisters.SetStateRegister(ASMregisters.Register.DATA, registerForOffset, true);
+			ASMregisters.SetStateRegister(ASMregisters.Register.SPECIAL, specialRegister, true);
 		}
 
 		private void PrintValueASM(string levelTabulatiion, string register, string offset = "")

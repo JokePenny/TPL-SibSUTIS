@@ -79,7 +79,7 @@ namespace lab1
                     break;
                 case TypeCommand.DUMP_ASM:
                     Lexer.StartLexer(source);
-                    AbstractSyntaxTree.CreateAST();
+                    AbstractSyntaxTree.CreateAST(true, true);
                     ASM.CreateASM();
                     ASM.RunCompileProgramm();
                     break;

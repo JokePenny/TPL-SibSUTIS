@@ -54,10 +54,10 @@ namespace lab1.ASTNodes
 				if (node is IEject)
 				{
 					elementStorage = (node as IEject).GetValue();
-					string register = ASMregisters.GetFreeRegisterData();
+					string register = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
 					ASM.WriteASMCode(levelTabulatiion + "mov\t" + register + ", " + elementStorage);
 					ASM.WriteASMCode(levelTabulatiion + "push\t" + register);
-					ASMregisters.SetStateRegisterData(register, true);
+					ASMregisters.SetStateRegister(ASMregisters.Register.DATA, register, true);
 				}
 				else
 				{
