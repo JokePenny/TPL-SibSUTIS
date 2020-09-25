@@ -77,44 +77,37 @@ namespace lab1.ASTNodes
 				FindLastRightNode(rightNode);
 			}
 
-			if (typeExpr == "bool")
+			if (leftNode is BinaryExprAST || leftNode is ParenthesisExprAST || leftNode is BoolAST)
 			{
-				if (leftNode is BoolAST)
-				{
+				if(typeExpr == "bool")
 					isBoolNodeAnd = op == "&&";
-					leftNode.PrintASM(levelTabulatiion);
-					if(rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
-					{
-						rightNode.PrintASM(levelTabulatiion);
-						PrintPop(levelTabulatiion, ref registerLeft);
-						PrintPop(levelTabulatiion, ref registerRight);
-					}
-					else if (rightNode is BoolAST)
-					{
-						rightNode.PrintASM(levelTabulatiion);
-						PrintPop(levelTabulatiion, ref registerLeft);
-						PrintPop(levelTabulatiion, ref registerRight);
-					}
-					else
-					{
-						registerRight = IdentificatorOrValuePrint(levelTabulatiion, rightNode);
-					}
+
+				leftNode.PrintASM(levelTabulatiion);
+				if(rightNode is BinaryExprAST || rightNode is ParenthesisExprAST || rightNode is BoolAST)
+				{
+					rightNode.PrintASM(levelTabulatiion);
 				}
 				else
 				{
-					if (leftNode is IdentificatorAST leftNodeIdentificatorAST)
-					{
-						IdentificatorMainPrint(levelTabulatiion, rightNode, leftNodeIdentificatorAST, ref registerLeft, ref registerRight);
-					}
-					else //value
-					{
-						ValuePrint(levelTabulatiion, leftNode, rightNode, ref registerLeft, ref registerRight);
-					}
+					registerRight = IdentificatorOrValuePrint(levelTabulatiion, rightNode);
 				}
+			}
+			else if (leftNode is IdentificatorAST leftNodeIdentificatorAST)
+			{
+				IdentificatorMainPrint(levelTabulatiion, rightNode, leftNodeIdentificatorAST, ref registerLeft, ref registerRight);
+			}
+			else //value
+			{
+				ValuePrint(levelTabulatiion, leftNode, rightNode, ref registerLeft, ref registerRight);
+			}
 
-				if (registerLeft == "") PrintPop(levelTabulatiion, ref registerLeft);
-				if (registerRight == "") PrintPop(levelTabulatiion, ref registerRight);
+			bool isEndOperationBool = headNested && typeExpr == "bool";
 
+			if (registerLeft == "" && !isEndOperationBool) PrintPop(levelTabulatiion, ref registerLeft);
+			if (registerRight == "" && !isEndOperationBool) PrintPop(levelTabulatiion, ref registerRight);
+
+			if(typeExpr == "bool")
+			{
 				if (op != "&&" && op != "||")
 				{
 					ASM.WriteASMCode(levelTabulatiion + "cmp\t" + registerLeft + ", " + registerRight);
@@ -124,35 +117,6 @@ namespace lab1.ASTNodes
 			}
 			else
 			{
-				if (leftNode is BinaryExprAST || leftNode is ParenthesisExprAST)
-				{
-					leftNode.PrintASM(levelTabulatiion);
-					if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
-					{
-						PrintExprAST(rightNode, levelTabulatiion);
-						PrintPop(levelTabulatiion, ref registerLeft);
-						PrintPop(levelTabulatiion, ref registerRight);
-					}
-					else
-					{
-						registerRight = IdentificatorOrValuePrint(levelTabulatiion, rightNode);
-					}
-				}
-				else
-				{
-					if (leftNode is IdentificatorAST leftNodeIdentificator)
-					{
-						IdentificatorMainPrint(levelTabulatiion, rightNode, leftNodeIdentificator, ref registerLeft, ref registerRight);
-					}
-					else //value
-					{
-						ValuePrint(levelTabulatiion, leftNode, rightNode, ref registerLeft, ref registerRight);
-					}
-				}
-
-				if (registerLeft == "") PrintPop(levelTabulatiion, ref registerLeft);
-				if (registerRight == "") PrintPop(levelTabulatiion, ref registerRight);
-
 				if (op != "/" && op != "%")
 				{
 					ASM.WriteASMCode(levelTabulatiion + ASMregisters.GetOperation(op) + "\t" + registerLeft + ", " + registerRight);
@@ -162,9 +126,9 @@ namespace lab1.ASTNodes
 				{
 					string registerAdditive = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA, "ecx");
 					ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerAdditive + ", " + registerLeft);
-					if(op == "%") ASM.WriteASMCode(levelTabulatiion + "mov\tedx, 0");
+					if (op == "%") ASM.WriteASMCode(levelTabulatiion + "mov\tedx, 0");
 					ASM.WriteASMCode(levelTabulatiion + "div\t" + registerAdditive);
-					if(op == "%")
+					if (op == "%")
 					{
 						ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", edx");
 					}
