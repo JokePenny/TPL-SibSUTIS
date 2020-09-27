@@ -13,17 +13,21 @@ namespace lab1
 	{
 		public static string MarkerJumpPrevBody { get; private set; }
 		public static string MarkerJumpAfterBody { get; private set; }
+		public static string ShowValue => showValue;
 		public static string ShowString => showString;
 		public static string SpaceString => spaceString;
 		public static string NewString => newString;
+		public static string BufferString => buuferString;
 		public static int stepByte { get; set; }
 
 		public static bool isContitionBelongsToCicle;
 
 		private static int countMarkers = 1;
+		private static string showValue = "showValue";
 		private static string showString = "showString";
 		private static string spaceString = "spaceString";
 		private static string newString = "newString";
+		private static string buuferString = "bufferString";
 		private static string[] registersData = { "eax", "ebx", "ecx", "edx" };
 		private static string[] registersSpecial = { "esi"};
 		private static List<int> registersSpecialState = new List<int>{ 0 };

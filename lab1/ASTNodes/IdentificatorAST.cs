@@ -169,7 +169,7 @@ namespace lab1.ASTNodes
 				else if (storage is BinaryExprAST || storage is ParenthesisExprAST)
 				{
 					storage.PrintASM(levelTabulatiion);
-					PrintArrayIterationASM(levelTabulatiion);
+					PrintArrayIterationASM(levelTabulatiion, isPushResult: true);
 				}
 				else
 				{
@@ -180,6 +180,7 @@ namespace lab1.ASTNodes
 						{
 							isArray = true;
 							stringAST.PrintSringArray(levelTabulatiion, startInStack);
+							lengthArray = stringAST.GetString().Length;
 						}
 						else if (storage is IEject ejectedStorage)
 						{
@@ -189,7 +190,7 @@ namespace lab1.ASTNodes
 						else
 						{
 							storage.PrintASM(levelTabulatiion);
-							PrintArrayIterationASM(levelTabulatiion);
+							PrintArrayIterationASM(levelTabulatiion, isPopInArray: true);
 						}
 					}
 					else
@@ -221,6 +222,7 @@ namespace lab1.ASTNodes
 						{
 							isArray = true;
 							stringAST.PrintSringArray(levelTabulatiion, startInStack);
+							lengthArray = stringAST.GetString().Length;
 						}
 						else if (storage is IEject ejectedStorage)
 						{
@@ -252,25 +254,29 @@ namespace lab1.ASTNodes
 		/// </summary>
 		public void PrintArrayASM(string levelTabulatiion)
 		{
-			string markerJumpPrevBody = ASMregisters.GetNewMarkerJumpPrevBody();
-			string markerJumpAfterBody = ASMregisters.GetNewMarkerJumpAfterBody();
-			ASMregisters.ClearMarkerPrevBody();
+			if (type != "string")
+			{
+				string registerIteration = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
+				ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerIteration + ", 0");
+				PrintArrayIterationASM(levelTabulatiion + "\t", registerIteration, isShowResult: true);
 
-			string registerIteration = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
-			ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerIteration + ", 0");
+				for (int i = 0; i < lengthArray; i++)
+				{
+					PrintArrayIterationASM(levelTabulatiion + "\t", registerIteration, isShowResult: true);
+				}
 
-			ASM.WriteASMCode(levelTabulatiion + markerJumpPrevBody + ":");
-			ASM.WriteASMCode(levelTabulatiion + "\tcmp\t" + registerIteration + ", " + (lengthArray - 1));
-			ASM.WriteASMCode(levelTabulatiion + "\t" + ASMregisters.GetTypeConditionJump(">", true) + "\t" + markerJumpAfterBody);
-			PrintArrayIterationASM(levelTabulatiion + "\t", registerIteration, isShowResult: true);
-			ASM.WriteASMCode(levelTabulatiion + "\tadd\t" + registerIteration + ", 1");
-			
-			ASM.WriteASMCode(levelTabulatiion + "\tjmp\t" + markerJumpPrevBody);
-			ASM.WriteASMCode(levelTabulatiion + markerJumpAfterBody + ":");
-			ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.NewString);
-			ASM.WriteASMCode(levelTabulatiion + "call\t[printf]");
+				ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.NewString);
+				ASM.WriteASMCode(levelTabulatiion + "call\t[printf]");
 
-			ASMregisters.SetStateRegister(ASMregisters.Register.DATA, registerIteration, true);
+				ASMregisters.SetStateRegister(ASMregisters.Register.DATA, registerIteration, true);
+			}
+			else
+			{
+				for (int i = 0; i < lengthArray; i++)
+				{
+					PrintStringASM(levelTabulatiion, i);
+				}
+			}
 		}
 
 		/// <summary>
@@ -308,7 +314,7 @@ namespace lab1.ASTNodes
 			ASM.WriteASMCode(levelTabulatiion + "imul\t" + registerBuffer + ", " + sizeType);
 
 			ASM.WriteASMCode(levelTabulatiion + "sub\t" + registerForOffset + ", " + registerBuffer);
-			// ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerForOffset + ", " + registerBuffer);
+			ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerForOffset + ", " + registerBuffer);
 
 			ASM.WriteASMCode(levelTabulatiion + "mov\t" + specialRegister + ", " + registerForOffset);
 
@@ -338,10 +344,21 @@ namespace lab1.ASTNodes
 		{
 			ASM.WriteASMCode(levelTabulatiion + "mov\t" + register + ", " + ASMregisters.GetNameType(type) + " [ebp-" + startInStack + offset + "]");
 			ASM.WriteASMCode(levelTabulatiion + "push\t" + register);
-			ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.ShowString);
+			ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.ShowValue);
 			ASM.WriteASMCode(levelTabulatiion + "call\t[printf]");
 			ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.SpaceString);
 			ASM.WriteASMCode(levelTabulatiion + "call\t[printf]");
+		}
+
+		private void PrintStringASM(string levelTabulatiion, int i)
+		{
+			string register = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
+			ASM.WriteASMCode(levelTabulatiion + "mov\t" + register + ", [ebp-" + (startInStack + i * 4) + "]");
+			ASM.WriteASMCode(levelTabulatiion + "mov\t" + "[" + ASMregisters.BufferString + "], " + register);
+			ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.BufferString);
+			//ASM.WriteASMCode(levelTabulatiion + "push\t" + ASMregisters.ShowString);
+			ASM.WriteASMCode(levelTabulatiion + "call\t[printf]");
+			ASMregisters.SetStateRegister(ASMregisters.Register.DATA, register, true);
 		}
 	}
 }

@@ -83,8 +83,10 @@ namespace lab1.ASTNodes
                 + "entry Start\n"
 				+ "include 'INCLUDE\\WIN32AX.inc'\n"
 				+ "section '.data' data readable writable\n"
-				+ "\tshowString dd '%d', 0\n"
+                + "\tshowValue dd '%d', 0\n"
+                + "\tshowString dd '%s', '0'\n"
                 + "\tspaceString dd ' ', 0\n"
+                + "\tbufferString dd ?\n"
                 + "\tnewString dd 10, 13\n"
                 + "section '.idata' import data readable\n"
 				+ "\tlibrary kernel, 'kernel32.dll',\\\n"
@@ -96,6 +98,7 @@ namespace lab1.ASTNodes
 				+ "\t\tscanf, 'scanf',\\\n"
 				+ "\t\tgetch, '_getch'\n"
 				+ "Start:\n"
+                + "\tsub esp, 1000\n"
             );
 
 			for (int i = 0; i < members.Count; i++)
@@ -106,7 +109,6 @@ namespace lab1.ASTNodes
             ASM.WriteASMCode
 			(
 				"Exit:\n"
-				+ "\tpush\teax\n"
                 + "\tcall\t[getch]\n"
 			);
 		}

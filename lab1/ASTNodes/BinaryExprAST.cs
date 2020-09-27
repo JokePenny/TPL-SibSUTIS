@@ -103,8 +103,8 @@ namespace lab1.ASTNodes
 
 			bool isEndOperationBool = headNested && typeExpr == "bool";
 
-			if (registerLeft == "" && !isEndOperationBool) PrintPop(levelTabulatiion, ref registerLeft);
-			if (registerRight == "" && !isEndOperationBool) PrintPop(levelTabulatiion, ref registerRight);
+			if (registerLeft == "") PrintPop(levelTabulatiion, ref registerLeft);
+			if (registerRight == "") PrintPop(levelTabulatiion, ref registerRight);
 
 			if(typeExpr == "bool")
 			{
@@ -158,7 +158,7 @@ namespace lab1.ASTNodes
 			registerLeft = ASMregisters.GetFreeRegister(ASMregisters.Register.DATA);
 			IEject valueLeft = (leftNode as IEject);
 			ASM.WriteASMCode(levelTabulatiion + "mov\t" + registerLeft + ", " + valueLeft.GetValue());
-			if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
+			if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST || rightNode is BoolAST)
 			{
 				PrintExprAST(rightNode, levelTabulatiion);
 				PrintPop(levelTabulatiion, ref registerLeft);
@@ -174,7 +174,7 @@ namespace lab1.ASTNodes
 		{
 			registerLeft = IdentificatorPrint(levelTabulatiion, leftNodeIdentificator);
 
-			if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST)
+			if (rightNode is BinaryExprAST || rightNode is ParenthesisExprAST || rightNode is BoolAST)
 			{
 				PrintExprAST(rightNode, levelTabulatiion);
 				PrintPop(levelTabulatiion, ref registerLeft);
